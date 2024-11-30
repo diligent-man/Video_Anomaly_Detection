@@ -14,7 +14,7 @@ COPY --chown=nonroot:nonroot . .
 ENV VIRTUAL_ENV=/home/app/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN python3 -m venv $VIRTUAL_ENV
-# RUN pip install --upgrade pip
+# RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 6969
