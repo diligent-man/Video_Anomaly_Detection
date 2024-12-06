@@ -1,8 +1,10 @@
 annotated-types==0.7.0
 anyio==4.6.2.post1
+click==8.1.7
 fastapi==0.115.5
 filelock==3.16.1
 fsspec==2024.10.0
+h11==0.14.0
 idna==3.10
 Jinja2==3.1.4
 MarkupSafe==3.0.2
@@ -31,3 +33,4 @@ torch==2.5.1
 torchvision==0.20.1
 triton==3.1.0
 typing_extensions==4.12.2
+uvicorn==0.32.1

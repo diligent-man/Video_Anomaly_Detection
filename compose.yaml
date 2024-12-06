@@ -16,7 +16,7 @@ services:
         restart: on-failure
 
         healthcheck:
-            test: [ "CMD-SHELL", "curl --silent --fail localhost:6969/demo_api_2/health-check || exit 1" ]
+            test: [ "CMD-SHELL", "curl --silent --fail 0.0.0.0:6969/demo_api_2/health-check || exit 1" ]
             interval: 5m
             timeout: 3s
             retries: 3
@@ -55,7 +55,7 @@ services:
         restart: on-failure
 
         healthcheck:
-            test: ["CMD-SHELL", "curl --silent --fail localhost:6968/health-check || exit 1"]
+            test: ["CMD-SHELL", "curl --silent --fail 0.0.0.0:6968/health-check || exit 1"]
             interval: 5m
             timeout: 3s
             retries: 3

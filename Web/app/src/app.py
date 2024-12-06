@@ -5,7 +5,7 @@ import gradio as gr
 
 from fastapi import FastAPI
 
-from .routers import (
+from .api import (
     index,
     demo_1,
     demo_2
@@ -24,3 +24,4 @@ app = gr.mount_gradio_app(app=app, blocks=page_2, path="/gradio_p2")
 app.include_router(router=index.router, prefix="")
 app.include_router(router=demo_1.router, prefix="/demo_api_1")
 app.include_router(router=demo_2.router, prefix="/demo_api_2")
+

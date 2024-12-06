@@ -23,7 +23,7 @@ def check_cuda():
 
 
 def main() -> None:
-    uvicorn.run(app, host="localhost", port=6968)
+    uvicorn.run(app, host="0.0.0.0", port=6968)
     return None
 
 

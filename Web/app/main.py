@@ -1,8 +1,10 @@
 import uvicorn
 
+from fastapi import FastAPI
+
 
 def main() -> None:
-    uvicorn.run("src:app", host="0.0.0.0", port=6969, reload=True)
+    uvicorn.run("src:app", host="0.0.0.0", port=6969, reload=False)
     return None
 
 
