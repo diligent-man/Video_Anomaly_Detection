@@ -1,25 +1,37 @@
 services:
-    web:
+    postgres:
         build:
-            context: ./MLflow
+            context: ./postgres
             dockerfile: Dockerfile
             platforms:
                 - "linux/amd64"
             tags:
-                - "capstone/mlflow:0.0.0"
+                - "capstone/postgres:0.0.0"
 
-        container_name: capstone_mlflow
+        container_name: capstone_postgres
+
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_PORT: ${POSTGRES_PORT}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+        networks:
+            -   MLOps
 
         ports:
-            - "5000:5000"
+            - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+
+#        volumes:
+#            - ~/MLOps_data/postgres/data:/var/lib/postgresql/data
 
         restart: on-failure
 
-#        healthcheck:
-#            test: [ "CMD-SHELL", "curl --silent --fail 0.0.0.0:6969/demo_api_2/health-check || exit 1" ]
-#            interval: 5m
-#            timeout: 3s
-#            retries: 3
+        healthcheck:
+            test: [ "CMD-SHELL", "psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c 'SELECT 1' || exit 1" ]
+            interval: 5s
+            timeout: 3s
+            retries: 3
 
         deploy:
             mode: global
@@ -35,5 +47,181 @@ services:
                     cpus: "4"
                     memory: 2048M
                 reservations:
-                    cpus: "1"
-                    memory: 512M
+                    cpus: "2"
+                    memory: 1024M
+
+
+    mlflow:
+        build:
+            context: ./MLflow
+            dockerfile: Dockerfile
+            platforms:
+                - "linux/amd64"
+            tags:
+                - "capstone/mlflow:0.0.0"
+        container_name: capstone_mlflow
+
+        environment:
+            MLFLOW_PORT: ${MLFLOW_PORT}
+            MLFLOW_ADMIN_USERNAME: ${MLFLOW_ADMIN_USERNAME}
+            MLFLOW_ADMIN_PASSWORD: ${MLFLOW_ADMIN_PASSWORD}
+
+            POSTGRES_PORT: ${POSTGRES_PORT}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+            BACKEND_STORE_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/backend
+            REGISTRY_STORE_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/backend
+            DEFAULT_ARTIFACT_ROOT: ./mlartifacts
+            ARTIFACTS_DESTINATION: ./mlartifacts
+
+        networks:
+            - MLOps
+
+        ports:
+            - "${MLFLOW_PORT}:${MLFLOW_PORT}"
+
+#        volumes:
+#            - ~/MLOps_data/MLflow/mlartifacts:/mlartifacts
+
+        restart: on-failure
+
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+        healthcheck:
+            test: [ "CMD-SHELL", "python3 /health_check.py || exit 1"]
+            interval: 15s
+            timeout: 3s
+            retries: 3
+
+        deploy:
+            mode: global
+
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                window: 120s
+                max_attempts: 3
+
+            resources:
+                limits:
+                    cpus: "4"
+                    memory: 2048M
+                reservations:
+                    cpus: "2"
+                    memory: 1024M
+
+    minio:
+        image: minio/minio:RELEASE.2023-05-18T00-05-36Z
+        # minio/minio:RELEASE.2024-11-07T00-52-20Z
+
+        container_name: capstone_minio
+
+        environment:
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+            MINIO_PORT: ${MINIO_PORT}
+            MINIO_ADDRESS: ${MINIO_ADDRESS}
+            MINIO_STORAGE_USE_HTTPS: ${MINIO_STORAGE_USE_HTTPS}
+            MINIO_CONSOLE_ADDRESS: ${MINIO_CONSOLE_ADDRESS}
+
+        networks:
+            - MLOps
+
+        ports:
+            - "${MINIO_PORT}:${MINIO_PORT}"
+            - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
+
+#        volumes:
+#            - ~/MLOps_data/minio/data:/data
+
+        restart: on-failure
+
+        entrypoint: ["minio", "server", "/data"]
+
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+            interval: 5m
+            timeout: 3s
+            retries: 3
+
+        deploy:
+            mode: global
+
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                window: 120s
+                max_attempts: 3
+
+            resources:
+                limits:
+                    cpus: "4"
+                    memory: 2048M
+                reservations:
+                    cpus: "2"
+                    memory: 1024M
+
+    lakefs:
+        build:
+            context: ./lakeFS
+            dockerfile: Dockerfile
+            platforms:
+                - "linux/amd64"
+            tags:
+                - "capstone/lakefs:0.0.0"
+
+        container_name: capstone_lakefs
+
+        environment:
+            LAKEFS_PORT: 8000
+
+            POSTGRES_PORT: ${POSTGRES_PORT}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+            MINIO_PORT: ${MINIO_PORT}
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+#            LAKEFS_LOGGING_LEVEL: INFO
+#            LAKEFS_STATS_ENABLED: 1
+#            LAKEFS_AUTH_ENCRYPT_SECRET_KEY: some random secret string
+#
+#            LAKEFS_BLOCKSTORE_TYPE: s3
+#            LAKEFS_BLOCKSTORE_S3_FORCE_PATH_STYLE: true
+#            LAKEFS_BLOCKSTORE_S3_DISCOVER_BUCKET_REGION: false
+#            LAKEFS_BLOCKSTORE_S3_ENDPOINT: http://minio:${MINIO_PORT}
+#            LAKEFS_BLOCKSTORE_S3_CREDENTIALS_ACCESS_KEY_ID: $MINIO_ROOT_USER
+#            LAKEFS_BLOCKSTORE_S3_CREDENTIALS_SECRET_ACCESS_KEY: $MINIO_ROOT_PASSWORD
+#
+#             Postgres for synchronizing actions on data repo (version >= 11.)
+#            LAKEFS_DATABASE_TYPE: postgres
+#            LAKEFS_DATABASE_POSTGRES_CONNECTION_STRING: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/lakefs
+
+        networks:
+            - MLOps
+
+        ports:
+            - "${LAKEFS_PORT}:${LAKEFS_PORT}"
+
+#        volumes:
+#            - ~/MLOps_data/lakeFS/root/lakefs:/root/lakefs
+
+        restart: on-failure
+
+        depends_on:
+            postgres:
+                condition: service_healthy
+            mlflow:
+                condition: service_healthy
+
+        command:
+            - |
+                source /generate_config.sh
+                lakefs run
+
+networks:
+    MLOps:
+        driver: bridge

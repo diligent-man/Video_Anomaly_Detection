@@ -21,9 +21,12 @@ from mlflow.types import Schema, TensorSpec
 from torcheval.metrics.classification import MulticlassAccuracy, MulticlassF1Score
 
 
-from MLOps.MLflow.demo.train import train, val, get_dataset
-from MLOps.MLflow.demo.ImageClassifier import ImageClassifier
+from MLOps.MLflow.demo.train_test.train import train, val, get_dataset
+from MLOps.MLflow.demo.train_test.ImageClassifier import ImageClassifier
 
+# Auth by env var for mlflow
+os.environ["MLFLOW_TRACKING_USERNAME"] = "trong"
+os.environ["MLFLOW_TRACKING_PASSWORD"] = "Trong123!"
 
 mlflow.set_tracking_uri(uri="http://0.0.0.0:5000")
 mlflow.set_experiment("pytorch_demo")
@@ -94,8 +97,8 @@ def test_with_mlflow(test_loader: torch.utils.data.DataLoader,
 
     model_uri: str = f"runs:/{df['run_id'][0]}/model"
     model: torch.nn.Module = mlflow.pytorch.load_model(model_uri)
-    print(model)
     model.eval()
+    print(model)
 
     metric_lst: List[torcheval.metrics.Metric] = [
         MulticlassAccuracy(num_classes=10, device=device),
@@ -130,7 +133,7 @@ def main() -> None:
     output_schema = Schema([TensorSpec(np.dtype(np.float32), (-1, 10), "output")])
     signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
-    for i in range(3):
+    for i in range(4):
         run_name = f"run {i}"
         model = ImageClassifier().to(device)
         loss = torch.nn.CrossEntropyLoss()
@@ -145,8 +148,8 @@ def main() -> None:
 
     test_with_mlflow(test_loader, signature)
 
-    if os.path.exists("./MNIST"):
-        shutil.rmtree("./MNIST")
+    # if os.path.exists("./MNIST"):
+    #     shutil.rmtree("./MNIST")
     return None
 
 

@@ -5,9 +5,7 @@ Num classes: 10
 """
 import torch
 
-__all__ = [
-    "ImageClassifier"
-]
+__all__ = ["ImageClassifier"]
 
 
 class ImageClassifier(torch.nn.Module):
