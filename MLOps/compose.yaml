@@ -22,8 +22,8 @@ services:
         ports:
             - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
-#        volumes:
-#            - ~/MLOps_data/postgres/data:/var/lib/postgresql/data
+        volumes:
+            - ~/MLOps_data/postgres/data:/var/lib/postgresql/data
 
         restart: on-failure
 
@@ -81,8 +81,8 @@ services:
         ports:
             - "${MLFLOW_PORT}:${MLFLOW_PORT}"
 
-#        volumes:
-#            - ~/MLOps_data/MLflow/mlartifacts:/mlartifacts
+        volumes:
+            - ~/MLOps_data/MLflow/mlartifacts:/mlartifacts
 
         restart: on-failure
 
@@ -134,8 +134,8 @@ services:
             - "${MINIO_PORT}:${MINIO_PORT}"
             - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
 
-#        volumes:
-#            - ~/MLOps_data/minio/data:/data
+        volumes:
+            - ~/MLOps_data/minio/data:/data
 
         restart: on-failure
 
@@ -206,8 +206,8 @@ services:
         ports:
             - "${LAKEFS_PORT}:${LAKEFS_PORT}"
 
-#        volumes:
-#            - ~/MLOps_data/lakeFS/root/lakefs:/root/lakefs
+        volumes:
+            - ~/MLOps_data/lakeFS/root/lakefs:/root/lakefs
 
         restart: on-failure
 

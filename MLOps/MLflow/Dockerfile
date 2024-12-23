@@ -10,7 +10,11 @@ RUN apt install -y libpq-dev python3-dev g++
 RUN pip install psycopg2
 
 COPY health_check.py /
-COPY docker-entrypoint.sh /usr/local/bin
+COPY basic_auth.ini /usr/local/lib/python3.10/site-packages/mlflow/server/auth/
+COPY docker-entrypoint.sh .
+
+RUN export MLFLOW_ADMIN_USERNAME=${MLFLOW_ADMIN_USERNAME}
+RUN export MLFLOW_ADMIN_PASSWORD=${MLFLOW_ADMIN_PASSWORD}
 
 EXPOSE 5000
-ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["bash", "docker-entrypoint.sh"]

@@ -17,3 +17,4 @@ psql --set ON_ERROR_STOP=1\
     CREATE DATABASE lakefs;
     GRANT ALL PRIVILEGES ON DATABASE lakefs TO $POSTGRES_USER;
 EOSQL
+echo "Init complete"
