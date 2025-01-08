@@ -1,11 +1,9 @@
-import torch
 from typing import Tuple
 
 
 __all__ = ["compute_pad"]
 
 
-@torch.fx.wrap
 def compute_pad(kernel_size: int | Tuple[int, int, int],
                 stride: int | Tuple[int, int, int],
                 dim: int,
