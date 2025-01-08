@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Tuple, Dict
 from collections import OrderedDict
 
 import torch
@@ -19,7 +19,7 @@ class InceptionI3d(torch.nn.Module):
     Inception architecture, introduced in:
         http://arxiv.org/pdf/1409.4842v1.pdf.
     """
-    __VALID_ENDPOINTS = (
+    __VALID_ENDPOINTS: Tuple[str] = (
         "conv3d_1a_7x7",
         "maxPool3d_2a_3x3",
         "conv3d_2b_1x1",
@@ -40,7 +40,7 @@ class InceptionI3d(torch.nn.Module):
         "predictions",
     )
 
-    __DEFAULT_INCEPTION_CONFIG = OrderedDict({
+    __INCEPTION_CONFIG: OrderedDict[str, Any] = OrderedDict({
         "maxPool3d_2a_3x3": MaxPool3dSamePadding((1, 3, 3), (1, 2, 2)),
         "conv3d_2b_1x1": Unit3D(64, 64, (1, 1, 1)),
         "conv3d_2c_3x3": Unit3D(64, 192, (3, 3, 3), padding=1),
@@ -70,30 +70,26 @@ class InceptionI3d(torch.nn.Module):
                  ):
         """Initializes I3D model instance.
         Args:
-          num_classes: The number of outputs in the logit layer (default 400, which
-              matches the Kinetics dataset).
-          spatial_squeeze: Whether to squeeze the spatial dimensions for the logits
-              before returning (default True).
-          final_endpoint: The model contains many possible endpoints.
-              `final_endpoint` specifies the last endpoint for the model to be built
-              up to. In addition to the output at `final_endpoint`, all the outputs
-              at endpoints up to `final_endpoint` will also be returned, in a
-              dictionary. `final_endpoint` must be one of
-              InceptionI3d.VALID_ENDPOINTS (default 'Logits').
-          name: A string (optional). The name of this module.
-        Raises:
-          ValueError: if `final_endpoint` is not recognized.
+            num_classes: The number of outputs in the logit layer (default 400, which
+                matches the Kinetics dataset).
+            spatial_squeeze: Whether to squeeze the spatial dimensions for the logits
+                  before returning (default True).
+            final_endpoint: The model contains many possible endpoints.
+                "final_endpoint" specifies the last endpoint for the model to be built
+                up to. In addition to the output at `final_endpoint`, all the outputs
+                at endpoints up to `final_endpoint` will also be returned, in a
+                dictionary. `final_endpoint` must be one of (default: "logits").
         """
         assert final_endpoint in self.__VALID_ENDPOINTS, ValueError(f"Unknown final endpoint {final_endpoint}")
         super(InceptionI3d, self).__init__()
-        self.__num_classes = num_classes
-        self.__spatial_squeeze = spatial_squeeze
-        self.__final_endpoint = final_endpoint
-        self.__end_points = self.__build_endpoints(in_channels)
+        self.__num_classes: int = num_classes
+        self.__spatial_squeeze: bool = spatial_squeeze
+        self.__final_endpoint: str = final_endpoint
+        self.__end_points: Dict[str, Any] = self.__build_endpoints(in_channels)
 
-        self.logits = self.__end_points.pop("logits", None)
-        self.avg_pool = torch.nn.AvgPool3d((2, 7, 7), (1, 1, 1))
-        self.dropout = torch.nn.Dropout(dropout_keep_prob)
+        self.logits: Unit3D | None = self.__end_points.pop("logits", None)
+        self.avg_pool: torch.nn.AvgPool3d = torch.nn.AvgPool3d((2, 7, 7), (1, 1, 1))
+        self.dropout: torch.nn.Dropout = torch.nn.Dropout(dropout_keep_prob)
 
     # def replace_logits(self, num_classes: int):
     #     self._num_classes = num_classes
@@ -114,11 +110,12 @@ class InceptionI3d(torch.nn.Module):
         endpoints = OrderedDict({})
 
         for endpoint in self.__VALID_ENDPOINTS:
+            # First layer
             if endpoint == "conv3d_1a_7x7":
-                # First layer
                 endpoints[endpoint] = Unit3D(in_channels, 64, (7, 7, 7), (2, 2, 2), (3, 3, 3))
+
+            # Output layer
             elif endpoint == "logits":
-                # Output layer
                 endpoints[endpoint] = Unit3D(
                     384 + 384 + 128 + 128,
                     self.__num_classes,
@@ -126,33 +123,28 @@ class InceptionI3d(torch.nn.Module):
                     use_batch_norm=False,
                     use_bias=True,
                 )
+
+            # Intermediary layers
             else:
-                # Intermediary layers
-                endpoints[endpoint] = self.__DEFAULT_INCEPTION_CONFIG[endpoint]
+                endpoints[endpoint] = self.__INCEPTION_CONFIG[endpoint]
 
             if endpoint == self.__final_endpoint:
                 break
 
         for endpoint in endpoints.keys():
-            if endpoint != "logits":
-                self.add_module(endpoint, endpoints[endpoint])
+            self.add_module(endpoint, endpoints[endpoint])
         return endpoints
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        :param x:
-        :return: Logits with shape (B, T, C)
+        :param x: input tensor of shape (B, C, T, H, W)
+        :return: Logits with shape (B, T, C) if spatial_squeeze else (B, T, C, 1, 1)
         """
-        # use _modules to work with data in parallel
-        for end_point in self.__VALID_ENDPOINTS:
-            if end_point in self.__end_points:
-                x = self._modules[end_point](x)
-
-        x = self.avg_pool(x)
-        x = self.dropout(x)
+        for layer in self.__end_points.values():
+            x = layer(x)
 
         if self.logits is not None:
-            x = self.logits(x)
+            x = self.logits(self.dropout(self.avg_pool(x)))
 
         if self.__spatial_squeeze:
             x = x.squeeze(3).squeeze(3)

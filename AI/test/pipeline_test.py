@@ -36,7 +36,7 @@ def extract_feature() -> torch.Tensor:
     }
 
     # Offload during training
-    video: torch.Tensor = torch.rand((32, 3, 13, 224, 224), device="cuda", dtype=torch.float16)
+    video: torch.Tensor = torch.rand((3, 13, 224, 224), device="cuda", dtype=torch.float16)
     tracer: CustomTracer = CustomTracer()
 
     with torch.autocast(device_type="cuda", dtype=torch.float16):
