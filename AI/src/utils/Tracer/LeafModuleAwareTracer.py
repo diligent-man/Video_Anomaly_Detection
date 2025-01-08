@@ -7,10 +7,10 @@ Ref:
 import torch
 
 
-__all__ = ["CustomTracer"]
+__all__ = ["LeafModuleAwareTracer"]
 
 
-class CustomTracer(torch.fx.Tracer):
+class LeafModuleAwareTracer(torch.fx.Tracer):
     """
     ``Tracer`` is the class that implements the symbolic tracing functionality
     of ``torch.fx.symbolic_trace``. A call to ``symbolic_trace(m)`` is equivalent
@@ -19,9 +19,13 @@ class CustomTracer(torch.fx.Tracer):
     right in some cases.
     """
 
-    def __init__(self, *args, custom_leaf_module=None, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.leaf_modules = {}
+        if "leaf_modules" in kwargs:
+            leaf_modules = kwargs.pop("leaf_modules")
+            self.leaf_modules = leaf_modules
+
         super().__init__(*args, **kwargs)
-        self.custom_leaf_module = custom_leaf_module
 
     def is_leaf_module(self, m: torch.nn.Module, module_qualified_name: str) -> bool:
         """
@@ -40,11 +44,11 @@ class CustomTracer(torch.fx.Tracer):
                 submodule ``bar``, which contains submodule ``baz``, that module will
                 appear with the qualified name ``foo.bar.baz`` here.
         """
-        if self.custom_leaf_module and isinstance(m, self.custom_leaf_module):
-            return True
-
         # Added part
         if hasattr(m, "is_leaf_module") and m.is_leaf_module:
+            return True
+
+        if isinstance(m, tuple(self.leaf_modules)):
             return True
 
         return m.__module__.startswith('torch.nn') and not isinstance(m, torch.nn.Sequential)

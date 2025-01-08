@@ -91,22 +91,11 @@ class InceptionI3d(torch.nn.Module):
         self.avg_pool: torch.nn.AvgPool3d = torch.nn.AvgPool3d((2, 7, 7), (1, 1, 1))
         self.dropout: torch.nn.Dropout = torch.nn.Dropout(dropout_keep_prob)
 
-    # def replace_logits(self, num_classes: int):
-    #     self._num_classes = num_classes
-    #     self.logits = Unit3D(384 + 384 + 128 + 128, self._num_classes,
-    #                          activation_fn=None,
-    #                          use_batch_norm=False,
-    #                          use_bias=True,
-    #                          name="logits"
-    #                          )
+    @property
+    def is_leaf_module(self):
+        return self._is_leaf_module
 
-    # def extract_features(self, x):
-    #     for end_point in self.VALID_ENDPOINTS:
-    #         if end_point in self.end_points:
-    #             x = self._modules[end_point](x)
-    #     return self.avg_pool(x)
-
-    def __build_endpoints(self, in_channels: int) -> dict:
+    def __build_endpoints(self, in_channels: int) -> Dict[str, Any]:
         endpoints = OrderedDict({})
 
         for endpoint in self.__VALID_ENDPOINTS:
@@ -147,7 +136,7 @@ class InceptionI3d(torch.nn.Module):
             x = self.logits(self.dropout(self.avg_pool(x)))
 
         if self.__spatial_squeeze:
-            x = x.squeeze(3).squeeze(3)
+            x = x.squeeze(-1).squeeze(-1)
         return x
 
 
