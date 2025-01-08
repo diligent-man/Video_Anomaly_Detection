@@ -156,4 +156,16 @@
     "DEVICE": "cuda",
     "TRAINING_EPOCHS": 1
 //    "EVALUATION_STRATEGY": "no"
+
+    "TEACHER": {
+        "FEATURE_EXTRACTOR":
+        [
+            {"1": {"num_classes": 1998, "dropout": 0.5}},
+            {"2": {"num_classes": 1998, "dropout": 0.5}},
+            {"3": {"num_classes": 1998, "dropout": 0.5}}
+        ],
+
+        "MLP": {}
+    }
+
 }

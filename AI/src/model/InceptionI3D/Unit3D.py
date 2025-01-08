@@ -51,7 +51,7 @@ class Unit3D(torch.nn.Module):
                                       bias=self._use_bias)
 
         if self._use_batch_norm:
-            self.bn = torch.nn.BatchNorm3d(self._output_channels, eps=0.001, momentum=0.01)
+            self.batch3d = torch.nn.BatchNorm3d(self._output_channels, eps=0.001, momentum=0.01)
 
     @property
     def is_leaf_module(self):
@@ -79,7 +79,7 @@ class Unit3D(torch.nn.Module):
         x: torch.Tensor = self.conv3d(x)
 
         if self._use_batch_norm:
-            x: torch.Tensor = self.bn(x)
+            x: torch.Tensor = self.batch3d(x)
 
         if self._activation_fn is not None:
             x: torch.Tensor = self._activation_fn(x)
