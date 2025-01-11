@@ -2,12 +2,12 @@ import torch
 
 from torchvision.models.video import s3d, S3D_Weights
 
-from AI.src.model import inception_i3d, MLP
+from AI.src.model import inception_i3d, MLP, TemporalAggregationModule
 from AI.src.utils.Tracer import LeafModuleAwareTracer
 from AI.src.utils.ModelArchInspector import ModelArchInspector
 from AI.src.utils.create_feature_extractor import create_feature_extractor
 from AI.src.utils.tensor_hook import pack_hook, unpack_hook
-
+from AI.src.utils.pseudo_label_refinement import PseudoLabelRefiner
 
 def extract_feature(reduce: str = "first") -> None:
     """
@@ -26,11 +26,11 @@ def extract_feature(reduce: str = "first") -> None:
         "i3d": inception_i3d,
     }
 
-    video: torch.Tensor = torch.rand((32, 3, 26, 224, 224), device="cuda", dtype=torch.float16)
+    video: torch.Tensor = torch.rand((32, 3, 26, 224, 224), device="cpu", dtype=torch.float16)
     tracer: LeafModuleAwareTracer = LeafModuleAwareTracer()
 
-    with torch.autocast(device_type="cuda", dtype=torch.float16):
-        for model_name, return_nodes, weights in zip(
+    # with torch.autocast(device_type="cuda", dtype=torch.float16):
+    for model_name, return_nodes, weights in zip(
             ["s3d", "i3d"],
             [{"avgpool": "features"}, {"avg_pool": "features"}],
             [S3D_Weights.DEFAULT, "../weights/I3D/rgb.pt"]
@@ -55,7 +55,7 @@ def extract_feature(reduce: str = "first") -> None:
 
             feature_extractor: torch.fx.graph_module.GraphModule = create_feature_extractor(model, return_nodes=return_nodes)
             feature_extractor.eval()
-            feature_extractor = feature_extractor.to("cuda")
+            feature_extractor = feature_extractor.to("cpu")
 
             # Forward with offloading. Able run with large input
             # with torch.autograd.graph.saved_tensors_hooks(pack_hook, unpack_hook):
@@ -75,9 +75,9 @@ def extract_feature(reduce: str = "first") -> None:
 
 
 def pass_mlp() -> None:
-    with torch.autocast(device_type="cuda", dtype=torch.float16):
-        features = torch.rand((32, 1024), device="cuda")  #  extract_feature()
-        features = MLP(features.shape[-1]).to("cuda")(features)
+    # with torch.autocast(device_type="cuda", dtype=torch.float16):
+    features = torch.rand((32, 1024), device="cpu")  #  extract_feature()
+    features = MLP(features.shape[-1]).to("cpu")(features)
     print(features.shape)
     return None
 

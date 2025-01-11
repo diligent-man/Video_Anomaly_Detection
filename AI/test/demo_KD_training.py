@@ -75,17 +75,17 @@ def normal_train(model, train_loader, epochs, learning_rate, device):
     for epoch in range(epochs):
         running_loss = 0.0
         for inputs, labels in train_loader:
-            with torch.amp.autocast("cuda", torch.float16):
-                inputs, labels = inputs.to(device), labels.to(device)
+        # with torch.amp.autocast("cuda", torch.float16):
+            inputs, labels = inputs.to(device), labels.to(device)
 
-                optimizer.zero_grad()
-                outputs = model(inputs)
+            optimizer.zero_grad()
+            outputs = model(inputs)
 
-                loss = criterion(outputs, labels)
-                loss.backward()
-                optimizer.step()
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
 
-            running_loss += loss.item()
+        running_loss += loss.item()
 
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {running_loss / len(train_loader)}")
     print()
@@ -109,37 +109,37 @@ def train_knowledge_distillation(teacher, student, train_loader,
     for epoch in range(epochs):
         running_loss = 0.0
         for inputs, labels in train_loader:
-            with torch.amp.autocast("cuda", torch.float16):
-                inputs, labels = inputs.to(device), labels.to(device)
+        # with torch.amp.autocast("cuda", torch.float16):
+            inputs, labels = inputs.to(device), labels.to(device)
 
-                optimizer.zero_grad()
+            optimizer.zero_grad()
 
-                # Forward pass with the teacher model - do not save gradients here as we do not change the teacher's weights
-                with torch.no_grad():
-                    teacher_logits = teacher(inputs)
+            # Forward pass with the teacher model - do not save gradients here as we do not change the teacher's weights
+            with torch.no_grad():
+                teacher_logits = teacher(inputs)
 
-                # Forward pass with the student model
-                student_logits = student(inputs)
+            # Forward pass with the student model
+            student_logits = student(inputs)
 
-            # Calculate distillation loss as described in "Distilling the knowledge in a neural network"
-            # input: soft_pred from student model
-            # target: soft labels from teacher model
-            # KLDivergence loss used to make soft pred from student more close to teacher soft pred
-            soft_loss = kd_loss(
-                torch.nn.functional.log_softmax(student_logits / T, -1),
-                torch.nn.functional.log_softmax(teacher_logits / T, -1)
-            ) * (T ** 2)
+        # Calculate distillation loss as described in "Distilling the knowledge in a neural network"
+        # input: soft_pred from student model
+        # target: soft labels from teacher model
+        # KLDivergence loss used to make soft pred from student more close to teacher soft pred
+        soft_loss = kd_loss(
+            torch.nn.functional.log_softmax(student_logits / T, -1),
+            torch.nn.functional.log_softmax(teacher_logits / T, -1)
+        ) * (T ** 2)
 
-            # Calculate the true label loss
-            hard_loss = ce_loss(student_logits, labels)
+        # Calculate the true label loss
+        hard_loss = ce_loss(student_logits, labels)
 
-            # Weighted sum of the two losses
-            loss = (1 - hard_loss_weight) * soft_loss + hard_loss_weight * hard_loss
+        # Weighted sum of the two losses
+        loss = (1 - hard_loss_weight) * soft_loss + hard_loss_weight * hard_loss
 
-            loss.backward()
-            optimizer.step()
+        loss.backward()
+        optimizer.step()
 
-            running_loss += loss.item()
+        running_loss += loss.item()
 
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {running_loss / len(train_loader)}")
     print()
@@ -155,15 +155,15 @@ def test(model, test_loader, device):
 
     with torch.no_grad():
         for inputs, labels in test_loader:
-            with torch.amp.autocast("cuda", torch.float16):
-                inputs, labels = inputs.to(device), labels.to(device)
+        # with torch.amp.autocast("cuda", torch.float16):
+            inputs, labels = inputs.to(device), labels.to(device)
 
-                outputs = model(inputs)
+            outputs = model(inputs)
 
-            _, predicted = torch.max(outputs.data, 1)
+        _, predicted = torch.max(outputs.data, 1)
 
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
 
     accuracy = 100 * correct / total
     print(f"Test {model.__class__.__name__}: {accuracy:.2f}%")
@@ -171,7 +171,7 @@ def test(model, test_loader, device):
 
 
 def main() -> None:
-    device = "cuda"
+    device = "cpu"
     torch.manual_seed(42)
 
     transforms_cifar = Compose([
