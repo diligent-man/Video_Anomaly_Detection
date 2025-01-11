@@ -7,6 +7,7 @@ Ref:
 import copy
 import torch
 import torchvision
+
 from torchvision.transforms import v2, Compose
 
 
@@ -184,9 +185,9 @@ def main() -> None:
     train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transforms_cifar)
     test_dataset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transforms_cifar)
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=4096, shuffle=True, num_workers=32,
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=4,
                                                persistent_workers=True, prefetch_factor=4)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=4096, shuffle=False, num_workers=32,
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=4,
                                               persistent_workers=True, prefetch_factor=4)
     print(f"Train dataloader: {len(train_loader)}, Test dataloader: {len(test_loader)}\n")
 
@@ -195,9 +196,9 @@ def main() -> None:
     student_model_1 = StudentModel().to(device)
     student_model_2 = copy.deepcopy(student_model_1)
 
-    teacher_model.compile()
-    student_model_1.compile()
-    student_model_2.compile()
+    # teacher_model.compile()
+    # student_model_1.compile()
+    # student_model_2.compile()
 
     total_params_deep = "{:,}".format(sum(p.numel() for p in teacher_model.parameters()))
     total_params_light = "{:,}".format(sum(p.numel() for p in student_model_1.parameters()))
