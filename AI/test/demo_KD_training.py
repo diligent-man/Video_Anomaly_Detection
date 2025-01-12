@@ -76,11 +76,11 @@ def normal_train(model, train_loader, epochs, learning_rate, device):
     for epoch in range(epochs):
         running_loss = 0.0
         for inputs, labels in train_loader:
-        # with torch.amp.autocast("cuda", torch.float16):
-            inputs, labels = inputs.to(device), labels.to(device)
+            with torch.amp.autocast(device, torch.float16):
+                inputs, labels = inputs.to(device), labels.to(device)
 
-            optimizer.zero_grad()
-            outputs = model(inputs)
+                optimizer.zero_grad()
+                outputs = model(inputs)
 
             loss = criterion(outputs, labels)
             loss.backward()
@@ -110,17 +110,17 @@ def train_knowledge_distillation(teacher, student, train_loader,
     for epoch in range(epochs):
         running_loss = 0.0
         for inputs, labels in train_loader:
-        # with torch.amp.autocast("cuda", torch.float16):
-            inputs, labels = inputs.to(device), labels.to(device)
+            with torch.amp.autocast(device, torch.float16):
+                inputs, labels = inputs.to(device), labels.to(device)
 
-            optimizer.zero_grad()
+                optimizer.zero_grad()
 
-            # Forward pass with the teacher model - do not save gradients here as we do not change the teacher's weights
-            with torch.no_grad():
+                # Forward pass with the teacher model - do not save gradients here as we do not change the teacher's weights
+                # with torch.no_grad():
                 teacher_logits = teacher(inputs)
 
-            # Forward pass with the student model
-            student_logits = student(inputs)
+                # Forward pass with the student model
+                student_logits = student(inputs)
 
         # Calculate distillation loss as described in "Distilling the knowledge in a neural network"
         # input: soft_pred from student model
@@ -156,10 +156,10 @@ def test(model, test_loader, device):
 
     with torch.no_grad():
         for inputs, labels in test_loader:
-        # with torch.amp.autocast("cuda", torch.float16):
-            inputs, labels = inputs.to(device), labels.to(device)
+            with torch.amp.autocast(device, torch.float16):
+                inputs, labels = inputs.to(device), labels.to(device)
 
-            outputs = model(inputs)
+                outputs = model(inputs)
 
         _, predicted = torch.max(outputs.data, 1)
 
@@ -172,7 +172,7 @@ def test(model, test_loader, device):
 
 
 def main() -> None:
-    device = "cpu"
+    device = "cuda"
     torch.manual_seed(42)
 
     transforms_cifar = Compose([
@@ -182,12 +182,12 @@ def main() -> None:
     ])
 
     # Loading the CIFAR-10 dataset:
-    train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transforms_cifar)
-    test_dataset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transforms_cifar)
+    train_dataset = torchvision.datasets.CIFAR10(root="/home/trong/Downloads/Dataset/cifar10/cifar-10-python", train=True, download=True, transform=transforms_cifar)
+    test_dataset = torchvision.datasets.CIFAR10(root="/home/trong/Downloads/Dataset/cifar10/cifar-10-python", train=False, download=True, transform=transforms_cifar)
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=4,
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=4096, shuffle=True, num_workers=4,
                                                persistent_workers=True, prefetch_factor=4)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=4,
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=4096, shuffle=False, num_workers=4,
                                               persistent_workers=True, prefetch_factor=4)
     print(f"Train dataloader: {len(train_loader)}, Test dataloader: {len(test_loader)}\n")
 
@@ -196,24 +196,24 @@ def main() -> None:
     student_model_1 = StudentModel().to(device)
     student_model_2 = copy.deepcopy(student_model_1)
 
-    # teacher_model.compile()
-    # student_model_1.compile()
-    # student_model_2.compile()
+    teacher_model.compile()
+    student_model_1.compile()
+    student_model_2.compile()
 
     total_params_deep = "{:,}".format(sum(p.numel() for p in teacher_model.parameters()))
     total_params_light = "{:,}".format(sum(p.numel() for p in student_model_1.parameters()))
-    print(f"Teacher paras: {total_params_deep}")
-    print(f"Student paras: {total_params_light}")
+    print(f"Teacher paras: {total_params_deep}")  # 1,186,986
+    print(f"Student paras: {total_params_light}")  # 267,738
     print()
 
     print("Norm of 1st layer of student 1:", torch.norm(student_model_1.features[0].weight).item())
     print("Norm of 1st layer of student 2:", torch.norm(student_model_2.features[0].weight).item())
     print()
 
-    normal_train(student_model_1, train_loader, 20, 1e-2, device)
+    normal_train(student_model_1, train_loader, 50, 1e-3, device)
     train_knowledge_distillation(
         teacher_model, student_model_2, train_loader,
-        20, 1e-3,
+        50, 1e-3,
         2, .3, device
     )
 

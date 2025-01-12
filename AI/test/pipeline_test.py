@@ -9,6 +9,7 @@ from AI.src.utils.create_feature_extractor import create_feature_extractor
 from AI.src.utils.tensor_hook import pack_hook, unpack_hook
 from AI.src.utils.pseudo_label_refinement import PseudoLabelRefiner
 
+
 def extract_feature(reduce: str = "first") -> None:
     """
     :param reduce: how to get final extracted features. 3D-CNN-related computations will return more than 1 timeframe
@@ -26,7 +27,7 @@ def extract_feature(reduce: str = "first") -> None:
         "i3d": inception_i3d,
     }
 
-    video: torch.Tensor = torch.rand((32, 3, 26, 224, 224), device="cpu", dtype=torch.float16)
+    video: torch.Tensor = torch.rand((32, 3, 26, 224, 224), device="cuda", dtype=torch.float16)
     tracer: LeafModuleAwareTracer = LeafModuleAwareTracer()
 
     # with torch.autocast(device_type="cuda", dtype=torch.float16):
@@ -76,8 +77,8 @@ def extract_feature(reduce: str = "first") -> None:
 
 def pass_mlp() -> None:
     # with torch.autocast(device_type="cuda", dtype=torch.float16):
-    features = torch.rand((32, 1024), device="cpu")  #  extract_feature()
-    features = MLP(features.shape[-1]).to("cpu")(features)
+    features = torch.rand((32, 1024), device="cuda")  # extract_feature()
+    features = MLP(features.shape[-1]).to("cuda")(features)
     print(features.shape)
     return None
 
