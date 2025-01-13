@@ -137,22 +137,22 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
     embed_dim = 512
     mlp = MLP(
         embed_dim,
-        [512],
-        32,
+        [512, 32],
+        1,
         True,
         0.5,
         torch.nn.ReLU(),
         torch.nn.Sigmoid()
-    )
+    ).to(device)
+    pseudo_label_refiner = PseudoLabelRefiner()
 
-    # with torch.amp.autocast(device, torch.float16):
-    #     Output shape from TAM [batch_size, seq_len, embed_dim]
-        # x: torch.Tensor = torch.rand((batch_size, seq_len, embed_dim), device=device)
-        # x = MLP(
-        #
-        # ).to(device)(x)
-        #
-        # print(x.shape)
+    # Output shape from TAM [batch_size, seq_len, embed_dim]
+    x: torch.Tensor = torch.rand((batch_size, seq_len, embed_dim), device=device)
+
+    with torch.amp.autocast(device, torch.float16):
+        # [batch_size, seq_len, 1]
+        anomalous_scores: torch.Tensor = mlp(x)
+        anomalous_scores = pseudo_label_refiner(anomalous_scores)
 
 
 
