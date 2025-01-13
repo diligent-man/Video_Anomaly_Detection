@@ -135,6 +135,8 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
     batch_size = 1
     seq_len = 32
     embed_dim = 512
+    mask_threshold = .9
+
     mlp = MLP(
         embed_dim,
         [512, 32],
@@ -144,35 +146,28 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
         torch.nn.ReLU(),
         torch.nn.Sigmoid()
     ).to(device)
-    pseudo_label_refiner = PseudoLabelRefiner()
+
+    pseudo_label_refiner: PseudoLabelRefiner = PseudoLabelRefiner()
 
     # Output shape from TAM [batch_size, seq_len, embed_dim]
     x: torch.Tensor = torch.rand((batch_size, seq_len, embed_dim), device=device)
 
     with torch.amp.autocast(device, torch.float16):
-        # [batch_size, seq_len, 1]
+        # [batch_size, seq_len, num_classes=1]
         anomalous_scores: torch.Tensor = mlp(x)
         anomalous_scores = pseudo_label_refiner(anomalous_scores)
 
+        mask = torch.where(anomalous_scores > mask_threshold, 1, 0)
 
-
-
-    # anomaly_scores = torch.rand(batch_size, seq_len)
-    # print("Original Anomaly Scores:")
-    # print(anomaly_scores)
-    #
-    # refiner = PseudoLabelRefiner(window_size=3)
-    #
-    # refined_scores = refiner(anomaly_scores)
-    # print("\nRefined Pseudo-Labels:")
-    # print(refined_scores)
+        print(f"""Segment-level prediction/ Soft pseudo-labels
+{mask.squeeze()}""")
 
 
 def main() -> None:
     # test_extract_feature()
     # test_mlp()
     # test_TAM()
-    test_pseudo_label_refiner()
+    # test_pseudo_label_refiner()
     # TODO: Implement test_pseudo_label_refiner()
     return None
 
