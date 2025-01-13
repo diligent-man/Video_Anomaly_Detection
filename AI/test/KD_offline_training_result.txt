@@ -1,0 +1,1953 @@
+Mode: offline, lr: 0.01, T: 2, weight: 0.1
+normal: 63.163716814159294, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.2
+normal: 54.5353982300885, KD: 10.398230088495575
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.3
+normal: 9.734513274336283, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.4
+normal: 45.63053097345133, KD: 18.196902654867255
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.5
+normal: 62.5, KD: 31.581858407079647
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.6
+normal: 46.68141592920354, KD: 11.33849557522124
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.7
+normal: 62.55530973451327, KD: 9.734513274336283
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.8
+normal: 62.057522123893804, KD: 10.121681415929203
+
+Mode: offline, lr: 0.01, T: 2, weight: 0.9
+normal: 55.586283185840706, KD: 36.39380530973451
+
+Mode: offline, lr: 0.01, T: 2, weight: 1.0
+normal: 59.84513274336283, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.1
+normal: 57.190265486725664, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.2
+normal: 59.126106194690266, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.3
+normal: 49.66814159292036, KD: 9.734513274336283
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.4
+normal: 61.006637168141594, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.5
+normal: 57.466814159292035, KD: 30.47566371681416
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.6
+normal: 62.942477876106196, KD: 18.694690265486727
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.7
+normal: 61.11725663716814, KD: 30.641592920353983
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.8
+normal: 64.15929203539822, KD: 26.714601769911503
+
+Mode: offline, lr: 0.01, T: 3, weight: 0.9
+normal: 55.807522123893804, KD: 28.650442477876105
+
+Mode: offline, lr: 0.01, T: 3, weight: 1.0
+normal: 60.01106194690266, KD: 34.402654867256636
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.1
+normal: 47.732300884955755, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.2
+normal: 9.29203539823009, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.3
+normal: 60.89601769911504, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.4
+normal: 58.46238938053097, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.5
+normal: 62.2787610619469, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.6
+normal: 59.67920353982301, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.7
+normal: 60.06637168141593, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.8
+normal: 61.89159292035398, KD: 25.221238938053098
+
+Mode: offline, lr: 0.01, T: 4, weight: 0.9
+normal: 62.22345132743363, KD: 41.980088495575224
+
+Mode: offline, lr: 0.01, T: 4, weight: 1.0
+normal: 54.70132743362832, KD: 37.2787610619469
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.1
+normal: 61.11725663716814, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.2
+normal: 47.123893805309734, KD: 9.734513274336283
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.3
+normal: 59.126106194690266, KD: 25.77433628318584
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.4
+normal: 60.453539823008846, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.5
+normal: 46.23893805309734, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.6
+normal: 43.80530973451327, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.7
+normal: 62.942477876106196, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.8
+normal: 60.5641592920354, KD: 29.424778761061948
+
+Mode: offline, lr: 0.01, T: 5, weight: 0.9
+normal: 61.89159292035398, KD: 18.91592920353982
+
+Mode: offline, lr: 0.01, T: 5, weight: 1.0
+normal: 58.573008849557525, KD: 42.809734513274336
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.1
+normal: 63.440265486725664, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.2
+normal: 47.01327433628319, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.3
+normal: 62.334070796460175, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.4
+normal: 61.17256637168141, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.5
+normal: 48.506637168141594, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.6
+normal: 59.900442477876105, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.7
+normal: 9.734513274336283, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.8
+normal: 63.49557522123894, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 6, weight: 0.9
+normal: 52.43362831858407, KD: 32.9646017699115
+
+Mode: offline, lr: 0.01, T: 6, weight: 1.0
+normal: 44.469026548672566, KD: 34.51327433628319
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.1
+normal: 45.6858407079646, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.2
+normal: 55.69690265486726, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.3
+normal: 47.732300884955755, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.4
+normal: 60.508849557522126, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.5
+normal: 64.26991150442478, KD: 31.52654867256637
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.6
+normal: 54.64601769911504, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.7
+normal: 9.623893805309734, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.8
+normal: 53.76106194690266, KD: 32.02433628318584
+
+Mode: offline, lr: 0.01, T: 7, weight: 0.9
+normal: 9.734513274336283, KD: 29.86725663716814
+
+Mode: offline, lr: 0.01, T: 7, weight: 1.0
+normal: 62.44469026548673, KD: 36.22787610619469
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.1
+normal: 57.24557522123894, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.2
+normal: 59.402654867256636, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.3
+normal: 9.734513274336283, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.4
+normal: 58.4070796460177, KD: 23.672566371681416
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.5
+normal: 61.283185840707965, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.6
+normal: 53.81637168141593, KD: 28.761061946902654
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.7
+normal: 60.28761061946903, KD: 34.402654867256636
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.8
+normal: 54.03761061946903, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 8, weight: 0.9
+normal: 62.16814159292036, KD: 40.597345132743364
+
+Mode: offline, lr: 0.01, T: 8, weight: 1.0
+normal: 52.76548672566372, KD: 28.871681415929203
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.1
+normal: 61.44911504424779, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.2
+normal: 54.81194690265487, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.3
+normal: 46.57079646017699, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.4
+normal: 59.51327433628319, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.5
+normal: 58.35176991150443, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.6
+normal: 54.70132743362832, KD: 28.595132743362832
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.7
+normal: 10.951327433628318, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.8
+normal: 55.25442477876106, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 9, weight: 0.9
+normal: 59.900442477876105, KD: 35.3429203539823
+
+Mode: offline, lr: 0.01, T: 9, weight: 1.0
+normal: 57.41150442477876, KD: 32.13495575221239
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.1
+normal: 64.26991150442478, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.2
+normal: 62.334070796460175, KD: 16.5929203539823
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.3
+normal: 59.84513274336283, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.4
+normal: 64.10398230088495, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.5
+normal: 43.41814159292036, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.6
+normal: 58.90486725663717, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.7
+normal: 49.336283185840706, KD: 27.1570796460177
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.8
+normal: 47.953539823008846, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 10, weight: 0.9
+normal: 64.4358407079646, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 10, weight: 1.0
+normal: 44.74557522123894, KD: 37.22345132743363
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.1
+normal: 47.400442477876105, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.2
+normal: 46.847345132743364, KD: 10.398230088495575
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.3
+normal: 46.017699115044245, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.4
+normal: 44.24778761061947, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.5
+normal: 59.623893805309734, KD: 24.280973451327434
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.6
+normal: 54.5353982300885, KD: 33.019911504424776
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.7
+normal: 10.951327433628318, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.8
+normal: 53.59513274336283, KD: 35.232300884955755
+
+Mode: offline, lr: 0.01, T: 11, weight: 0.9
+normal: 56.969026548672566, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 11, weight: 1.0
+normal: 59.900442477876105, KD: 40.873893805309734
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.1
+normal: 60.28761061946903, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.2
+normal: 54.92256637168141, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.3
+normal: 62.942477876106196, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.4
+normal: 47.123893805309734, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.5
+normal: 61.17256637168141, KD: 9.734513274336283
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.6
+normal: 59.67920353982301, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.7
+normal: 61.72566371681416, KD: 31.692477876106196
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.8
+normal: 61.780973451327434, KD: 38.716814159292035
+
+Mode: offline, lr: 0.01, T: 12, weight: 0.9
+normal: 57.41150442477876, KD: 28.70575221238938
+
+Mode: offline, lr: 0.01, T: 12, weight: 1.0
+normal: 61.39380530973451, KD: 36.50442477876106
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.1
+normal: 63.10840707964602, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.2
+normal: 61.61504424778761, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.3
+normal: 43.14159292035398, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.4
+normal: 60.3429203539823, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.5
+normal: 52.65486725663717, KD: 26.493362831858406
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.6
+normal: 59.126106194690266, KD: 27.43362831858407
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.7
+normal: 57.85398230088496, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.8
+normal: 61.006637168141594, KD: 31.969026548672566
+
+Mode: offline, lr: 0.01, T: 13, weight: 0.9
+normal: 46.29424778761062, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 13, weight: 1.0
+normal: 60.508849557522126, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.1
+normal: 57.9646017699115, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.2
+normal: 62.389380530973455, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.3
+normal: 58.296460176991154, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.4
+normal: 62.942477876106196, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.5
+normal: 59.18141592920354, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.6
+normal: 59.29203539823009, KD: 10.398230088495575
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.7
+normal: 58.019911504424776, KD: 16.150442477876105
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.8
+normal: 60.39823008849557, KD: 26.825221238938052
+
+Mode: offline, lr: 0.01, T: 14, weight: 0.9
+normal: 56.80309734513274, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 14, weight: 1.0
+normal: 62.77654867256637, KD: 38.716814159292035
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.1
+normal: 54.0929203539823, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.2
+normal: 58.517699115044245, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.3
+normal: 59.95575221238938, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.4
+normal: 59.29203539823009, KD: 21.460176991150444
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.5
+normal: 54.424778761061944, KD: 13.053097345132743
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.6
+normal: 60.232300884955755, KD: 30.530973451327434
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.7
+normal: 54.3141592920354, KD: 17.865044247787612
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.8
+normal: 60.89601769911504, KD: 34.07079646017699
+
+Mode: offline, lr: 0.01, T: 15, weight: 0.9
+normal: 60.95132743362832, KD: 30.47566371681416
+
+Mode: offline, lr: 0.01, T: 15, weight: 1.0
+normal: 65.26548672566372, KD: 40.15486725663717
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.1
+normal: 47.34513274336283, KD: 9.29203539823009
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.2
+normal: 43.47345132743363, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.3
+normal: 57.52212389380531, KD: 9.734513274336283
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.4
+normal: 59.45796460176991, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.5
+normal: 58.849557522123895, KD: 34.402654867256636
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.6
+normal: 63.66150442477876, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.7
+normal: 59.51327433628319, KD: 26.161504424778762
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.8
+normal: 60.89601769911504, KD: 40.43141592920354
+
+Mode: offline, lr: 0.01, T: 16, weight: 0.9
+normal: 62.22345132743363, KD: 26.88053097345133
+
+Mode: offline, lr: 0.01, T: 16, weight: 1.0
+normal: 62.942477876106196, KD: 34.347345132743364
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.1
+normal: 58.90486725663717, KD: 9.734513274336283
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.2
+normal: 57.02433628318584, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.3
+normal: 57.07964601769911, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.4
+normal: 47.56637168141593, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.5
+normal: 64.38053097345133, KD: 26.825221238938052
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.6
+normal: 62.00221238938053, KD: 30.254424778761063
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.7
+normal: 44.63495575221239, KD: 26.991150442477878
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.8
+normal: 48.61725663716814, KD: 29.0929203539823
+
+Mode: offline, lr: 0.01, T: 17, weight: 0.9
+normal: 60.5641592920354, KD: 30.199115044247787
+
+Mode: offline, lr: 0.01, T: 17, weight: 1.0
+normal: 9.29203539823009, KD: 28.871681415929203
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.1
+normal: 63.49557522123894, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.2
+normal: 56.4712389380531, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.3
+normal: 59.84513274336283, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.4
+normal: 61.006637168141594, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.5
+normal: 59.623893805309734, KD: 34.78982300884956
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.6
+normal: 45.85176991150443, KD: 10.06637168141593
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.7
+normal: 57.68805309734513, KD: 29.20353982300885
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.8
+normal: 53.76106194690266, KD: 28.761061946902654
+
+Mode: offline, lr: 0.01, T: 18, weight: 0.9
+normal: 60.01106194690266, KD: 17.699115044247787
+
+Mode: offline, lr: 0.01, T: 18, weight: 1.0
+normal: 47.676991150442475, KD: 38.66150442477876
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.1
+normal: 60.01106194690266, KD: 9.734513274336283
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.2
+normal: 47.676991150442475, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.3
+normal: 60.7853982300885, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.4
+normal: 54.480088495575224, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.5
+normal: 55.75221238938053, KD: 10.951327433628318
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.6
+normal: 61.836283185840706, KD: 30.807522123893804
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.7
+normal: 61.50442477876106, KD: 9.900442477876107
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.8
+normal: 61.50442477876106, KD: 31.25
+
+Mode: offline, lr: 0.01, T: 19, weight: 0.9
+normal: 59.126106194690266, KD: 30.199115044247787
+
+Mode: offline, lr: 0.01, T: 19, weight: 1.0
+normal: 54.0929203539823, KD: 10.508849557522124
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.1
+normal: 56.913716814159294, KD: 10.398230088495575
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.2
+normal: 58.573008849557525, KD: 23.506637168141594
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.3
+normal: 58.517699115044245, KD: 30.420353982300885
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.4
+normal: 61.836283185840706, KD: 26.050884955752213
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.5
+normal: 47.78761061946903, KD: 9.45796460176991
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.6
+normal: 54.0929203539823, KD: 10.176991150442477
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.7
+normal: 62.7212389380531, KD: 9.623893805309734
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.8
+normal: 10.06637168141593, KD: 10.398230088495575
+
+Mode: offline, lr: 0.01, T: 20, weight: 0.9
+normal: 64.82300884955752, KD: 26.65929203539823
+
+Mode: offline, lr: 0.01, T: 20, weight: 1.0
+normal: 46.626106194690266, KD: 31.858407079646017
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.1
+normal: 62.5, KD: 35.7853982300885
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.2
+normal: 63.716814159292035, KD: 43.69469026548673
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.3
+normal: 64.60176991150442, KD: 40.98451327433628
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.4
+normal: 64.60176991150442, KD: 44.24778761061947
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.5
+normal: 61.72566371681416, KD: 40.099557522123895
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.6
+normal: 65.48672566371681, KD: 43.47345132743363
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.7
+normal: 62.99778761061947, KD: 39.93362831858407
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.8
+normal: 63.163716814159294, KD: 37.83185840707964
+
+Mode: offline, lr: 0.001, T: 2, weight: 0.9
+normal: 62.5, KD: 40.81858407079646
+
+Mode: offline, lr: 0.001, T: 2, weight: 1.0
+normal: 62.610619469026545, KD: 40.76327433628319
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.1
+normal: 63.27433628318584, KD: 39.269911504424776
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.2
+normal: 63.163716814159294, KD: 40.98451327433628
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.3
+normal: 62.16814159292036, KD: 43.25221238938053
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.4
+normal: 64.15929203539822, KD: 44.413716814159294
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.5
+normal: 63.66150442477876, KD: 41.980088495575224
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.6
+normal: 63.219026548672566, KD: 41.150442477876105
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.7
+normal: 62.7212389380531, KD: 40.43141592920354
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.8
+normal: 62.99778761061947, KD: 41.703539823008846
+
+Mode: offline, lr: 0.001, T: 3, weight: 0.9
+normal: 63.219026548672566, KD: 38.49557522123894
+
+Mode: offline, lr: 0.001, T: 3, weight: 1.0
+normal: 64.60176991150442, KD: 39.4358407079646
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.1
+normal: 63.163716814159294, KD: 35.674778761061944
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.2
+normal: 62.942477876106196, KD: 39.71238938053097
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.3
+normal: 64.65707964601769, KD: 43.41814159292036
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.4
+normal: 63.88274336283186, KD: 44.192477876106196
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.5
+normal: 63.49557522123894, KD: 43.41814159292036
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.6
+normal: 63.66150442477876, KD: 41.426991150442475
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.7
+normal: 64.76769911504425, KD: 40.48672566371681
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.8
+normal: 64.93362831858407, KD: 40.76327433628319
+
+Mode: offline, lr: 0.001, T: 4, weight: 0.9
+normal: 64.93362831858407, KD: 40.32079646017699
+
+Mode: offline, lr: 0.001, T: 4, weight: 1.0
+normal: 62.2787610619469, KD: 39.15929203539823
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.1
+normal: 63.77212389380531, KD: 38.38495575221239
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.2
+normal: 62.7212389380531, KD: 42.75442477876106
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.3
+normal: 63.440265486725664, KD: 44.13716814159292
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.4
+normal: 61.94690265486726, KD: 43.19690265486726
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.5
+normal: 64.10398230088495, KD: 40.70796460176991
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.6
+normal: 64.60176991150442, KD: 41.426991150442475
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.7
+normal: 63.716814159292035, KD: 42.09070796460177
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.8
+normal: 63.77212389380531, KD: 41.703539823008846
+
+Mode: offline, lr: 0.001, T: 5, weight: 0.9
+normal: 64.76769911504425, KD: 41.53761061946903
+
+Mode: offline, lr: 0.001, T: 5, weight: 1.0
+normal: 64.8783185840708, KD: 37.7212389380531
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.1
+normal: 63.55088495575221, KD: 37.77654867256637
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.2
+normal: 62.88716814159292, KD: 41.758849557522126
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.3
+normal: 63.38495575221239, KD: 43.36283185840708
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.4
+normal: 61.780973451327434, KD: 42.20132743362832
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.5
+normal: 64.4358407079646, KD: 42.809734513274336
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.6
+normal: 62.057522123893804, KD: 41.26106194690266
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.7
+normal: 63.93805309734513, KD: 40.54203539823009
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.8
+normal: 64.26991150442478, KD: 39.491150442477874
+
+Mode: offline, lr: 0.001, T: 6, weight: 0.9
+normal: 63.32964601769911, KD: 41.09513274336283
+
+Mode: offline, lr: 0.001, T: 6, weight: 1.0
+normal: 64.04867256637168, KD: 39.325221238938056
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.1
+normal: 63.82743362831859, KD: 38.60619469026549
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.2
+normal: 62.88716814159292, KD: 40.70796460176991
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.3
+normal: 63.219026548672566, KD: 40.81858407079646
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.4
+normal: 63.993362831858406, KD: 42.92035398230089
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.5
+normal: 63.49557522123894, KD: 42.36725663716814
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.6
+normal: 63.27433628318584, KD: 39.60176991150443
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.7
+normal: 61.50442477876106, KD: 40.26548672566372
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.8
+normal: 64.71238938053098, KD: 41.20575221238938
+
+Mode: offline, lr: 0.001, T: 7, weight: 0.9
+normal: 64.82300884955752, KD: 39.823008849557525
+
+Mode: offline, lr: 0.001, T: 7, weight: 1.0
+normal: 64.38053097345133, KD: 40.92920353982301
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.1
+normal: 65.04424778761062, KD: 34.29203539823009
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.2
+normal: 64.82300884955752, KD: 45.13274336283186
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.3
+normal: 64.82300884955752, KD: 44.690265486725664
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.4
+normal: 62.22345132743363, KD: 43.14159292035398
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.5
+normal: 64.21460176991151, KD: 41.03982300884956
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.6
+normal: 64.82300884955752, KD: 39.93362831858407
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.7
+normal: 64.10398230088495, KD: 41.09513274336283
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.8
+normal: 65.37610619469027, KD: 40.98451327433628
+
+Mode: offline, lr: 0.001, T: 8, weight: 0.9
+normal: 63.163716814159294, KD: 41.924778761061944
+
+Mode: offline, lr: 0.001, T: 8, weight: 1.0
+normal: 64.10398230088495, KD: 39.10398230088496
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.1
+normal: 64.76769911504425, KD: 44.413716814159294
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.2
+normal: 62.942477876106196, KD: 42.64380530973451
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.3
+normal: 63.66150442477876, KD: 42.69911504424779
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.4
+normal: 63.66150442477876, KD: 41.3716814159292
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.5
+normal: 63.10840707964602, KD: 41.924778761061944
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.6
+normal: 62.2787610619469, KD: 42.20132743362832
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.7
+normal: 63.10840707964602, KD: 41.03982300884956
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.8
+normal: 64.76769911504425, KD: 42.256637168141594
+
+Mode: offline, lr: 0.001, T: 9, weight: 0.9
+normal: 64.54646017699115, KD: 39.10398230088496
+
+Mode: offline, lr: 0.001, T: 9, weight: 1.0
+normal: 63.55088495575221, KD: 41.980088495575224
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.1
+normal: 62.665929203539825, KD: 42.69911504424779
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.2
+normal: 63.77212389380531, KD: 40.98451327433628
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.3
+normal: 63.05309734513274, KD: 41.426991150442475
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.4
+normal: 64.60176991150442, KD: 41.3716814159292
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.5
+normal: 62.22345132743363, KD: 40.92920353982301
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.6
+normal: 63.219026548672566, KD: 41.20575221238938
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.7
+normal: 63.993362831858406, KD: 41.980088495575224
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.8
+normal: 63.77212389380531, KD: 41.64823008849557
+
+Mode: offline, lr: 0.001, T: 10, weight: 0.9
+normal: 64.10398230088495, KD: 41.86946902654867
+
+Mode: offline, lr: 0.001, T: 10, weight: 1.0
+normal: 63.38495575221239, KD: 42.58849557522124
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.1
+normal: 62.99778761061947, KD: 38.10840707964602
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.2
+normal: 64.15929203539822, KD: 42.92035398230089
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.3
+normal: 65.09955752212389, KD: 42.809734513274336
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.4
+normal: 64.26991150442478, KD: 41.3716814159292
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.5
+normal: 63.88274336283186, KD: 37.610619469026545
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.6
+normal: 61.67035398230089, KD: 43.25221238938053
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.7
+normal: 62.389380530973455, KD: 41.09513274336283
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.8
+normal: 62.99778761061947, KD: 43.69469026548673
+
+Mode: offline, lr: 0.001, T: 11, weight: 0.9
+normal: 62.5, KD: 38.82743362831859
+
+Mode: offline, lr: 0.001, T: 11, weight: 1.0
+normal: 64.38053097345133, KD: 39.93362831858407
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.1
+normal: 63.55088495575221, KD: 40.76327433628319
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.2
+normal: 63.27433628318584, KD: 42.64380530973451
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.3
+normal: 62.44469026548673, KD: 44.30309734513274
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.4
+normal: 63.66150442477876, KD: 41.924778761061944
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.5
+normal: 64.49115044247787, KD: 44.57964601769911
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.6
+normal: 63.66150442477876, KD: 40.099557522123895
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.7
+normal: 63.440265486725664, KD: 39.767699115044245
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.8
+normal: 64.04867256637168, KD: 41.31637168141593
+
+Mode: offline, lr: 0.001, T: 12, weight: 0.9
+normal: 63.77212389380531, KD: 40.15486725663717
+
+Mode: offline, lr: 0.001, T: 12, weight: 1.0
+normal: 64.8783185840708, KD: 40.376106194690266
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.1
+normal: 64.82300884955752, KD: 42.92035398230089
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.2
+normal: 63.440265486725664, KD: 40.81858407079646
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.3
+normal: 60.84070796460177, KD: 42.09070796460177
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.4
+normal: 63.993362831858406, KD: 44.469026548672566
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.5
+normal: 63.716814159292035, KD: 41.86946902654867
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.6
+normal: 63.82743362831859, KD: 40.76327433628319
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.7
+normal: 63.716814159292035, KD: 42.42256637168141
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.8
+normal: 63.66150442477876, KD: 43.75
+
+Mode: offline, lr: 0.001, T: 13, weight: 0.9
+normal: 63.49557522123894, KD: 40.597345132743364
+
+Mode: offline, lr: 0.001, T: 13, weight: 1.0
+normal: 63.77212389380531, KD: 38.88274336283186
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.1
+normal: 62.44469026548673, KD: 42.75442477876106
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.2
+normal: 63.38495575221239, KD: 43.80530973451327
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.3
+normal: 65.09955752212389, KD: 40.76327433628319
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.4
+normal: 63.82743362831859, KD: 44.74557522123894
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.5
+normal: 63.993362831858406, KD: 41.703539823008846
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.6
+normal: 65.15486725663717, KD: 42.31194690265487
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.7
+normal: 61.33849557522124, KD: 42.97566371681416
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.8
+normal: 62.83185840707964, KD: 39.60176991150443
+
+Mode: offline, lr: 0.001, T: 14, weight: 0.9
+normal: 63.93805309734513, KD: 41.09513274336283
+
+Mode: offline, lr: 0.001, T: 14, weight: 1.0
+normal: 63.60619469026549, KD: 40.81858407079646
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.1
+normal: 65.15486725663717, KD: 37.5
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.2
+normal: 64.15929203539822, KD: 37.610619469026545
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.3
+normal: 63.60619469026549, KD: 44.85619469026549
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.4
+normal: 63.77212389380531, KD: 40.376106194690266
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.5
+normal: 64.4358407079646, KD: 40.98451327433628
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.6
+normal: 63.77212389380531, KD: 41.31637168141593
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.7
+normal: 64.38053097345133, KD: 42.86504424778761
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.8
+normal: 63.49557522123894, KD: 42.0353982300885
+
+Mode: offline, lr: 0.001, T: 15, weight: 0.9
+normal: 64.54646017699115, KD: 41.8141592920354
+
+Mode: offline, lr: 0.001, T: 15, weight: 1.0
+normal: 61.33849557522124, KD: 39.38053097345133
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.1
+normal: 62.88716814159292, KD: 42.0353982300885
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.2
+normal: 64.4358407079646, KD: 44.30309734513274
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.3
+normal: 63.60619469026549, KD: 40.98451327433628
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.4
+normal: 61.44911504424779, KD: 41.26106194690266
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.5
+normal: 62.665929203539825, KD: 40.81858407079646
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.6
+normal: 63.82743362831859, KD: 43.086283185840706
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.7
+normal: 62.44469026548673, KD: 41.980088495575224
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.8
+normal: 64.21460176991151, KD: 40.54203539823009
+
+Mode: offline, lr: 0.001, T: 16, weight: 0.9
+normal: 61.44911504424779, KD: 41.8141592920354
+
+Mode: offline, lr: 0.001, T: 16, weight: 1.0
+normal: 62.610619469026545, KD: 38.993362831858406
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.1
+normal: 62.44469026548673, KD: 30.86283185840708
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.2
+normal: 63.10840707964602, KD: 41.64823008849557
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.3
+normal: 65.65265486725664, KD: 44.02654867256637
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.4
+normal: 61.836283185840706, KD: 41.482300884955755
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.5
+normal: 63.66150442477876, KD: 43.25221238938053
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.6
+normal: 64.54646017699115, KD: 40.92920353982301
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.7
+normal: 64.98893805309734, KD: 39.2146017699115
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.8
+normal: 64.8783185840708, KD: 39.04867256637168
+
+Mode: offline, lr: 0.001, T: 17, weight: 0.9
+normal: 64.04867256637168, KD: 40.76327433628319
+
+Mode: offline, lr: 0.001, T: 17, weight: 1.0
+normal: 64.82300884955752, KD: 41.20575221238938
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.1
+normal: 61.94690265486726, KD: 39.491150442477874
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.2
+normal: 63.163716814159294, KD: 44.35840707964602
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.3
+normal: 66.31637168141593, KD: 41.150442477876105
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.4
+normal: 63.93805309734513, KD: 42.533185840707965
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.5
+normal: 63.55088495575221, KD: 42.36725663716814
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.6
+normal: 65.320796460177, KD: 43.860619469026545
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.7
+normal: 63.66150442477876, KD: 40.376106194690266
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.8
+normal: 63.993362831858406, KD: 42.31194690265487
+
+Mode: offline, lr: 0.001, T: 18, weight: 0.9
+normal: 64.49115044247787, KD: 40.92920353982301
+
+Mode: offline, lr: 0.001, T: 18, weight: 1.0
+normal: 65.21017699115045, KD: 40.099557522123895
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.1
+normal: 63.163716814159294, KD: 35.5641592920354
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.2
+normal: 64.32522123893806, KD: 44.30309734513274
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.3
+normal: 62.99778761061947, KD: 42.75442477876106
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.4
+normal: 63.93805309734513, KD: 43.915929203539825
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.5
+normal: 62.389380530973455, KD: 43.19690265486726
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.6
+normal: 64.21460176991151, KD: 40.54203539823009
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.7
+normal: 63.716814159292035, KD: 41.980088495575224
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.8
+normal: 63.93805309734513, KD: 42.92035398230089
+
+Mode: offline, lr: 0.001, T: 19, weight: 0.9
+normal: 64.71238938053098, KD: 39.71238938053097
+
+Mode: offline, lr: 0.001, T: 19, weight: 1.0
+normal: 63.60619469026549, KD: 39.8783185840708
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.1
+normal: 64.26991150442478, KD: 44.192477876106196
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.2
+normal: 63.27433628318584, KD: 45.85176991150443
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.3
+normal: 63.993362831858406, KD: 44.02654867256637
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.4
+normal: 63.66150442477876, KD: 42.09070796460177
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.5
+normal: 65.04424778761062, KD: 43.14159292035398
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.6
+normal: 62.942477876106196, KD: 43.307522123893804
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.7
+normal: 62.11283185840708, KD: 40.376106194690266
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.8
+normal: 64.76769911504425, KD: 42.92035398230089
+
+Mode: offline, lr: 0.001, T: 20, weight: 0.9
+normal: 62.83185840707964, KD: 39.4358407079646
+
+Mode: offline, lr: 0.001, T: 20, weight: 1.0
+normal: 63.66150442477876, KD: 39.60176991150443
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.1
+normal: 51.10619469026549, KD: 30.86283185840708
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.2
+normal: 50.33185840707964, KD: 30.75221238938053
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.3
+normal: 51.43805309734513, KD: 28.81637168141593
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.4
+normal: 50.60840707964602, KD: 29.535398230088497
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.5
+normal: 52.71017699115044, KD: 28.042035398230087
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.6
+normal: 52.267699115044245, KD: 27.654867256637168
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.7
+normal: 51.60398230088496, KD: 30.807522123893804
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.8
+normal: 50.940265486725664, KD: 28.650442477876105
+
+Mode: offline, lr: 0.0001, T: 2, weight: 0.9
+normal: 51.16150442477876, KD: 28.373893805309734
+
+Mode: offline, lr: 0.0001, T: 2, weight: 1.0
+normal: 50.442477876106196, KD: 27.26769911504425
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.1
+normal: 48.83849557522124, KD: 26.88053097345133
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.2
+normal: 49.50221238938053, KD: 29.258849557522122
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.3
+normal: 51.10619469026549, KD: 28.373893805309734
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.4
+normal: 51.991150442477874, KD: 29.701327433628318
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.5
+normal: 51.7146017699115, KD: 30.97345132743363
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.6
+normal: 49.61283185840708, KD: 29.037610619469028
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.7
+normal: 51.216814159292035, KD: 27.93141592920354
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.8
+normal: 52.323008849557525, KD: 27.32300884955752
+
+Mode: offline, lr: 0.0001, T: 3, weight: 0.9
+normal: 50.55309734513274, KD: 26.714601769911503
+
+Mode: offline, lr: 0.0001, T: 3, weight: 1.0
+normal: 50.27654867256637, KD: 29.48008849557522
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.1
+normal: 51.493362831858406, KD: 31.13938053097345
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.2
+normal: 50.442477876106196, KD: 28.650442477876105
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.3
+normal: 49.39159292035398, KD: 29.148230088495577
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.4
+normal: 50.88495575221239, KD: 27.765486725663717
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.5
+normal: 50.33185840707964, KD: 29.646017699115045
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.6
+normal: 49.7787610619469, KD: 30.199115044247787
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.7
+normal: 52.48893805309734, KD: 27.765486725663717
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.8
+normal: 50.49778761061947, KD: 27.378318584070797
+
+Mode: offline, lr: 0.0001, T: 4, weight: 0.9
+normal: 52.1570796460177, KD: 24.059734513274336
+
+Mode: offline, lr: 0.0001, T: 4, weight: 1.0
+normal: 50.55309734513274, KD: 23.949115044247787
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.1
+normal: 50.60840707964602, KD: 32.743362831858406
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.2
+normal: 50.2212389380531, KD: 31.74778761061947
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.3
+normal: 50.2212389380531, KD: 28.373893805309734
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.4
+normal: 50.88495575221239, KD: 27.82079646017699
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.5
+normal: 50.165929203539825, KD: 28.92699115044248
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.6
+normal: 50.99557522123894, KD: 30.309734513274336
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.7
+normal: 48.89380530973451, KD: 29.646017699115045
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.8
+normal: 50.55309734513274, KD: 24.72345132743363
+
+Mode: offline, lr: 0.0001, T: 5, weight: 0.9
+normal: 50.77433628318584, KD: 26.050884955752213
+
+Mode: offline, lr: 0.0001, T: 5, weight: 1.0
+normal: 50.99557522123894, KD: 27.378318584070797
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.1
+normal: 49.059734513274336, KD: 28.761061946902654
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.2
+normal: 51.16150442477876, KD: 28.207964601769913
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.3
+normal: 51.216814159292035, KD: 27.32300884955752
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.4
+normal: 50.88495575221239, KD: 27.654867256637168
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.5
+normal: 49.280973451327434, KD: 28.92699115044248
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.6
+normal: 50.719026548672566, KD: 28.761061946902654
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.7
+normal: 51.216814159292035, KD: 26.825221238938052
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.8
+normal: 51.216814159292035, KD: 29.20353982300885
+
+Mode: offline, lr: 0.0001, T: 6, weight: 0.9
+normal: 51.825221238938056, KD: 27.212389380530972
+
+Mode: offline, lr: 0.0001, T: 6, weight: 1.0
+normal: 51.825221238938056, KD: 26.327433628318584
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.1
+normal: 50.88495575221239, KD: 32.85398230088496
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.2
+normal: 49.889380530973455, KD: 31.471238938053098
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.3
+normal: 49.834070796460175, KD: 27.710176991150444
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.4
+normal: 50.77433628318584, KD: 27.765486725663717
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.5
+normal: 50.55309734513274, KD: 25.995575221238937
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.6
+normal: 51.10619469026549, KD: 29.86725663716814
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.7
+normal: 49.72345132743363, KD: 28.761061946902654
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.8
+normal: 51.60398230088496, KD: 24.170353982300885
+
+Mode: offline, lr: 0.0001, T: 7, weight: 0.9
+normal: 51.7146017699115, KD: 28.31858407079646
+
+Mode: offline, lr: 0.0001, T: 7, weight: 1.0
+normal: 50.33185840707964, KD: 24.336283185840706
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.1
+normal: 49.39159292035398, KD: 28.042035398230087
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.2
+normal: 51.825221238938056, KD: 32.02433628318584
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.3
+normal: 51.32743362831859, KD: 30.143805309734514
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.4
+normal: 50.99557522123894, KD: 26.88053097345133
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.5
+normal: 51.43805309734513, KD: 26.825221238938052
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.6
+normal: 49.22566371681416, KD: 26.9358407079646
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.7
+normal: 51.43805309734513, KD: 28.98230088495575
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.8
+normal: 51.38274336283186, KD: 28.152654867256636
+
+Mode: offline, lr: 0.0001, T: 8, weight: 0.9
+normal: 50.719026548672566, KD: 26.438053097345133
+
+Mode: offline, lr: 0.0001, T: 8, weight: 1.0
+normal: 51.88053097345133, KD: 27.599557522123895
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.1
+normal: 49.72345132743363, KD: 28.871681415929203
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.2
+normal: 50.99557522123894, KD: 29.535398230088497
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.3
+normal: 49.557522123893804, KD: 27.32300884955752
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.4
+normal: 51.9358407079646, KD: 29.258849557522122
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.5
+normal: 49.72345132743363, KD: 27.765486725663717
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.6
+normal: 50.663716814159294, KD: 26.493362831858406
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.7
+normal: 51.493362831858406, KD: 25.829646017699115
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.8
+normal: 49.61283185840708, KD: 24.170353982300885
+
+Mode: offline, lr: 0.0001, T: 9, weight: 0.9
+normal: 50.88495575221239, KD: 27.1570796460177
+
+Mode: offline, lr: 0.0001, T: 9, weight: 1.0
+normal: 51.16150442477876, KD: 28.42920353982301
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.1
+normal: 49.66814159292036, KD: 29.36946902654867
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.2
+normal: 51.54867256637168, KD: 30.420353982300885
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.3
+normal: 50.2212389380531, KD: 27.654867256637168
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.4
+normal: 50.110619469026545, KD: 29.701327433628318
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.5
+normal: 49.889380530973455, KD: 29.424778761061948
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.6
+normal: 50.0, KD: 26.9358407079646
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.7
+normal: 50.0, KD: 21.902654867256636
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.8
+normal: 50.49778761061947, KD: 25.829646017699115
+
+Mode: offline, lr: 0.0001, T: 10, weight: 0.9
+normal: 50.2212389380531, KD: 26.714601769911503
+
+Mode: offline, lr: 0.0001, T: 10, weight: 1.0
+normal: 49.834070796460175, KD: 26.991150442477878
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.1
+normal: 51.38274336283186, KD: 29.037610619469028
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.2
+normal: 50.442477876106196, KD: 29.535398230088497
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.3
+normal: 50.60840707964602, KD: 32.41150442477876
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.4
+normal: 51.65929203539823, KD: 29.3141592920354
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.5
+normal: 51.16150442477876, KD: 26.714601769911503
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.6
+normal: 50.442477876106196, KD: 28.373893805309734
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.7
+normal: 50.05530973451327, KD: 24.557522123893804
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.8
+normal: 50.27654867256637, KD: 25.719026548672566
+
+Mode: offline, lr: 0.0001, T: 11, weight: 0.9
+normal: 50.442477876106196, KD: 25.940265486725664
+
+Mode: offline, lr: 0.0001, T: 11, weight: 1.0
+normal: 50.2212389380531, KD: 25.940265486725664
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.1
+normal: 50.55309734513274, KD: 25.940265486725664
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.2
+normal: 50.719026548672566, KD: 30.86283185840708
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.3
+normal: 48.45132743362832, KD: 30.530973451327434
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.4
+normal: 50.88495575221239, KD: 28.097345132743364
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.5
+normal: 52.3783185840708, KD: 28.70575221238938
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.6
+normal: 50.49778761061947, KD: 25.0
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.7
+normal: 48.783185840707965, KD: 27.488938053097346
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.8
+normal: 49.50221238938053, KD: 29.258849557522122
+
+Mode: offline, lr: 0.0001, T: 12, weight: 0.9
+normal: 50.110619469026545, KD: 25.553097345132745
+
+Mode: offline, lr: 0.0001, T: 12, weight: 1.0
+normal: 50.663716814159294, KD: 29.3141592920354
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.1
+normal: 50.27654867256637, KD: 24.170353982300885
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.2
+normal: 51.05088495575221, KD: 30.586283185840706
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.3
+normal: 51.05088495575221, KD: 27.654867256637168
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.4
+normal: 51.43805309734513, KD: 30.309734513274336
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.5
+normal: 50.60840707964602, KD: 30.47566371681416
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.6
+normal: 49.834070796460175, KD: 28.097345132743364
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.7
+normal: 50.2212389380531, KD: 27.378318584070797
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.8
+normal: 49.61283185840708, KD: 27.43362831858407
+
+Mode: offline, lr: 0.0001, T: 13, weight: 0.9
+normal: 50.2212389380531, KD: 28.81637168141593
+
+Mode: offline, lr: 0.0001, T: 13, weight: 1.0
+normal: 50.82964601769911, KD: 26.603982300884955
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.1
+normal: 51.991150442477874, KD: 28.595132743362832
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.2
+normal: 50.38716814159292, KD: 29.756637168141594
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.3
+normal: 49.72345132743363, KD: 30.47566371681416
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.4
+normal: 50.2212389380531, KD: 27.876106194690266
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.5
+normal: 49.336283185840706, KD: 29.86725663716814
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.6
+normal: 51.54867256637168, KD: 29.48008849557522
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.7
+normal: 51.38274336283186, KD: 30.586283185840706
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.8
+normal: 50.99557522123894, KD: 29.97787610619469
+
+Mode: offline, lr: 0.0001, T: 14, weight: 0.9
+normal: 50.77433628318584, KD: 27.876106194690266
+
+Mode: offline, lr: 0.0001, T: 14, weight: 1.0
+normal: 50.82964601769911, KD: 28.097345132743364
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.1
+normal: 51.991150442477874, KD: 29.258849557522122
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.2
+normal: 51.991150442477874, KD: 31.36061946902655
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.3
+normal: 50.0, KD: 28.595132743362832
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.4
+normal: 51.493362831858406, KD: 27.599557522123895
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.5
+normal: 51.10619469026549, KD: 26.493362831858406
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.6
+normal: 51.493362831858406, KD: 29.258849557522122
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.7
+normal: 49.72345132743363, KD: 29.037610619469028
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.8
+normal: 49.7787610619469, KD: 23.61725663716814
+
+Mode: offline, lr: 0.0001, T: 15, weight: 0.9
+normal: 49.39159292035398, KD: 28.097345132743364
+
+Mode: offline, lr: 0.0001, T: 15, weight: 1.0
+normal: 51.65929203539823, KD: 28.042035398230087
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.1
+normal: 52.046460176991154, KD: 28.595132743362832
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.2
+normal: 52.48893805309734, KD: 31.969026548672566
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.3
+normal: 50.110619469026545, KD: 30.641592920353983
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.4
+normal: 50.99557522123894, KD: 30.918141592920353
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.5
+normal: 50.77433628318584, KD: 27.488938053097346
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.6
+normal: 52.323008849557525, KD: 28.595132743362832
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.7
+normal: 50.663716814159294, KD: 27.765486725663717
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.8
+normal: 50.0, KD: 28.207964601769913
+
+Mode: offline, lr: 0.0001, T: 16, weight: 0.9
+normal: 51.27212389380531, KD: 24.115044247787612
+
+Mode: offline, lr: 0.0001, T: 16, weight: 1.0
+normal: 50.55309734513274, KD: 26.65929203539823
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.1
+normal: 50.82964601769911, KD: 31.028761061946902
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.2
+normal: 51.216814159292035, KD: 30.365044247787612
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.3
+normal: 50.49778761061947, KD: 29.756637168141594
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.4
+normal: 50.38716814159292, KD: 29.0929203539823
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.5
+normal: 51.60398230088496, KD: 30.807522123893804
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.6
+normal: 50.99557522123894, KD: 26.493362831858406
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.7
+normal: 51.88053097345133, KD: 28.484513274336283
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.8
+normal: 51.10619469026549, KD: 27.1570796460177
+
+Mode: offline, lr: 0.0001, T: 17, weight: 0.9
+normal: 51.493362831858406, KD: 27.378318584070797
+
+Mode: offline, lr: 0.0001, T: 17, weight: 1.0
+normal: 51.38274336283186, KD: 26.714601769911503
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.1
+normal: 49.280973451327434, KD: 26.825221238938052
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.2
+normal: 50.38716814159292, KD: 27.82079646017699
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.3
+normal: 50.82964601769911, KD: 29.97787610619469
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.4
+normal: 50.38716814159292, KD: 26.327433628318584
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.5
+normal: 50.99557522123894, KD: 27.488938053097346
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.6
+normal: 50.55309734513274, KD: 27.43362831858407
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.7
+normal: 51.32743362831859, KD: 27.26769911504425
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.8
+normal: 50.60840707964602, KD: 26.548672566371682
+
+Mode: offline, lr: 0.0001, T: 18, weight: 0.9
+normal: 50.719026548672566, KD: 27.488938053097346
+
+Mode: offline, lr: 0.0001, T: 18, weight: 1.0
+normal: 51.27212389380531, KD: 29.811946902654867
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.1
+normal: 50.38716814159292, KD: 31.913716814159294
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.2
+normal: 52.93141592920354, KD: 28.595132743362832
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.3
+normal: 51.05088495575221, KD: 32.02433628318584
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.4
+normal: 52.21238938053097, KD: 29.36946902654867
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.5
+normal: 52.267699115044245, KD: 26.548672566371682
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.6
+normal: 49.11504424778761, KD: 28.70575221238938
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.7
+normal: 49.72345132743363, KD: 30.033185840707965
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.8
+normal: 49.94469026548673, KD: 25.553097345132745
+
+Mode: offline, lr: 0.0001, T: 19, weight: 0.9
+normal: 49.17035398230089, KD: 26.603982300884955
+
+Mode: offline, lr: 0.0001, T: 19, weight: 1.0
+normal: 50.719026548672566, KD: 25.829646017699115
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.1
+normal: 50.0, KD: 27.32300884955752
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.2
+normal: 51.32743362831859, KD: 29.811946902654867
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.3
+normal: 50.2212389380531, KD: 29.59070796460177
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.4
+normal: 49.834070796460175, KD: 27.876106194690266
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.5
+normal: 50.2212389380531, KD: 30.918141592920353
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.6
+normal: 51.32743362831859, KD: 30.088495575221238
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.7
+normal: 50.940265486725664, KD: 27.26769911504425
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.8
+normal: 49.72345132743363, KD: 29.20353982300885
+
+Mode: offline, lr: 0.0001, T: 20, weight: 0.9
+normal: 50.49778761061947, KD: 28.152654867256636
+
+Mode: offline, lr: 0.0001, T: 20, weight: 1.0
+normal: 50.442477876106196, KD: 26.161504424778762
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.1
+normal: 31.63716814159292, KD: 11.117256637168142
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.2
+normal: 32.07964601769911, KD: 13.329646017699115
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.3
+normal: 32.02433628318584, KD: 12.776548672566372
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.4
+normal: 31.969026548672566, KD: 13.440265486725664
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.5
+normal: 32.90929203539823, KD: 14.6570796460177
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.6
+normal: 32.90929203539823, KD: 13.938053097345133
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.7
+normal: 33.79424778761062, KD: 17.035398230088497
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.8
+normal: 32.35619469026549, KD: 13.38495575221239
+
+Mode: offline, lr: 1e-05, T: 2, weight: 0.9
+normal: 31.63716814159292, KD: 14.988938053097344
+
+Mode: offline, lr: 1e-05, T: 2, weight: 1.0
+normal: 32.79867256637168, KD: 14.878318584070797
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.1
+normal: 33.68362831858407, KD: 14.491150442477876
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.2
+normal: 33.13053097345133, KD: 14.988938053097344
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.3
+normal: 32.63274336283186, KD: 16.86946902654867
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.4
+normal: 34.51327433628319, KD: 12.11283185840708
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.5
+normal: 32.13495575221239, KD: 10.896017699115044
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.6
+normal: 31.913716814159294, KD: 13.219026548672566
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.7
+normal: 32.63274336283186, KD: 9.679203539823009
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.8
+normal: 31.63716814159292, KD: 13.716814159292035
+
+Mode: offline, lr: 1e-05, T: 3, weight: 0.9
+normal: 34.01548672566372, KD: 12.555309734513274
+
+Mode: offline, lr: 1e-05, T: 3, weight: 1.0
+normal: 31.305309734513273, KD: 12.997787610619469
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.1
+normal: 32.79867256637168, KD: 15.376106194690266
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.2
+normal: 30.86283185840708, KD: 13.77212389380531
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.3
+normal: 31.25, KD: 13.108407079646017
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.4
+normal: 32.52212389380531, KD: 14.878318584070797
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.5
+normal: 32.9646017699115, KD: 11.725663716814159
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.6
+normal: 31.803097345132745, KD: 12.942477876106194
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.7
+normal: 32.466814159292035, KD: 14.712389380530974
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.8
+normal: 31.028761061946902, KD: 10.508849557522124
+
+Mode: offline, lr: 1e-05, T: 4, weight: 0.9
+normal: 31.194690265486727, KD: 14.491150442477876
+
+Mode: offline, lr: 1e-05, T: 4, weight: 1.0
+normal: 31.52654867256637, KD: 12.334070796460177
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.1
+normal: 35.1216814159292, KD: 14.93362831858407
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.2
+normal: 31.028761061946902, KD: 12.997787610619469
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.3
+normal: 32.41150442477876, KD: 13.716814159292035
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.4
+normal: 31.581858407079647, KD: 12.223451327433628
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.5
+normal: 31.803097345132745, KD: 14.54646017699115
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.6
+normal: 32.30088495575221, KD: 10.121681415929203
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.7
+normal: 32.190265486725664, KD: 13.219026548672566
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.8
+normal: 33.849557522123895, KD: 14.325221238938052
+
+Mode: offline, lr: 1e-05, T: 5, weight: 0.9
+normal: 33.79424778761062, KD: 15.210176991150442
+
+Mode: offline, lr: 1e-05, T: 5, weight: 1.0
+normal: 33.68362831858407, KD: 14.214601769911505
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.1
+normal: 32.63274336283186, KD: 11.61504424778761
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.2
+normal: 30.530973451327434, KD: 11.891592920353983
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.3
+normal: 34.45796460176991, KD: 12.444690265486726
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.4
+normal: 31.305309734513273, KD: 13.219026548672566
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.5
+normal: 31.74778761061947, KD: 13.495575221238939
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.6
+normal: 34.01548672566372, KD: 12.444690265486726
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.7
+normal: 32.02433628318584, KD: 13.716814159292035
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.8
+normal: 29.701327433628318, KD: 10.508849557522124
+
+Mode: offline, lr: 1e-05, T: 6, weight: 0.9
+normal: 33.1858407079646, KD: 11.33849557522124
+
+Mode: offline, lr: 1e-05, T: 6, weight: 1.0
+normal: 33.019911504424776, KD: 18.58407079646018
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.1
+normal: 33.296460176991154, KD: 13.938053097345133
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.2
+normal: 32.63274336283186, KD: 12.831858407079647
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.3
+normal: 29.701327433628318, KD: 14.380530973451327
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.4
+normal: 32.190265486725664, KD: 13.827433628318584
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.5
+normal: 31.25, KD: 15.154867256637168
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.6
+normal: 33.79424778761062, KD: 15.320796460176991
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.7
+normal: 31.803097345132745, KD: 12.88716814159292
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.8
+normal: 31.581858407079647, KD: 11.22787610619469
+
+Mode: offline, lr: 1e-05, T: 7, weight: 0.9
+normal: 32.466814159292035, KD: 15.929203539823009
+
+Mode: offline, lr: 1e-05, T: 7, weight: 1.0
+normal: 31.74778761061947, KD: 15.70796460176991
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.1
+normal: 35.28761061946903, KD: 11.22787610619469
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.2
+normal: 34.126106194690266, KD: 14.93362831858407
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.3
+normal: 31.194690265486727, KD: 10.3429203539823
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.4
+normal: 32.57743362831859, KD: 11.61504424778761
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.5
+normal: 31.08407079646018, KD: 12.057522123893806
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.6
+normal: 32.35619469026549, KD: 10.619469026548673
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.7
+normal: 33.849557522123895, KD: 17.36725663716814
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.8
+normal: 33.1858407079646, KD: 13.938053097345133
+
+Mode: offline, lr: 1e-05, T: 8, weight: 0.9
+normal: 34.23672566371681, KD: 16.758849557522122
+
+Mode: offline, lr: 1e-05, T: 8, weight: 1.0
+normal: 32.9646017699115, KD: 12.5
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.1
+normal: 31.25, KD: 14.103982300884956
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.2
+normal: 31.969026548672566, KD: 13.274336283185841
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.3
+normal: 31.41592920353982, KD: 13.495575221238939
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.4
+normal: 31.471238938053098, KD: 15.652654867256636
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.5
+normal: 33.13053097345133, KD: 12.057522123893806
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.6
+normal: 31.692477876106196, KD: 10.84070796460177
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.7
+normal: 32.190265486725664, KD: 13.882743362831858
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.8
+normal: 31.13938053097345, KD: 12.5
+
+Mode: offline, lr: 1e-05, T: 9, weight: 0.9
+normal: 31.692477876106196, KD: 11.172566371681416
+
+Mode: offline, lr: 1e-05, T: 9, weight: 1.0
+normal: 32.79867256637168, KD: 12.942477876106194
+
+Mode: offline, lr: 1e-05, T: 10, weight: 0.1
+normal: 31.858407079646017, KD: 15.43141592920354
+

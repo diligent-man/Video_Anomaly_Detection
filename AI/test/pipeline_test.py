@@ -2,7 +2,8 @@ import torch
 
 from torchvision.models.video import s3d, S3D_Weights
 
-from AI.src.model import inception_i3d, MLP, TemporalAggregationModule
+from AI.src.model import inception_i3d, MLP
+from AI.src.model.TAM import TemporalAggregation
 from AI.src.utils.Tracer import LeafModuleAwareTracer
 from AI.src.utils.ModelArchInspector import ModelArchInspector
 from AI.src.utils.create_feature_extractor import create_feature_extractor
@@ -83,9 +84,42 @@ def pass_mlp() -> None:
     return None
 
 
+def pass_TAM():
+    device = "cuda"
+
+    batch_size = 1
+    embed_dim = 512
+    max_rel_pos = 4
+    seq_len = 32
+
+    # Case 1: Single backbone, cross-c2c term will be omitted
+    num_backbones = 1
+    tam = TemporalAggregation(
+        embed_dim,
+        num_backbones,
+        max_rel_pos,
+        *(False, device, torch.float32)
+    )
+    inputs = torch.rand((num_backbones, batch_size, seq_len, embed_dim), device=device)
+    assert tam(inputs).shape == torch.Size([batch_size, seq_len, embed_dim])
+
+    # Case 2: Multiple backbones
+    num_backbones = 10
+    tam = TemporalAggregation(
+        embed_dim,
+        num_backbones,
+        max_rel_pos,
+        *(False, device, torch.float32)
+    )
+    inputs = torch.rand((num_backbones, batch_size, seq_len, embed_dim), device=device)
+    assert tam(inputs).shape == torch.Size([batch_size, seq_len, embed_dim])
+    return None
+
+
 def main() -> None:
-    extract_feature()
+    # extract_feature()
     # pass_mlp()
+    pass_TAM()
     return None
 
 

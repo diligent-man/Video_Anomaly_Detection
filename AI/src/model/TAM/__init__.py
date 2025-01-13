@@ -1,3 +1,3 @@
-from .TAM import TemporalAggregationModule
+from .TemporalAggregation import TemporalAggregation
 
-__all__ = ["TemporalAggregationModule"]
+__all__ = ["TemporalAggregation"]

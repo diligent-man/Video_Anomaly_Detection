@@ -96,19 +96,27 @@ def normal_train(model, train_loader, epochs, learning_rate, device):
 def train_knowledge_distillation(teacher, student, train_loader,
                                  epochs, learning_rate,
                                  T, hard_loss_weight,
-                                 device
+                                 device,
+                                 KD_modes: str = "offline"
                                  ):
-    """In this training, we only train student model"""
+    """
+    In this training, we only train student model.
+    KD modes: currently, test with offline or online mode.
+        offline mode: only student's weight is updated during training
+        online mode: both teacher & student' weights are update during training
+    """
     print("Starting knowledge distillation train")
     ce_loss = torch.nn.CrossEntropyLoss()
     kd_loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
     optimizer = torch.optim.Adam(student.parameters(), lr=learning_rate)
+    KD_mode = False if KD_modes == "offline" else False
 
     teacher.eval()  # Teacher set to evaluation mode and act as feature extractor
     student.train()  # Student to train mode
 
     for epoch in range(epochs):
         running_loss = 0.0
+
         for inputs, labels in train_loader:
             with torch.amp.autocast(device, torch.float16):
                 inputs, labels = inputs.to(device), labels.to(device)
@@ -116,8 +124,8 @@ def train_knowledge_distillation(teacher, student, train_loader,
                 optimizer.zero_grad()
 
                 # Forward pass with the teacher model - do not save gradients here as we do not change the teacher's weights
-                # with torch.no_grad():
-                teacher_logits = teacher(inputs)
+                with torch.set_grad_enabled(KD_mode):
+                    teacher_logits = teacher(inputs)
 
                 # Forward pass with the student model
                 student_logits = student(inputs)
@@ -135,7 +143,7 @@ def train_knowledge_distillation(teacher, student, train_loader,
         hard_loss = ce_loss(student_logits, labels)
 
         # Weighted sum of the two losses
-        loss = (1 - hard_loss_weight) * soft_loss + hard_loss_weight * hard_loss
+        loss = hard_loss_weight * hard_loss + (1 - hard_loss_weight) * soft_loss
 
         loss.backward()
         optimizer.step()
@@ -147,7 +155,10 @@ def train_knowledge_distillation(teacher, student, train_loader,
     print()
 
 
-def test(model, test_loader, device):
+def test(model: torch.nn.Module,
+         test_loader: torch.utils.data.DataLoader,
+         device: str
+         ) -> float:
     model.to(device)
     model.eval()
 
@@ -168,7 +179,7 @@ def test(model, test_loader, device):
 
     accuracy = 100 * correct / total
     print(f"Test {model.__class__.__name__}: {accuracy:.2f}%")
-    return None
+    return accuracy
 
 
 def main() -> None:
@@ -191,34 +202,43 @@ def main() -> None:
                                               persistent_workers=True, prefetch_factor=4)
     print(f"Train dataloader: {len(train_loader)}, Test dataloader: {len(test_loader)}\n")
 
-    # Train teacher model
-    teacher_model = TeacherModel().to(device)
-    student_model_1 = StudentModel().to(device)
-    student_model_2 = copy.deepcopy(student_model_1)
+    f = open("KD_offline_training_result.txt", "w")
+    for mode in ["offline", "online"]:
+        for lr in [1e-2, 1e-3, 1e-4, 1e-5]:
+            for T in range(2, 21):
+                for hard_loss_weight in range(1, 11):
+                    teacher_model = TeacherModel().to(device)
+                    student_model_1 = StudentModel().to(device)
+                    student_model_2 = copy.deepcopy(student_model_1)
 
-    teacher_model.compile()
-    student_model_1.compile()
-    student_model_2.compile()
+                    teacher_model.compile()
+                    student_model_1.compile()
+                    student_model_2.compile()
 
-    total_params_deep = "{:,}".format(sum(p.numel() for p in teacher_model.parameters()))
-    total_params_light = "{:,}".format(sum(p.numel() for p in student_model_1.parameters()))
-    print(f"Teacher paras: {total_params_deep}")  # 1,186,986
-    print(f"Student paras: {total_params_light}")  # 267,738
-    print()
+                    total_params_deep = "{:,}".format(sum(p.numel() for p in teacher_model.parameters()))
+                    total_params_light = "{:,}".format(sum(p.numel() for p in student_model_1.parameters()))
+                    print(f"Teacher paras: {total_params_deep}")  # 1,186,986
+                    print(f"Student paras: {total_params_light}")  # 267,738
+                    print()
 
-    print("Norm of 1st layer of student 1:", torch.norm(student_model_1.features[0].weight).item())
-    print("Norm of 1st layer of student 2:", torch.norm(student_model_2.features[0].weight).item())
-    print()
+                    print("Norm of 1st layer of student 1:", torch.norm(student_model_1.features[0].weight).item())
+                    print("Norm of 1st layer of student 2:", torch.norm(student_model_2.features[0].weight).item())
+                    print()
 
-    normal_train(student_model_1, train_loader, 50, 1e-3, device)
-    train_knowledge_distillation(
-        teacher_model, student_model_2, train_loader,
-        50, 1e-3,
-        2, .3, device
-    )
+                    normal_train(student_model_1, train_loader, 30, lr, device)
+                    train_knowledge_distillation(
+                        teacher_model, student_model_2, train_loader,
+                        30, lr,
+                        T, hard_loss_weight / 10, device,
+                        mode
+                    )
 
-    test(student_model_1, test_loader, device)  # Latest test: Acc=62.93%
-    test(student_model_2, test_loader, device)  # Latest test: Acc=70.42%
+                    normal_acc = test(student_model_1, test_loader, device)  # Latest test: Acc=67.53%
+                    KD_acc = test(student_model_2, test_loader, device)  # Latest test: Acc=48.23%
+
+                    f.write(f"""Mode: {mode}, lr: {lr}, T: {T}, weight: {hard_loss_weight / 10}
+normal: {normal_acc}, KD: {KD_acc}\n\n""")
+    f.close()
     return None
 
 
