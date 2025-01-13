@@ -1,3 +1,4 @@
+# TODO: Implement multihead mechanism
 from typing import List, Dict
 
 import torch
@@ -71,7 +72,7 @@ class TemporalAggregation(torch.nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         :param x: tensor of shape (num_backbones, batch_size, seq_len, embed_dim)
-        :return: embedded tensor of shape (num_backbones, batch_size, seq_len, embed_dim)
+        :return: embedded tensor of shape [batch_size, seq_len, embed_dim]
         """
         assert x.dim() == 4, "Required dimension is not satisfied"
 
