@@ -14,7 +14,6 @@ from AI.src.utils.pseudo_label_refinement import PseudoLabelRefiner
 from AI.src.utils.create_feature_extractor import create_feature_extractor
 
 
-
 def test_extract_feature(reduce: str = "first",
                          device: str = "cuda"
                          ) -> None:
@@ -81,7 +80,7 @@ def test_extract_feature(reduce: str = "first",
             print(f"""Test feature extractor
 Feature extractor: {model.__class__.__name__}
 Input: {video.shape}
-Ouput: {features.shape}
+Output: {features.shape}
 """)
             gc.collect()
             torch.cuda.empty_cache()
@@ -89,12 +88,26 @@ Ouput: {features.shape}
 
 
 def test_mlp(device: str = "cuda") -> None:
+    seq_len: int = 32
+    embed_dim: int = 1024
+
+    mlp: MLP = MLP(
+        embed_dim,
+        [512, 512],
+        512,
+        True,
+        0.5,
+        torch.nn.ReLU()
+    ).to(device)
+
+    features = torch.rand((1, seq_len, embed_dim), device=device)
+
     with torch.autocast(device, torch.float16):
-        features = torch.rand((1, 32, 1024), device=device)
-        outputs: torch.Tensor = MLP(features.shape[-1]).to(device)(features)
+        outputs: torch.Tensor = mlp(features)
+
     print(f"""Test MLP result:
 Input shape: {features.shape}
-OUtput shape: {outputs.shape}
+Output shape: {outputs.shape}
 """)
     gc.collect()
     torch.cuda.empty_cache()
@@ -146,7 +159,7 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
         torch.nn.ReLU(),
         torch.nn.Sigmoid()
     ).to(device)
-
+    print(mlp)
     pseudo_label_refiner: PseudoLabelRefiner = PseudoLabelRefiner()
 
     # Output shape from TAM [batch_size, seq_len, embed_dim]
@@ -159,16 +172,15 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
 
         mask = torch.where(anomalous_scores > mask_threshold, 1, 0)
 
-        print(f"""Segment-level prediction/ Soft pseudo-labels
+        print(f"""Test segment-level prediction/ soft pseudo-labels
 {mask.squeeze()}""")
 
 
 def main() -> None:
-    # test_extract_feature()
-    # test_mlp()
-    # test_TAM()
-    # test_pseudo_label_refiner()
-    # TODO: Implement test_pseudo_label_refiner()
+    test_extract_feature()
+    test_mlp()
+    test_TAM()
+    test_pseudo_label_refiner()
     return None
 
 

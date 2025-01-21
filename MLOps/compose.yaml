@@ -59,6 +59,7 @@ services:
                 - "linux/amd64"
             tags:
                 - "capstone/mlflow:0.0.0"
+
         container_name: capstone_mlflow
 
         environment:
@@ -72,8 +73,8 @@ services:
 
             BACKEND_STORE_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/backend
             REGISTRY_STORE_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/backend
-            DEFAULT_ARTIFACT_ROOT: ./mlartifacts
-            ARTIFACTS_DESTINATION: ./mlartifacts
+            DEFAULT_ARTIFACT_ROOT: /mlartifacts
+            ARTIFACTS_DESTINATION: /mlartifacts
 
         networks:
             - MLOps

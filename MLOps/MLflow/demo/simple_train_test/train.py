@@ -12,21 +12,21 @@ from torchvision.transforms import v2, Compose
 __all__ = ["get_dataset", "train", "val"]
 
 
-def get_dataset():
+def get_dataset(root: str = "./MNIST"):
     transform = Compose([
         v2.PILToTensor(),
         v2.ToDtype(torch.float32, scale=True),
     ])
 
     train = torchvision.datasets.MNIST(
-        root="./MNIST",
+        root=root,
         train=True,
         download=True,
         transform=transform
     )
 
     test = torchvision.datasets.MNIST(
-        root=".",
+        root=root,
         train=False,
         download=True,
         transform=transform

@@ -21,14 +21,14 @@ from mlflow.types import Schema, TensorSpec
 from torcheval.metrics.classification import MulticlassAccuracy, MulticlassF1Score
 
 
-from MLOps.MLflow.demo.train_test.train import train, val, get_dataset
-from MLOps.MLflow.demo.train_test.ImageClassifier import ImageClassifier
+from MLOps.MLflow.demo.simple_train_test.train import train, val, get_dataset
+from MLOps.MLflow.demo.simple_train_test.ImageClassifier import ImageClassifier
 
 # Auth by env var for mlflow
-os.environ["MLFLOW_TRACKING_USERNAME"] = "trong"
-os.environ["MLFLOW_TRACKING_PASSWORD"] = "Trong123!"
+os.environ["MLFLOW_TRACKING_USERNAME"] = "root"
+os.environ["MLFLOW_TRACKING_PASSWORD"] = "Root123!"
 
-mlflow.set_tracking_uri(uri="http://0.0.0.0:5000")
+mlflow.set_tracking_uri(uri="http://localhost:5000")
 mlflow.set_experiment("pytorch_demo")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -101,8 +101,8 @@ def test_with_mlflow(test_loader: torch.utils.data.DataLoader,
     print(model)
 
     metric_lst: List[torcheval.metrics.Metric] = [
-        MulticlassAccuracy(num_classes=10, device=device),
-        MulticlassF1Score(num_classes=10, device=device)
+        MulticlassAccuracy(num_classes=10, device=torch.device(device)),
+        MulticlassF1Score(num_classes=10, device=torch.device(device)),
     ]
 
     with torch.no_grad():
@@ -119,11 +119,11 @@ def test_with_mlflow(test_loader: torch.utils.data.DataLoader,
 
 
 def main() -> None:
-    epochs = 5
+    epochs = 1
     lr = 1e-3
-    batch_size = 128
+    batch_size = 1024
 
-    train_data, test_data = get_dataset()
+    train_data, test_data = get_dataset(root="/home/trong/Downloads/Dataset/MNIST/raw")
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, drop_last=False)
     val_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, drop_last=False)
     test_loader = copy.deepcopy(val_loader)
@@ -137,14 +137,16 @@ def main() -> None:
         run_name = f"run {i}"
         model = ImageClassifier().to(device)
         loss = torch.nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(model.parameters(), lr=lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
         metric_lst = [
-            MulticlassAccuracy(num_classes=10, device=device),
-            MulticlassF1Score(num_classes=10, device=device)
+            MulticlassAccuracy(num_classes=10, device=torch.device(device)),
+            MulticlassF1Score(num_classes=10, device=torch.device(device))
         ]
-
-        # train_with_mlflow(run_name, epochs, lr, batch_size, model, loss, metric_lst, optimizer, train_loader, val_loader, signature)
-        lr /= .1
+        train_with_mlflow(run_name, epochs, lr, batch_size,
+                          model, loss, metric_lst, optimizer,
+                          train_loader, val_loader, signature
+                          )
+        lr *= .1
 
     test_with_mlflow(test_loader, signature)
 
