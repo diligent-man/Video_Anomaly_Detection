@@ -43,9 +43,9 @@ class RelPosProj(torch.nn.Module):
         rel_pos = rel_pos.reshape((1, -1)) - rel_pos.reshape((-1, 1))
 
         # Rescale to [0, 2 * max_rel_pos - 1)
-        rel_pos += self.__max_rel_pos
+        rel_pos += 2 * self.__max_rel_pos - 1
         rel_pos = rel_pos.clamp(0, 2 * self.__max_rel_pos - 1)
-
         rel_embeddings = self.__rel_pos_embed(rel_pos)
+
         rel_q, rel_k, _ = self.__qkv_proj(rel_embeddings)
         return rel_q, rel_k

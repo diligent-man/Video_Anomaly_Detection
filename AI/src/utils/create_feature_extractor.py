@@ -336,7 +336,7 @@ def create_feature_extractor(
             model.eval()
 
         # Instantiate our NodePathTracer and use that to trace the model
-        tracer = NodePathTracer(**tracer_kwargs)
+        tracer: NodePathTracer = NodePathTracer(**tracer_kwargs)
         graph = tracer.trace(model, concrete_args=concrete_args)
 
         name = model.__class__.__name__ if isinstance(model, nn.Module) else model.__name__

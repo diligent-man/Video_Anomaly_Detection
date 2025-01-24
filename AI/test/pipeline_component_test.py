@@ -1,9 +1,13 @@
 import gc
 import time
-import torch
 
+
+import torch
+from transformers import CLIPProcessor
 from torchvision.models.video import s3d, S3D_Weights
 
+
+from AI.src.model.CLIP import CLIPModel
 from AI.src.model import inception_i3d, MLP
 from AI.src.model.TAM import TemporalAggregation
 
@@ -14,9 +18,9 @@ from AI.src.utils.pseudo_label_refinement import PseudoLabelRefiner
 from AI.src.utils.create_feature_extractor import create_feature_extractor
 
 
-def test_extract_feature(reduce: str = "first",
-                         device: str = "cuda"
-                         ) -> None:
+def test_3D_extract_feature(reduce: str = "first",
+                            device: str = "cuda"
+                            ) -> None:
     """
     :param reduce: how to get final extracted features. 3D-CNN-related computations will return more than 1 timeframe
                    if T > 13. We can choose to take first time frame or mean all timeframes as extracted features.
@@ -33,7 +37,7 @@ def test_extract_feature(reduce: str = "first",
         "i3d": inception_i3d,
     }
 
-    video: torch.Tensor = torch.rand((32, 3, 80, 224, 224), device=device, dtype=torch.float16)
+    video: torch.Tensor = torch.rand((80, 3, 16, 224, 224), device=device, dtype=torch.float16)
     tracer: LeafModuleAwareTracer = LeafModuleAwareTracer()
 
     with (torch.autocast(device_type=device, dtype=torch.float16)):
@@ -57,8 +61,7 @@ def test_extract_feature(reduce: str = "first",
             # graph: torch.fx.graph.Graph = tracer.trace(model)
             # graph.print_tabular()
 
-            feature_extractor: torch.fx.graph_module.GraphModule = create_feature_extractor(model, return_nodes=return_nodes)
-            feature_extractor.eval()
+            feature_extractor: torch.fx.graph_module.GraphModule = create_feature_extractor(model, return_nodes).eval()
             feature_extractor = feature_extractor.to(device)
 
             # Forward with offloading. Able run with large input
@@ -70,7 +73,7 @@ def test_extract_feature(reduce: str = "first",
             with torch.no_grad():
                 features: torch.Tensor = feature_extractor(video)["features"]  # [B, C, 1, 1, 1] due to 3DConv
 
-            features = features.squeeze()
+            features = features.squeeze(-1).squeeze(-1)
 
             if reduce == "mean":
                 features = features.mean(dim=-1)
@@ -85,6 +88,57 @@ Output: {features.shape}
             gc.collect()
             torch.cuda.empty_cache()
     return None
+
+
+def test_2D_extract_feature(device: str = "cuda") -> None:
+    """
+    :return: extracted features
+    More feature extractors can be found at: https://github.com/v-iashin/video_features/tree/master
+    """
+    video_frames: torch.Tensor = torch.rand((128, 3, 224, 224), device=device, dtype=torch.float16)
+
+    model: torch.nn.Module = CLIPModel.from_pretrained("../weights/CLIP/vit-base-patch16/", use_safetensors=True)
+    preprocessor = CLIPProcessor.from_pretrained("../weights/CLIP/vit-base-patch16", do_rescale=False)
+
+    tracer: LeafModuleAwareTracer = LeafModuleAwareTracer()
+    with (torch.autocast(device_type=device, dtype=torch.float16)):
+        # inputs: dict = preprocessor(
+        #     text=["a photo of a dog"], images=video, return_tensors="pt", padding=True
+        # )
+        # ModelArchInspector(
+        #     model, None, inputs.pop("input_ids"),
+        #     depth=5,
+        #     device="cuda",
+        #     verbose=1,
+        #     mode="eval",
+        #     **inputs
+        # )()
+
+        # graph: torch.fx.graph.Graph = tracer.trace(model, concrete_args={"return_loss": None, "return_dict": None})
+        # graph.print_tabular()
+
+        feature_extractor: torch.fx.graph_module.GraphModule = create_feature_extractor(
+            model,
+            {"visual_projection": "features"},
+            concrete_args={"return_loss": None, "return_dict": None}
+        ).eval()
+        feature_extractor = feature_extractor.to(device)
+
+        # Forwarding model
+        inputs: dict = preprocessor(
+            text=["a photo of a cat", "a photo of a dog"], images=video_frames, return_tensors="pt", padding=True
+        )
+
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+        features = feature_extractor(**inputs)["features"]  # [B, D] due to 3DConv
+
+        print(f"""Test feature extractor
+Feature extractor: {model.__class__.__name__}
+Input: {video_frames.shape}
+Output: {features.shape}
+""")
+        gc.collect()
+        torch.cuda.empty_cache()
 
 
 def test_mlp(device: str = "cuda") -> None:
@@ -115,7 +169,7 @@ Output shape: {outputs.shape}
 
 
 def test_TAM(device: str = "cuda") -> None:
-    batch_size = 1
+    batch_size = 10
     embed_dim = 512
     max_rel_pos = 4
     seq_len = 32
@@ -177,7 +231,8 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
 
 
 def main() -> None:
-    test_extract_feature()
+    test_3D_extract_feature()
+    test_2D_extract_feature()
     test_mlp()
     test_TAM()
     test_pseudo_label_refiner()
