@@ -1,0 +1,71 @@
+from torch.nn import (
+    # Non-linear Activations (weighted sum, nonlinearity)
+    ELU,
+    Hardshrink,
+    Hardsigmoid,
+    Hardtanh,
+    Hardswish,
+    LeakyReLU,
+    LogSigmoid,
+    MultiheadAttention,
+    PReLU,
+    ReLU,
+    ReLU6,
+    RReLU,
+    SELU,
+    CELU,
+    GELU,
+    Sigmoid,
+    SiLU,
+    Mish,
+    Softplus,
+    Softshrink,
+    Softsign,
+    Tanh,
+    Tanhshrink,
+    Threshold,
+    GLU,
+
+    # Non-linear Activations (other)
+    Softmin,
+    Softmax,
+    Softmax2d,
+    LogSoftmax,
+    AdaptiveLogSoftmaxWithLoss
+)
+
+available_activation = {
+    "ELU": ELU,
+    "Hardshrink": Hardshrink,
+    "Hardsigmoid": Hardsigmoid,
+    "Hardtanh": Hardtanh,
+    "Hardswish": Hardswish,
+    "LeakyReLU": LeakyReLU,
+    "LogSigmoid": LogSigmoid,
+    "MultiheadAttention": MultiheadAttention,
+    "PReLU": PReLU,
+    "ReLU": ReLU,
+    "ReLU6": ReLU6,
+    "RReLU": RReLU,
+    "SELU": SELU,
+    "CELU": CELU,
+    "GELU": GELU,
+    "Sigmoid": Sigmoid,
+    "SiLU": SiLU,
+    "Mish": Mish,
+    "Softplus": Softplus,
+    "Softshrink": Softshrink,
+    "Softsign": Softsign,
+    "Tanh": Tanh,
+    "Tanhshrink": Tanhshrink,
+    "Threshold": Threshold,
+    "GLU": GLU,
+
+    "Softmin": Softmin,
+    "Softmax": Softmax,
+    "Softmax2d": Softmax2d,
+    "LogSoftmax": LogSoftmax,
+    "AdaptiveLogSoftmaxWithLoss": AdaptiveLogSoftmaxWithLoss
+}
+
+

@@ -6,18 +6,18 @@ from typing import Tuple
 __all__ = [
     "load_video_v1",
     "load_video_v2",
-    "load_video_v3"
 ]
 
 
 def load_video_v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
-    import torchvision
     """
     :param path: path to video
     :param output_format: returned shape. Currently, THWC or TCHW
     :return: decoded video frames tensor
     Decode video with pyav, Pythonic binding for ffmpeg, as a backend
     """
+    import torchvision
+
     # Ignore audio frame and info in returned result
     frames, _, _ = torchvision.io.read_video(path, pts_unit="sec", output_format=output_format)
     return frames
