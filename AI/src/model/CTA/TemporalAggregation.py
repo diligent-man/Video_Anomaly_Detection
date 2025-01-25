@@ -3,8 +3,8 @@ from typing import List, Dict
 
 import torch
 
-from .QKVProj import QKVProj
-from .RelPosProj import RelPosProj
+from .Proj import QKVProj, RelPosProj
+
 
 __all__ = ["TemporalAggregation"]
 

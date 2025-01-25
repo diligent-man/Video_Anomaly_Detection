@@ -52,7 +52,7 @@ class MLP(torch.nn.Module):
 
         dropout = torch.nn.Dropout(dropout) if dropout is not None and dropout > 0 else None
 
-        self.__layers = self.__make_layers(
+        self._layers = self.__make_layers(
             input_dim,
             hidden_dim,
             output_dim,
@@ -63,9 +63,6 @@ class MLP(torch.nn.Module):
             layer_order,
             **factory_kwargs
         )
-
-        self.__out_activation = out_activation
-
     @property
     def layers(self) -> torch.nn.Sequential:
         return self.__layers
@@ -121,5 +118,5 @@ class MLP(torch.nn.Module):
         return torch.nn.Sequential(collections.OrderedDict(hidden_layers))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.__layers(x)
+        x = self._layers(x)
         return x

@@ -35,11 +35,11 @@ class QKVProj(torch.nn.Module):
         :return:
         """
         batch_size, seq_len, embed_dim = x.size()
-        proj_x = x @ self._in_proj_weight.T
+        x = x @ self._in_proj_weight.T
 
         if self._in_proj_bias is not None:
-            proj_x += self._in_proj_bias
+            x += self._in_proj_bias
 
-        proj_x = proj_x.reshape((3, batch_size, seq_len, embed_dim))
-        q, k, v = proj_x[:, ...]
+        x = x.reshape((3, batch_size, seq_len, embed_dim))
+        q, k, v = x[:, ...]
         return q, k, v
