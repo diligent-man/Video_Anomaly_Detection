@@ -2,13 +2,16 @@ from typing import List, Dict
 
 import torch
 
-from AI.src.model.CTA.Proj import QKVProj, RelPosProj
+
+from .QKV import QKV
+from .RelativePE import RelativePE
+from .._functional import dynamic_expand
 
 
-__all__ = ["CTAEncoder"]
+__all__ = ["TAM"]
 
 
-class CTAEncoder(torch.nn.Module):
+class TAM(torch.nn.Module):
     def __init__(self,
                  num_backbones: int,
                  relative_attention: bool = True,
@@ -19,16 +22,16 @@ class CTAEncoder(torch.nn.Module):
         assert max_relative_position >= 0, ValueError("max_relative_positions must be >= 0")
         assert embed_dim >= 0, ValueError("hidden_size must be > 0")
 
-        self._num_backbones = num_backbones
-        self._content_proj_lst = torch.nn.ModuleList([QKVProj(embed_dim) for _ in range(num_backbones)])
         self._embed_dim = embed_dim
+        self._num_backbones = num_backbones
+        self._content_qkv = torch.nn.ModuleList([QKV(embed_dim) for _ in range(num_backbones)])
 
         if relative_attention:
             if max_relative_position == 0:
                 max_relative_position = embed_dim
-            self._pos_proj = RelPosProj(embed_dim, max_relative_position)
+            self._relative_pe = RelativePE(embed_dim, max_relative_position)
         else:
-            self.register_parameter("__pos_proj", None)
+            self.register_parameter("_relative_pe", None)
 
     def _compute_hidden_state(self,
                               seq_len: int,
@@ -46,26 +49,34 @@ class CTAEncoder(torch.nn.Module):
         :return: hidden state of current sequence. Shape [batch_size, seq_len, embed_dim]
 
         Einsum ref: https://stackoverflow.com/questions/55894693/understanding-pytorch-einsum
+        Algo ref: https://towardsdatascience.com/large-language-models-deberta-decoding-enhanced-bert-with-disentangled-attention-90016668db4b
+        Note: Multi-head is currently not implemented
         """
-        # [seq_len, seq_len, embed_dim]
-        rel_q, rel_k = self._pos_proj(seq_len)
 
-        # TODO: Check how to calculate c2p, p2c ?
+        if self._relative_pe is not None:
+            # rel_q, rel_k: [attn_span, embed_dim],
+            # rel_pos_idx: [seq_len, seq_len]
+            rel_q, rel_k, c2p_rel_pos, p2c_rel_pos = self._relative_pe(seq_len)
+
+            # [batch, seq_len, hidden_dim] x [1, attn_span, embed_dim]
+            c2p_attn: torch.Tensor = q @ rel_k.transpose(-1,-2)
+            c2p_attn = torch.gather(c2p_attn, dim=-1, index=dynamic_expand(c2p_rel_pos, q, [0, 1, 1]))
+
+            # [batch, seq_len, hidden_dim] x [1, attn_span, embed_dim]
+            p2c_attn: torch.Tensor = k @ rel_q.transpose(-1, -2)
+            p2c_attn = torch.gather(p2c_attn, dim=-1, index=dynamic_expand(p2c_rel_pos, k, [0, 1, 1]))
+        else:
+            c2p_attn, p2c_attn = torch.tensor(0), torch.tensor(0)
+
         # 4 attn scores return shape [batch, seq_len, seq_len]
-        c2c_attn: torch.Tensor = q @ k.transpose(-2, -1)
-        cross_c2c_attn: torch.Tensor | None = q @ next_k.transpose(-2, -1) if next_k is not None else None
+        c2c_attn: torch.Tensor = q @ k.transpose(-2, -1)  # self-attn
+        cross_c2c_attn: torch.Tensor | None = q @ next_k.transpose(-2, -1) if next_k is not None else torch.tensor(0) # cross-attn
 
-        # [seq_len, seq_len, embed_dim] x [batch, seq_len, embed_dim]
-        c2p_attn: torch.Tensor = torch.einsum("qkd, bkd -> bqk", rel_k, q)
-        p2c_attn: torch.Tensor = torch.einsum("qkd, bkd -> bqk", rel_q, k)
-
-        attn_score: torch.Tensor = c2c_attn + c2p_attn + p2c_attn
-        if cross_c2c_attn is not None:
-            attn_score += cross_c2c_attn
+        attn_score: torch.Tensor = c2c_attn + cross_c2c_attn + c2p_attn + p2c_attn
 
         attn_score /= (((self._num_backbones + 2) * self._embed_dim) ** .5)
-        hidden_state: torch.Tensor = torch.einsum("bqk,bvd->bqd", attn_score.softmax(dim=-1), v)
-        return hidden_state
+        attn_score = attn_score.softmax(dim=-1)
+        return attn_score @ v
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -78,19 +89,19 @@ class CTAEncoder(torch.nn.Module):
         output: torch.Tensor | None = None
         if self._num_backbones == 1:
             x = x.squeeze(dim=0)
-            q, k, v = self._qkv_proj_lst[0](x)  # [batch_size, seq_len, embed_dim]
+            q, k, v = self._content_qkv[0](x)  # [batch_size, seq_len, hidden_dim]
             output = self._compute_hidden_state(seq_len, q, k, v)
         else:
             hidden_state: None = None
             cache: Dict[str, torch.Tensor | List[torch.Tensor]] = {}
 
             for i in range(self._num_backbones):
-                q, k, v = self._content_proj_lst[i](x[i])  # [batch_size, seq_len, embed_dim]
+                q, k, v = self._content_qkv[i](x[i])  # [batch_size, seq_len, hidden_dim]
                 current_backbone = [q, k, v]
 
                 if i == 0:
                     cache["first_k"] = k
-                elif i == self._num_backbones:
+                elif i == self._num_backbones - 1:
                     hidden_state: torch.Tensor = self._compute_hidden_state(seq_len, *cache["last_backbone"], cache["first_k"])
                 else:
                     hidden_state: torch.Tensor = self._compute_hidden_state(seq_len, *cache["last_backbone"], current_backbone[1])

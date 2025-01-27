@@ -1,15 +1,14 @@
 import gc
-import time
 
 
 import torch
 from transformers import CLIPProcessor
 from torchvision.models.video import s3d, S3D_Weights
 
-
+from AI.src.model.MLP import MLP
 from AI.src.model.CLIP import CLIPModel
-from AI.src.model import inception_i3d, MLP
-from AI.src.model.CTA import CTAModel
+from AI.src.model.TA import TAModel, TAM
+from AI.src.model.InceptionI3D import inception_i3d
 
 from AI.src.utils.Tracer import LeafModuleAwareTracer
 from AI.src.utils.tensor_hook import pack_hook, unpack_hook
@@ -173,29 +172,36 @@ Output shape: {outputs.shape}
 
 def test_TAM(device: str = "cuda") -> None:
     batch_size = 10
-    embed_dim = 512
-    max_rel_pos = 4
+
     seq_len = 32
+    hidden_dim = 1024
+    embed_dim = 1024
+
+    max_rel_pos = 4
 
     # Case 1: Single backbone, cross-c2c term will be omitted
     num_backbones = 1
-    tam = TemporalAggregation(
-        embed_dim,
+    tam = TAM(
         num_backbones,
+        True,
         max_rel_pos,
-        *(False, device, torch.float32)
+        embed_dim
     )
-    inputs = torch.rand((num_backbones, batch_size, seq_len, embed_dim), device=device)
+
+    tam = tam.to(device)
+    inputs = torch.rand((num_backbones, batch_size, seq_len, hidden_dim), device=device)
     assert tam(inputs).shape == torch.Size([batch_size, seq_len, embed_dim])
 
     # Case 2: Multiple backbones
     num_backbones = 10
-    tam = TemporalAggregation(
-        embed_dim,
+    tam = TAM(
         num_backbones,
+        True,
         max_rel_pos,
-        *(False, device, torch.float32)
+        embed_dim
     )
+
+    tam = tam.to(device)
     inputs = torch.rand((num_backbones, batch_size, seq_len, embed_dim), device=device)
     assert tam(inputs).shape == torch.Size([batch_size, seq_len, embed_dim])
     return None
@@ -233,139 +239,86 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
 {mask.squeeze()}""")
 
 
-from transformers.models.deberta import DebertaModel, DebertaTokenizer
-from transformers.models.deberta_v2 import DebertaV2Model, DebertaV2Tokenizer
+def test_model() -> None:
+    batch_size = 1
+    device = "cuda"
+
+    num_backbones = 4
+    hidden_dim = 1024
+    embed_dim = 1024
+    seq_len = 32
+    max_relative_position = 10
+
+    config = {
+        "MODEL_TEACHER_ARGS": {
+            "num_backbones": num_backbones,
+            "in_proj_args": {
+                "input_dim": hidden_dim,
+                "hidden_dim": [hidden_dim // 2, hidden_dim // 2],
+                "output_dim": embed_dim,
+                "bias": True,
+                "dropout": .5,
+                "hidden_activation": "LeakyReLU",
+                "hidden_activation_args": None,
+                "out_activation": None,
+                "out_activation_args": None,
+                "layer_order": "fc->drop->act",
+                "device": None,
+                "dtype": None
+            },
+            "out_proj_args": {
+                "input_dim": embed_dim,
+                "hidden_dim": [512, 32],
+                "output_dim": 1,
+                "bias": True,
+                "dropout": .5,
+                "hidden_activation": "LeakyReLU",
+                "hidden_activation_args": None,
+                "out_activation": "Sigmoid",
+                "out_activation_args": None,
+                "layer_order": "fc->drop->act",
+                "device": None,
+                "dtype": None
+            },
+            "CTA_encoder_args": {
+                # "num_blocks": 1,
+                # "num_heads": 1,
+                "relative_attention": True,
+                "max_relative_position": max_relative_position,
+                "embed_dim": embed_dim,
+            }
+        },
+
+        "MODEL_STUDENT_ARGS": {
+
+        },
+
+    }
+
+    videos = torch.randn((num_backbones, batch_size, seq_len, hidden_dim), device=device)
+
+    with torch.amp.autocast(device, torch.float16):
+        model = TAModel(**config["MODEL_TEACHER_ARGS"]).to(device)
+
+        ModelArchInspector(
+            model, None, videos,
+            depth=3,
+            device="cuda",
+            verbose=1,
+            mode="train"
+        )()
+
+        outs = model(videos)
+        print("Output:", outs.shape)
 
 
 def main() -> None:
     # test_3D_extract_feature()
     # test_2D_extract_feature()
-    test_mlp()
+    # test_mlp()
     # test_TAM()
     # test_pseudo_label_refiner()
-
-#     txt = ["""acts as a guide for navigating VAD
-# research in the subsequent sections, where we explore the
-# challenges associated with the VAD problem. Commencing
-# with an array of diverse datasets, we traverse through var-
-# ious feature extraction techniques utilized to extract spatial,
-# temporal, spatiotemporal, or textual features, leveraging vision
-# language models.
-# Our exploration begins with the utilization of diverse
-# datasets and a spectrum of feature extraction techniques,
-# encompassing CNN, 3D CNN, Autoencoders, GANs, LSTMs,
-# Transformers, vision language features, and Hybrid feature
-# extractors. These methodologies are applied to extract spatial,
-# temporal, spatiotemporal, and textual features. Additionally,
-# the section will address various learning approaches, including
-# supervised, self-supervised, and reconstruction-based strate-
-# gies, which often fall within the realm of unsupervised or
-# one-class classification methods, alongside weakly supervised
-# and predictive models. We will also examine into aspects such
-# as loss functions, regularization methods, and anomaly score
-# computation. Our objective is to provide a comprehensive
-# analysis of these challenges and review the solutions proposed
-# by researchers in this field.
-# Furthermore, our exploration will encompass various learn-
-# ing and supervision strategies, including supervised methods,
-# self-supervised techniques, and unsupervised techniques (of-
-# ten classified as reconstruction-based or one-class classifica-
-# tion approaches), alongside weakly supervised and prediction
-# methods. Additionally, we will illuminate the significance of
-# loss functions, regularization techniques, and anomaly score
-# computation. Evaluation protocols for models are discussed
-# in section acts as a guide for navigating VAD
-# research in the subsequent sections, where we explore the
-# challenges associated with the VAD problem. Commencing
-# with an array of diverse datasets, we traverse through var-
-# ious feature extraction techniques utilized to extract spatial,
-# temporal, spatiotemporal, or textual features, leveraging vision
-# language models.
-# Our exploration begins with the utilization of diverse
-# datasets and a spectrum of feature extraction techniques,
-# encompassing CNN, 3D CNN, Autoencoders, GANs, LSTMs,
-# Transformers, vision language features, and Hybrid feature
-# extractors. These methodologies are applied to extract spatial,
-# temporal, spatiotemporal, and textual features. Additionally,
-# the section will address various learning approaches, including
-# supervised, self-supervised, and reconstruction-based strate-
-# gies, which often fall within the realm of unsupervised or
-# one-class classification methods, alongside weakly supervised
-# and predictive models. We will also examine into aspects such
-# as loss functions, regularization methods, and anomaly score
-# computation. Our objective is to provide a comprehensive
-# analysis of these challenges and review the solutions proposed
-# by researchers in this field.
-# Furthermore, our exploration will encompass various learn-
-# ing and supervision strategies, including supervised methods,
-# self-supervised techniques, and unsupervised techniques (of-
-# ten classified as reconstruction-based or one-class classifica-
-# tion approaches), alongside weakly supervised and prediction
-# methods. Additionally, we will illuminate the significance of
-# loss functions, regularization techniques, and anomaly score
-# computation. Evaluation protocols for models are discussed
-# in section acts as a guide for navigating VAD
-# research in the subsequent sections, where we explore the
-# challenges associated with the VAD problem. Commencing
-# with an array of diverse datasets, we traverse through var-
-# ious feature extraction techniques utilized to extract spatial,
-# temporal, spatiotemporal, or textual features, leveraging vision
-# language models.
-# Our exploration begins with the utilization of diverse
-# datasets and a spectrum of feature extraction techniques,
-# encompassing CNN, 3D CNN, Autoencoders, GANs, LSTMs,
-# Transformers, vision language features, and Hybrid feature
-# extractors. These methodologies are applied to extract spatial,
-# temporal, spatiotemporal, and textual features. Additionally,
-# the section will address various learning approaches, including
-# supervised, self-supervised, and reconstruction-based strate-
-# gies, which often fall within the realm of unsupervised or
-# one-class classification methods, alongside weakly supervised
-# and predictive models. We will also examine into aspects such
-# as loss functions, regularization methods, and anomaly score
-# computation. Our objective is to provide a comprehensive
-# analysis of these challenges and review the solutions proposed
-# by researchers in this field.
-# Furthermore, our exploration will encompass various learn-
-# ing and supervision strategies, including supervised methods,
-# self-supervised techniques, and unsupervised techniques (of-
-# ten classified as reconstruction-based or one-class classifica-
-# tion approaches), alongside weakly supervised and prediction
-# methods. Additionally, we will illuminate the significance of
-# loss functions, regularization techniques, and anomaly score
-# computation. Evaluation protocols for models are discussed
-# in section"""]
-#     v1_model = DebertaModel.from_pretrained("microsoft/deberta-base")
-#     v2_model = DebertaV2Model.from_pretrained("microsoft/deberta-v3-small")
-#
-#     v1_tokenizer = DebertaTokenizer.from_pretrained("microsoft/deberta-base")
-#     v2_tokenizer = DebertaV2Tokenizer.from_pretrained("microsoft/deberta-v3-small")
-#
-#     for tokenizer, model in zip([v1_tokenizer, v2_tokenizer], [v1_model, v2_model]):
-#         # inputs = tokenizer(
-#         #     txt,
-#         #     padding=True,
-#         #     return_tensors="pt"
-#         # ).to("cuda")
-#         # ModelArchInspector(
-#         #     model, None, inputs.pop("input_ids"),
-#         #     depth=5,
-#         #     device="cuda",
-#         #     verbose=1,
-#         #     mode="eval",
-#         #     **inputs
-#         # )()
-#
-#
-#         inputs = tokenizer(
-#             txt,
-#             padding=True,
-#             return_tensors="pt"
-#         ).to("cuda")
-#         model = model.to("cuda")
-#         outputs = model(**inputs)
-#         print(type(outputs))
-#         break
+    test_model()
     return None
 
 

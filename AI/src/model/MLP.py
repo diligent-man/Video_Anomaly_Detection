@@ -1,3 +1,4 @@
+import copy
 import collections
 
 from typing import List, Tuple, Dict, Any
@@ -100,18 +101,18 @@ class MLP(torch.nn.Module):
                 hidden_layers[f"fc{i}"] = fc_layer
 
                 if dropout is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"dropout{i}"] = dropout
+                    hidden_layers[f"dropout{i}"] = copy.deepcopy(dropout)
 
                 if hidden_activation is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"act{i}"] = hidden_activation
+                    hidden_layers[f"act{i}"] = copy.deepcopy(hidden_activation)
             elif layer_order == "fc->act->drop":
                 hidden_layers[f"fc{i}"] = fc_layer
 
                 if hidden_activation is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"act{i}"] = hidden_activation
+                    hidden_layers[f"act{i}"] = copy.deepcopy(hidden_activation)
 
                 if dropout is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"dropout{i}"] = dropout
+                    hidden_layers[f"dropout{i}"] = copy.deepcopy(dropout)
 
         if out_activation is not None:
             hidden_layers[f"out_act"] = out_activation
