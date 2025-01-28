@@ -15,10 +15,11 @@ class TAM(torch.nn.Module):
     def __init__(self,
                  num_backbones: int,
                  relative_attention: bool = True,
-                 max_relative_position: int = 0,
-                 embed_dim: int = 512
+                 max_relative_position: int = 10,
+                 embed_dim: int = 1024
                  ):
         super().__init__()
+
         assert max_relative_position >= 0, ValueError("max_relative_positions must be >= 0")
         assert embed_dim >= 0, ValueError("hidden_size must be > 0")
 

@@ -240,32 +240,74 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
 
 
 def test_model() -> None:
-    batch_size = 1
+    batch_size = 2
     device = "cuda"
 
     num_backbones = 4
-    hidden_dim = 1024
+    hidden_dims = [1024, 512, 512, 1024]
     embed_dim = 1024
     seq_len = 32
     max_relative_position = 10
 
     config = {
         "MODEL_TEACHER_ARGS": {
-            "num_backbones": num_backbones,
-            "in_proj_args": {
-                "input_dim": hidden_dim,
-                "hidden_dim": [hidden_dim // 2, hidden_dim // 2],
-                "output_dim": embed_dim,
-                "bias": True,
-                "dropout": .5,
-                "hidden_activation": "LeakyReLU",
-                "hidden_activation_args": None,
-                "out_activation": None,
-                "out_activation_args": None,
-                "layer_order": "fc->drop->act",
-                "device": None,
-                "dtype": None
-            },
+            # Input dim of in_proj MLP is predicated upon corresponding feature extractor
+            "in_proj_args":
+                [
+                    # 1st feature extractor
+                    {
+                        "input_dim": hidden_dims[0],
+                        "hidden_dim": [512, 512],
+                        "output_dim": embed_dim,
+                        "bias": True,
+                        "dropout": .5,
+                        "hidden_activation": "LeakyReLU",
+                        "hidden_activation_args": None,
+                        "out_activation": None,
+                        "out_activation_args": None,
+                        "layer_order": "fc->drop->act",
+                    },
+                    # 2nd feature extractor
+                    {
+                        "input_dim": hidden_dims[1],
+                        "hidden_dim": [512, 512],
+                        "output_dim": embed_dim,
+                        "bias": True,
+                        "dropout": .5,
+                        "hidden_activation": "LeakyReLU",
+                        "hidden_activation_args": None,
+                        "out_activation": None,
+                        "out_activation_args": None,
+                        "layer_order": "fc->drop->act",
+                    },
+                    # 3rd feature extractor
+                    {
+                        "input_dim": hidden_dims[2],
+                        "hidden_dim": [512, 512],
+                        "output_dim": embed_dim,
+                        "bias": True,
+                        "dropout": .5,
+                        "hidden_activation": "LeakyReLU",
+                        "hidden_activation_args": None,
+                        "out_activation": None,
+                        "out_activation_args": None,
+                        "layer_order": "fc->drop->act",
+                    },
+
+                    # 4th feature extractor
+                    {
+                        "input_dim": hidden_dims[3],
+                        "hidden_dim": [512, 512],
+                        "output_dim": embed_dim,
+                        "bias": True,
+                        "dropout": .5,
+                        "hidden_activation": "LeakyReLU",
+                        "hidden_activation_args": None,
+                        "out_activation": None,
+                        "out_activation_args": None,
+                        "layer_order": "fc->drop->act",
+                    }
+                ],
             "out_proj_args": {
                 "input_dim": embed_dim,
                 "hidden_dim": [512, 32],
@@ -277,15 +319,13 @@ def test_model() -> None:
                 "out_activation": "Sigmoid",
                 "out_activation_args": None,
                 "layer_order": "fc->drop->act",
-                "device": None,
-                "dtype": None
             },
-            "CTA_encoder_args": {
+
+            "TAM_args": {
                 # "num_blocks": 1,
                 # "num_heads": 1,
                 "relative_attention": True,
                 "max_relative_position": max_relative_position,
-                "embed_dim": embed_dim,
             }
         },
 
@@ -295,20 +335,23 @@ def test_model() -> None:
 
     }
 
-    videos = torch.randn((num_backbones, batch_size, seq_len, hidden_dim), device=device)
+    extracted_features = [
+        torch.randn((batch_size, seq_len, hidden_dim), device=device)
+        for hidden_dim in hidden_dims
+    ]
 
     with torch.amp.autocast(device, torch.float16):
         model = TAModel(**config["MODEL_TEACHER_ARGS"]).to(device)
 
-        ModelArchInspector(
-            model, None, videos,
-            depth=3,
-            device="cuda",
-            verbose=1,
-            mode="train"
-        )()
-
-        outs = model(videos)
+        # ModelArchInspector(
+        #     model, None, extracted_features,
+        #     depth=3,
+        #     device="cuda",
+        #     verbose=1,
+        #     mode="train"
+        # )()
+        #
+        outs = model(extracted_features)
         print("Output:", outs.shape)
 
 
