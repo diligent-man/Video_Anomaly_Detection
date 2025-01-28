@@ -5,7 +5,7 @@ import torch
 
 from .QKV import QKV
 from .RelativePE import RelativePE
-from .._functional import dynamic_expand
+from .._functional import dynamic_expand, transform_multihead
 
 
 __all__ = ["TAM"]
@@ -36,20 +36,7 @@ class TAM(torch.nn.Module):
         else:
             self.register_parameter("_relative_pe", None)
 
-    def _transform_multihead(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        :param x: tensor of shape [batch_size, seq_len, embed_dim]
-        :return: multi-headed x. Shape [batch_size, num_heads, seq_len, head_dim]
-        """
-        batch, seq_len, embed_dim = x.shape
-        head_dim = embed_dim // self._num_heads
-
-        new_shape = (batch, seq_len, self._num_heads, head_dim)
-        x = x.view(new_shape).permute(0, 2, 1, 3)
-        return x
-
     def _compute_hidden_state(self,
-                              seq_len: int,
                               q: torch.Tensor,
                               k: torch.Tensor,
                               v: torch.Tensor,
@@ -68,14 +55,14 @@ class TAM(torch.nn.Module):
         Note: Multi-head is currently not implemented
         """
         batch, seq_len, embed_dim = v.shape
-        q, k, v = [self._transform_multihead(x) for x in [q, k, v]]  # [batch_size, num_heads, seq_len, head_dim]
-        next_k = self._transform_multihead(next_k) if next_k is not None else next_k
+        q, k, v = [transform_multihead(x, self._num_heads) for x in [q, k, v]]  # [batch_size, num_heads, seq_len, head_dim]
+        next_k = transform_multihead(next_k, self._num_heads) if next_k is not None else next_k
 
         if self._relative_pe is not None:
             # rel_q, rel_k: [attn_span, embed_dim],
             # rel_pos_idx: [seq_len, seq_len]
             rel_q, rel_k, c2p_rel_pos, p2c_rel_pos = self._relative_pe(seq_len)
-            rel_q, rel_k = self._transform_multihead(rel_q), self._transform_multihead(rel_k)
+            rel_q, rel_k = transform_multihead(rel_q, self._num_heads), transform_multihead(rel_k, self._num_heads)
 
             # [batch_size, num_heads, seq_len, head_dim] x [batch_size, num_heads, seq_len, head_dim]
             c2p_attn: torch.Tensor = q @ rel_k.transpose(-1,-2)
@@ -124,12 +111,11 @@ class TAM(torch.nn.Module):
                 if i == 0:
                     cache["first_k"] = k
                 elif i == self._num_backbones - 1:
-                    hidden_state: torch.Tensor = self._compute_hidden_state(seq_len, *cache["last_backbone"], cache["first_k"])
+                    hidden_state: torch.Tensor = self._compute_hidden_state(*cache["last_backbone"], cache["first_k"])
                 else:
-                    hidden_state: torch.Tensor = self._compute_hidden_state(seq_len, *cache["last_backbone"], current_backbone[1])
+                    hidden_state: torch.Tensor = self._compute_hidden_state(*cache["last_backbone"], current_backbone[1])
 
                 output = hidden_state if output is None else output + hidden_state
                 cache["last_backbone"] = current_backbone
-
             output /= self._num_backbones
         return output

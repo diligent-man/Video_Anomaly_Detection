@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple, Union
 
 import torch
 
@@ -68,7 +68,9 @@ class TAModel(torch.nn.Module):
         assert TAM_args["num_heads"] % in_proj_args[0]["output_dim"], ValueError(f"Embed_dim ({in_proj_args[0]['output_dim']}) \
         must be divisible by ({TAM_args['num_heads']})")
 
-    def forward(self, x: List[torch.Tensor], return_TAM_states: bool = False) -> torch.Tensor:
+    def forward(self, x: List[torch.Tensor],
+                return_TAM_states: bool = False
+                ) -> Union[Tuple[torch.Tensor, torch.Tensor], torch.Tensor]:
         """
         :param x: Hidden states from feature extractors. Shape list([Num_backbones, batch_size, seg_len, hidden_dim])
         :param return_TAM_states: Hidden states from TAM. Shape [batch, seq_len, embed_dim]
@@ -80,6 +82,10 @@ class TAModel(torch.nn.Module):
         """
         assert len(x) == len(self._in_proj), "Input has more elements than num_backbones"
         x = torch.stack([self._in_proj[i](x[i]) for i in range(self._num_backbones)], dim=0)
-        x = self._TAM(x)
-        x = self._out_proj(x)
-        return x
+        TAM_states = self._TAM(x)
+        x = self._out_proj(TAM_states)
+
+        if return_TAM_states:
+            return x, TAM_states
+        else:
+            return x
