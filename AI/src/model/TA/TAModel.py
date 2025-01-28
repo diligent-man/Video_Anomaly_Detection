@@ -18,19 +18,14 @@ class TAModel(torch.nn.Module):
 
         self._verify_in_proj_args(in_proj_args)
         self._verify_out_proj_args(in_proj_args, out_proj_args)
+        self._verify_TAM_args(TAM_args, in_proj_args)
 
         self._num_backbones = len(in_proj_args)
         self._in_proj = torch.nn.ModuleList([MLP(**in_proj_args[i]) for i in range(self._num_backbones)])
         self._out_proj = MLP(**out_proj_args)
 
-        if TAM_args.get("num_backbones", None) is None:
-            print("TAM args does not contains num_backbones, init based on len of in_proj_args")
-            TAM_args["num_backbones"] = self._num_backbones
-
-        if TAM_args.get("embed_dim", None) is None:
-            print("TAM args does not contains embed_dim, init based on output_dim of in_proj_args")
-            TAM_args["embed_dim"] = in_proj_args[0]["output_dim"]
-
+        # from pprint import pprint as pp
+        # pp(TAM_args)
         self._TAM = TAM(**TAM_args)
 
     @staticmethod
@@ -55,6 +50,23 @@ class TAModel(torch.nn.Module):
         assert out_proj_args.get("input_dim", None) is not None, ValueError("Input dim must be provided and equal to embed_dim")
         assert in_proj_args[0]["output_dim"] == out_proj_args["input_dim"], ValueError("Output dim of 1st MLP must be equivalent to input dim of 2nd MLP")
         print("Done !\n")
+
+    @staticmethod
+    def _verify_TAM_args(TAM_args: Dict[str, Any], in_proj_args: List[Dict[str, Any]]) -> None:
+        if TAM_args.get("num_backbones", None) is None:
+            print("TAM args does not contains num_backbones, init based on len of in_proj_args")
+            TAM_args["num_backbones"] = len(in_proj_args)
+
+        if TAM_args.get("embed_dim", None) is None:
+            print("TAM args does not contains embed_dim, init based on output_dim of in_proj_args")
+            TAM_args["embed_dim"] = in_proj_args[0]["output_dim"]
+
+        if TAM_args.get("num_heads", None) is None:
+            print("Num_heads is set to 1 by default")
+            TAM_args["num_heads"] = 1
+
+        assert TAM_args["num_heads"] % in_proj_args[0]["output_dim"], ValueError(f"Embed_dim ({in_proj_args[0]['output_dim']}) \
+        must be divisible by ({TAM_args['num_heads']})")
 
     def forward(self, x: List[torch.Tensor], return_TAM_states: bool = False) -> torch.Tensor:
         """

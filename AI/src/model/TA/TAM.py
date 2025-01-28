@@ -14,6 +14,7 @@ __all__ = ["TAM"]
 class TAM(torch.nn.Module):
     def __init__(self,
                  num_backbones: int,
+                 num_heads: int,
                  relative_attention: bool = True,
                  max_relative_position: int = 10,
                  embed_dim: int = 1024
@@ -23,8 +24,9 @@ class TAM(torch.nn.Module):
         assert max_relative_position >= 0, ValueError("max_relative_positions must be >= 0")
         assert embed_dim >= 0, ValueError("hidden_size must be > 0")
 
-        self._embed_dim = embed_dim
         self._num_backbones = num_backbones
+        self._num_heads = num_heads
+        self._embed_dim = embed_dim
         self._content_qkv = torch.nn.ModuleList([QKV(embed_dim) for _ in range(num_backbones)])
 
         if relative_attention:
@@ -33,6 +35,18 @@ class TAM(torch.nn.Module):
             self._relative_pe = RelativePE(embed_dim, max_relative_position)
         else:
             self.register_parameter("_relative_pe", None)
+
+    def _transform_multihead(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        :param x: tensor of shape [batch_size, seq_len, embed_dim]
+        :return: multi-headed x. Shape [batch_size, num_heads, seq_len, head_dim]
+        """
+        batch, seq_len, embed_dim = x.shape
+        head_dim = embed_dim // self._num_heads
+
+        new_shape = (batch, seq_len, self._num_heads, head_dim)
+        x = x.view(new_shape).permute(0, 2, 1, 3)
+        return x
 
     def _compute_hidden_state(self,
                               seq_len: int,
@@ -53,19 +67,23 @@ class TAM(torch.nn.Module):
         Algo ref: https://towardsdatascience.com/large-language-models-deberta-decoding-enhanced-bert-with-disentangled-attention-90016668db4b
         Note: Multi-head is currently not implemented
         """
+        batch, seq_len, embed_dim = v.shape
+        q, k, v = [self._transform_multihead(x) for x in [q, k, v]]  # [batch_size, num_heads, seq_len, head_dim]
+        next_k = self._transform_multihead(next_k) if next_k is not None else next_k
 
         if self._relative_pe is not None:
             # rel_q, rel_k: [attn_span, embed_dim],
             # rel_pos_idx: [seq_len, seq_len]
             rel_q, rel_k, c2p_rel_pos, p2c_rel_pos = self._relative_pe(seq_len)
+            rel_q, rel_k = self._transform_multihead(rel_q), self._transform_multihead(rel_k)
 
-            # [batch, seq_len, hidden_dim] x [1, attn_span, embed_dim]
+            # [batch_size, num_heads, seq_len, head_dim] x [batch_size, num_heads, seq_len, head_dim]
             c2p_attn: torch.Tensor = q @ rel_k.transpose(-1,-2)
-            c2p_attn = torch.gather(c2p_attn, dim=-1, index=dynamic_expand(c2p_rel_pos, q, [0, 1, 1]))
+            c2p_attn = torch.gather(c2p_attn, dim=-1, index=dynamic_expand(c2p_rel_pos, q, [0, 1, 2, 2]))
 
             # [batch, seq_len, hidden_dim] x [1, attn_span, embed_dim]
             p2c_attn: torch.Tensor = k @ rel_q.transpose(-1, -2)
-            p2c_attn = torch.gather(p2c_attn, dim=-1, index=dynamic_expand(p2c_rel_pos, k, [0, 1, 1]))
+            p2c_attn = torch.gather(p2c_attn, dim=-1, index=dynamic_expand(p2c_rel_pos, k, [0, 1, 2, 2]))
         else:
             c2p_attn, p2c_attn = torch.tensor(0), torch.tensor(0)
 
@@ -74,10 +92,13 @@ class TAM(torch.nn.Module):
         cross_c2c_attn: torch.Tensor | None = q @ next_k.transpose(-2, -1) if next_k is not None else torch.tensor(0) # cross-attn
 
         attn_score: torch.Tensor = c2c_attn + cross_c2c_attn + c2p_attn + p2c_attn
-
         attn_score /= (((self._num_backbones + 2) * self._embed_dim) ** .5)
         attn_score = attn_score.softmax(dim=-1)
-        return attn_score @ v
+
+        hidden_state = attn_score @ v
+        # [batch, num_heads, seq_len, head_dim] -> [batch, seq_len, num_heads, head_dim] -> [batch, seq_len, embed_dim]
+        hidden_state = hidden_state.permute(0, 2, 1, 3).reshape(batch, seq_len, embed_dim)
+        return hidden_state
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -107,11 +128,7 @@ class TAM(torch.nn.Module):
                 else:
                     hidden_state: torch.Tensor = self._compute_hidden_state(seq_len, *cache["last_backbone"], current_backbone[1])
 
-                if output is None:
-                    output = hidden_state
-                else:
-                    output += hidden_state
-
+                output = hidden_state if output is None else output + hidden_state
                 cache["last_backbone"] = current_backbone
 
             output /= self._num_backbones

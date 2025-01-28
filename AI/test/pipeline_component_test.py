@@ -240,11 +240,10 @@ def test_pseudo_label_refiner(device: str = "cuda") -> None:
 
 
 def test_model() -> None:
-    batch_size = 2
+    batch_size = 64
     device = "cuda"
 
-    num_backbones = 4
-    hidden_dims = [1024, 512, 512, 1024]
+    hidden_dims = [1024, 512]
     embed_dim = 1024
     seq_len = 32
     max_relative_position = 10
@@ -279,33 +278,6 @@ def test_model() -> None:
                         "out_activation": None,
                         "out_activation_args": None,
                         "layer_order": "fc->drop->act",
-                    },
-                    # 3rd feature extractor
-                    {
-                        "input_dim": hidden_dims[2],
-                        "hidden_dim": [512, 512],
-                        "output_dim": embed_dim,
-                        "bias": True,
-                        "dropout": .5,
-                        "hidden_activation": "LeakyReLU",
-                        "hidden_activation_args": None,
-                        "out_activation": None,
-                        "out_activation_args": None,
-                        "layer_order": "fc->drop->act",
-                    },
-
-                    # 4th feature extractor
-                    {
-                        "input_dim": hidden_dims[3],
-                        "hidden_dim": [512, 512],
-                        "output_dim": embed_dim,
-                        "bias": True,
-                        "dropout": .5,
-                        "hidden_activation": "LeakyReLU",
-                        "hidden_activation_args": None,
-                        "out_activation": None,
-                        "out_activation_args": None,
-                        "layer_order": "fc->drop->act",
                     }
                 ],
             "out_proj_args": {
@@ -323,7 +295,7 @@ def test_model() -> None:
 
             "TAM_args": {
                 # "num_blocks": 1,
-                # "num_heads": 1,
+                "num_heads": 2,
                 "relative_attention": True,
                 "max_relative_position": max_relative_position,
             }
@@ -344,16 +316,17 @@ def test_model() -> None:
         model = TAModel(**config["MODEL_TEACHER_ARGS"]).to(device)
 
         # ModelArchInspector(
-        #     model, None, extracted_features,
+        #     model, None, {"x": extracted_features},
         #     depth=3,
         #     device="cuda",
         #     verbose=1,
         #     mode="train"
         # )()
-        #
+
         outs = model(extracted_features)
         print("Output:", outs.shape)
 
+    from transformers.models.deberta import DebertaModel
 
 def main() -> None:
     # test_3D_extract_feature()
