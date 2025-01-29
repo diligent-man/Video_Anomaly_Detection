@@ -357,7 +357,7 @@ def main() -> None:
     # test_mlp()
     # test_TAM()
     # test_pseudo_label_refiner()
-    test_model()
+    # test_model()
     return None
 
 
