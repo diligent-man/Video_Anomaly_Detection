@@ -13,8 +13,7 @@ def main(args: argparse.Namespace) -> None:
     # if config["Global"]["distributed"]:
     #     dist.init_parallel_env()
     #
-    # global_config = config["Global"]
-    args: DotDict = ConfigPreprocessor(args.config_path)()
+    config: DotDict = ConfigPreprocessor(args.config_path).config
     return None
 
 

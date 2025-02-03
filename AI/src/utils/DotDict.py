@@ -31,7 +31,8 @@ class DotDict(dict):
         super(DotDict, self).__init__()
 
         for k, v in in_dict.items():
-            k = self._preprocess_key(k, depth, kwargs.get("capitalize_first_level_key", True))
+            k: str = self._preprocess_key(k, depth, kwargs.get("capitalize_first_level_key", True))
+
             if isinstance(v, (list, tuple, set)):
                 v = self._remove_duplicated_dicts(v)
                 setattr(self, k, [DotDict(x, depth+1, **kwargs) if isinstance(x, dict) else x for x in v])

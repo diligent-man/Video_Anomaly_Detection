@@ -211,19 +211,6 @@
             "apply": true,
             "inspect_model": true,
             "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
-        },
-
-        {
-            "name": "tensorboard1",
-            "apply": {"abc": true},
-            "inspect_model": true,
-            "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
-        },
-        {
-            "name": "tensorboard1",
-            "apply": true,
-            "inspect_model": true,
-            "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
         }
     ]
 //    "EVALUATION_STRATEGY": "no"
