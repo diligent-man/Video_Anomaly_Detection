@@ -1,7 +1,7 @@
 import os
 import pathlib
 
-from typing import Union, Dict
+from typing import Union, Dict, Any
 
 from .DotDict import DotDict
 from .utils import load_config
@@ -60,7 +60,7 @@ class ConfigPreprocessor(object):
         for directory in dirs_to_check:
             # Add path to class attr
             k = f"{directory}_path"
-            print(output_path, args.technique, "_".join(architecture_components), directory)
+            print(output_path, args.Global.technique, "_".join(architecture_components), directory)
             v = os.path.join(output_path, args.technique, "_".join(architecture_components), directory)
             args[k] = v
 
@@ -71,10 +71,18 @@ class ConfigPreprocessor(object):
             else:
                 print(f"Dir for {directory} has already been around and will be overridden.")
         print("""#####################################################################""")
+    @staticmethod
+    def _capitalize_first_depth_key(config: Dict[str, Any]) -> DotDict:
+        new_config = DotDict({k.capitalize(): v for k, v in config.items()})
+        return new_config
 
     def __call__(self, *args, **kwargs) -> DotDict:
-        config = load_config(self.__config_path)
-        args: DotDict = DotDict(config, key_error_handling="warn")
+        config: Dict[str, Any] = load_config(self.__config_path)
+        config: DotDict = DotDict(config, key_error_handling="warn")
+        config: DotDict = self._capitalize_first_depth_key(config)
+
+        from pprint import pprint as pp
+        pp(config)
 
         # self._post_init(args)
         # return args

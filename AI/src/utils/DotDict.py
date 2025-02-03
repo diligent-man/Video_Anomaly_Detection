@@ -31,8 +31,7 @@ class DotDict(dict):
         super(DotDict, self).__init__()
 
         for k, v in in_dict.items():
-            k = self._preprocess_key(k)
-
+            k = self._preprocess_key(k, depth, kwargs.get("capitalize_first_level_key", True))
             if isinstance(v, (list, tuple, set)):
                 v = self._remove_duplicated_dicts(v)
                 setattr(self, k, [DotDict(x, depth+1, **kwargs) if isinstance(x, dict) else x for x in v])
@@ -58,10 +57,10 @@ class DotDict(dict):
             raise AttributeError(f"{self.__class__.__name__} object has no attribute '{k}'")
 
     @staticmethod
-    def _preprocess_key(k: str) -> str:
+    def _preprocess_key(k: str, depth: int, capitalize_first_level_key: bool) -> str:
         k = k.replace("-", "_")
         k = k.replace(" ", "_")
-        k = k.lower()
+        k = k.lower() if depth > 0 and capitalize_first_level_key else k.capitalize()
         return k
 
     @staticmethod
