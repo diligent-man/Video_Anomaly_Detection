@@ -1,15 +1,16 @@
 import os
 import pathlib
-import commentjson
 
 from typing import Union, Dict
+
 from .DotDict import DotDict
+from .utils import load_config
 
 
-__all__ = ["ArgsInitializer"]
+__all__ = ["ConfigPreprocessor"]
 
 
-class ArgsInitializer(object):
+class ConfigPreprocessor(object):
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
 
@@ -59,6 +60,7 @@ class ArgsInitializer(object):
         for directory in dirs_to_check:
             # Add path to class attr
             k = f"{directory}_path"
+            print(output_path, args.technique, "_".join(architecture_components), directory)
             v = os.path.join(output_path, args.technique, "_".join(architecture_components), directory)
             args[k] = v
 
@@ -71,8 +73,9 @@ class ArgsInitializer(object):
         print("""#####################################################################""")
 
     def __call__(self, *args, **kwargs) -> DotDict:
-        with open(file=self.__config_path, mode="r", encoding="UTF-8") as f:
-            json_obj: dict = commentjson.loads(f.read())
-            args: DotDict = DotDict(json_obj, key_error_handling="warn")
-        self._post_init(args)
-        return args
+        config = load_config(self.__config_path)
+        args: DotDict = DotDict(config, key_error_handling="warn")
+
+        # self._post_init(args)
+        # return args
+

@@ -1,6 +1,16 @@
 {
-//        "output_path": "./training_results/AIP391",
+    "global":
+    {
+        //        "output_path": "./training_results/AIP391",
         "project_name": "AIP391",
+        "technique": "normal",
+        "seed": 12345,
+        "device": "cuda",
+        "epochs": 100,
+        "print_batch_step": 1,
+        "save_epoch_step": 1
+    },
+
     "data":
     {
         "INPUT_SHAPE": [3, 224, 224],
@@ -203,17 +213,18 @@
             "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
         },
 
-//        {
-//            "name": "tensorboard",
-//            "apply": true,
-//            "inspect_model": true,
-//            "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
-//        }
-    ],
-
-    "technique": "normal",
-    "seed": 12345,
-    "device": "cuda",
-    "training_epochs": 100
+        {
+            "name": "tensorboard1",
+            "apply": {"abc": true},
+            "inspect_model": true,
+            "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
+        },
+        {
+            "name": "tensorboard1",
+            "apply": true,
+            "inspect_model": true,
+            "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
+        }
+    ]
 //    "EVALUATION_STRATEGY": "no"
 }
