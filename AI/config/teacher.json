@@ -3,7 +3,7 @@
     {
         //        "output_path": "./training_results/AIP391",
         "project_name": "AIP391",
-        "technique": "normal",
+        "technique": "single",
         "seed": 12345,
         "device": "cuda",
         "epochs": 100,

@@ -7,10 +7,10 @@ from .DotDict import DotDict
 from .utils import load_config
 
 
-__all__ = ["ConfigPreprocessor"]
+__all__ = ["ConfigReader"]
 
 
-class ConfigPreprocessor(object):
+class ConfigReader(object):
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
@@ -61,7 +61,7 @@ class ConfigPreprocessor(object):
             print(f"output path: {self.__config.Global.get('output_path')}")
             print(f"project name: {self.__config.Global.get('project_name')} (default: nameless_project)")
 
-            output_path: str = os.path.join(os.getcwd(), "training_results", project_name)
+            output_path: str = os.path.join(os.path.dirname(os.getcwd()), "training_results", project_name)
         else:
             output_path: str = self.__config.output_path
         return pathlib.Path(output_path)

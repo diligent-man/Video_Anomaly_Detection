@@ -1,23 +1,17 @@
+# Dirty workaround for module import, which violates PEP8: E402
 import os
 import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, "../../../../src")))
-
-
-from pprint import pprint as pp
-pp(sys.modules)
+sys.path.append(os.path.join(os.getcwd(), "../../"))
 
 import pathlib
 import argparse
 import warnings
 
-from ..utils import ConfigReader
-from ..utils.DotDict import DotDict
-
+from AI.src.utils import ConfigReader
+from AI.src.utils.DotDict import DotDict
+from AI.src.data.dataset.VideoDataset import VideoDataset
+# from AI.src.data.dataset.VideoFolderDataset import VideoFolderDataset
 warnings.filterwarnings("once")
-
 
 
 def main(args: argparse.Namespace) -> None:
@@ -27,6 +21,25 @@ def main(args: argparse.Namespace) -> None:
     #
     config: DotDict = ConfigReader(args.config).config
 
+    import torch
+    import time
+    from AI.src.utils import load_video_v2, load_video_v1
+    from AI.src.utils.saving import save_video
+    ds: VideoDataset = VideoDataset(
+        "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+        "mp4",
+        device="cpu",
+        loader=load_video_v2
+    )
+
+    start = time.time()
+    dl = torch.utils.data.DataLoader(ds, batch_size=16, num_workers=8, multiprocessing_context="fork", shuffle=False)
+    path, data = next(iter(dl))
+    print(data.shape)
+
+    print(time.time() - start)
+    # v1: 72.28s (1)
+    # v2:
     return None
 
 

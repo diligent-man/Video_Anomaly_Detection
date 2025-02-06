@@ -24,6 +24,9 @@ def load_video_v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
 
 
 def load_video_v2(path: str,
+                  fps: int = None,
+                  chunk_multiplier: int = 50,
+                  buffer_multiplier: int = 3,
                   threads: int = 32,
                   thread_type: str = "slice",
                   device: str = "cuda",
@@ -61,9 +64,9 @@ def load_video_v2(path: str,
         g: torch.Tensor = 1.164 * (y - 16) - 0.813 * (v - 128) - 0.392 * (u - 128)
         b: torch.Tensor = 1.164 * (y - 16) + 2.017 * (u - 128)
 
-        rgb: torch.Tensor = torch.stack([r, g, b], -1)
-        rgb = rgb.clamp(0, 255).to(torch.uint8)
-        return rgb
+        imgs: torch.Tensor = torch.stack([r, g, b], -1)
+        imgs = imgs.clamp(0, 255).to(torch.uint8)
+        return imgs
 
     # Ignore audio frame and info in returned result
     __DECODERS = ["h264", "mpeg4"]
@@ -78,8 +81,10 @@ def load_video_v2(path: str,
     }
 
     # Format should be left blank for automatic definition
-    stream_reader = torchaudio.io.StreamReader(path)
-    decoder = stream_reader.get_src_stream_info(0).codec
+    stream_reader: torchaudio.io.StreamReader = torchaudio.io.StreamReader(path)
+
+    decoder: str = stream_reader.get_src_stream_info(0).codec
+    fps: int = int(stream_reader.get_src_stream_info(0).frame_rate) if fps is None else fps
 
     if device == "cpu":
         del __DEFAULT_DECODER_CONFIG["gpu"]
@@ -88,17 +93,19 @@ def load_video_v2(path: str,
         decoder = __DECODERS[decoder]
 
     stream_reader.add_video_stream(
-        frames_per_chunk=-1,
-        buffer_chunk_size=-1,
+        fps * chunk_multiplier,
+        fps * buffer_multiplier,
         decoder=decoder,
         decoder_option=__DEFAULT_DECODER_CONFIG,
         hw_accel=device if device == "cuda" else None,
+
     )
 
-    stream_reader.process_all_packets()
+    video: torch.Tensor | None = None
+    for chunk in stream_reader.stream():
+        frames = chunk[0]
+        frames = _yuv_to_rgb(frames)  # frames is in YUV444P format
+        video = frames if video is None else torch.vstack([video, frames])
 
-    # frames is in YUV444P format
-    frames: torch.Tensor = stream_reader.pop_chunks()[0]
-    frames = frames.to("cpu")
-    frames = _yuv_to_rgb(frames)
-    return frames
+    # print(video.shape, stream_reader.get_src_stream_info(0).num_frames)
+    return video
