@@ -1,33 +1,30 @@
 import torch
 
-from typing import Tuple
+from typing import Tuple, Dict, Callable
 
 
-__all__ = [
-    "load_video_v1",
-    "load_video_v2",
-    "load_video_v3"
-]
-
-
-def load_video_v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
-    import torchvision
+def v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
     """
     :param path: path to video
     :param output_format: returned shape. Currently, THWC or TCHW
     :return: decoded video frames tensor
     Decode video with pyav, Pythonic binding for ffmpeg, as a backend
     """
+    import torchvision
+
     # Ignore audio frame and info in returned result
     frames, _, _ = torchvision.io.read_video(path, pts_unit="sec", output_format=output_format)
     return frames
 
 
-def load_video_v2(path: str,
-                  threads: int = 32,
-                  thread_type: str = "slice",
-                  device: str = "cuda",
-                  output_shape: Tuple[int, int] = (224, 224),
+def v2(path: str,
+       fps: int = None,
+       chunk_multiplier: int = 5,
+       buffer_multiplier: int = 3,
+       threads: int = 32,
+       thread_type: str = "slice",
+       device: str = "cuda",
+       output_shape: Tuple[int, int] = (224, 224),
                   ) -> torch.Tensor:
     import torchaudio
     """
@@ -61,9 +58,9 @@ def load_video_v2(path: str,
         g: torch.Tensor = 1.164 * (y - 16) - 0.813 * (v - 128) - 0.392 * (u - 128)
         b: torch.Tensor = 1.164 * (y - 16) + 2.017 * (u - 128)
 
-        rgb: torch.Tensor = torch.stack([r, g, b], -1)
-        rgb = rgb.clamp(0, 255).to(torch.uint8)
-        return rgb
+        imgs: torch.Tensor = torch.stack([r, g, b], -1)
+        imgs = imgs.clamp(0, 255).to(torch.uint8)
+        return imgs
 
     # Ignore audio frame and info in returned result
     __DECODERS = ["h264", "mpeg4"]
@@ -78,8 +75,10 @@ def load_video_v2(path: str,
     }
 
     # Format should be left blank for automatic definition
-    stream_reader = torchaudio.io.StreamReader(path)
-    decoder = stream_reader.get_src_stream_info(0).codec
+    stream_reader: torchaudio.io.StreamReader = torchaudio.io.StreamReader(path)
+
+    decoder: str = stream_reader.get_src_stream_info(0).codec
+    fps: int = int(stream_reader.get_src_stream_info(0).frame_rate) if fps is None else fps
 
     if device == "cpu":
         del __DEFAULT_DECODER_CONFIG["gpu"]
@@ -88,17 +87,24 @@ def load_video_v2(path: str,
         decoder = __DECODERS[decoder]
 
     stream_reader.add_video_stream(
-        frames_per_chunk=-1,
-        buffer_chunk_size=-1,
+        fps * chunk_multiplier,
+        fps * buffer_multiplier,
         decoder=decoder,
         decoder_option=__DEFAULT_DECODER_CONFIG,
         hw_accel=device if device == "cuda" else None,
     )
 
-    stream_reader.process_all_packets()
+    video: torch.Tensor | None = None
+    for chunk in stream_reader.stream():
+        frames = chunk[0]
+        frames = _yuv_to_rgb(frames)  # read frames is in YUV444P format
+        video = frames if video is None else torch.vstack([video, frames])
+    return video
 
-    # frames is in YUV444P format
-    frames: torch.Tensor = stream_reader.pop_chunks()[0]
-    frames = frames.to("cpu")
-    frames = _yuv_to_rgb(frames)
-    return frames
+
+video_loader: Dict[str, Callable] = {
+    "v1": v1,
+    "v2": v2
+}
+
+__all__ = [video_loader]
