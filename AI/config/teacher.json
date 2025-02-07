@@ -13,69 +13,149 @@
 
     "data":
     {
-        "INPUT_SHAPE": [3, 224, 224],
-        "DATASET": "DefaultDataset",
-
-        "train_dataset_args":
+        "train":
         {
-            "root": "/home/trong/Downloads/Dataset/small_celeb_A/",
-            "annotation": "/home/trong/Downloads/Dataset/small_celeb_A/train.csv"
-        },
-
-        "VAL_DATASET_ARGS":
-        {
-            "root": "/home/trong/Downloads/Dataset/small_celeb_A/",
-            "annotation": "/home/trong/Downloads/Dataset/small_celeb_A/val.csv"
-        },
-
-        "TEST_DATASET_ARGS":
-        {
-            "root": "/home/trong/Downloads/Dataset/small_celeb_A/",
-            "annotation": "/home/trong/Downloads/Dataset/small_celeb_A/test.csv"
-        },
-
-        "DATALOADER": "DefaultDataLoader",
-
-        "TRAIN_DATALOADER_ARGS":
-        {
-            "batch_size": 1600,
-            "shuffle": true,
-            "num_workers": 4,
-            "prefetch_factor": 2,
-            "drop_last": false,
-            "pin_memory": true,
-            "pin_memory_device": "cuda",
-            "multiprocessing_context": "fork"
-        },
-
-        "NUM_CLASSES": 1,
-
-        "TRANSFORM":
-        {
-            "Resize":
+            "dataset":
             {
-                "size": [224, 224],
-                "interpolation": "BICUBIC",
-                "antialias": true
+                "name": "VideoDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+                "ext": "mp4",
+                "loader": "v2",
+                "device": "cpu",
+                "return_device": null,
+                "transform": {}
             },
 
-            "PILToTensor": {},
-
-            "ToDtype":
+            "dataloader":
             {
-                "dtype": "float32",
-                "scale": true
-            },
-
-            "RandomRotation":
-            {
-                "degrees": [-10, 10],
-                "interpolation": "NEAREST"
+                "name": "DefaultDataLoader",
+                "batch_size": 8,
+                "shuffle": true,
+                "num_workers": 4,
+                "drop_last": false,
+                "pin_memory": false,
+                "timeout": 10,
+                "multiprocessing_context": "fork",
+                "prefetch_factor": 2,
+                "persistent_workers": false,
+                "pin_memory_device": "cuda"
             }
         },
+        /////////////////////////////////////////////////////////
+        "val":
+        {
+            "dataset":
+            {
+                "name": "VideoDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+                "ext": "mp4",
+                "loader": "v2",
+                "device": "cpu",
+                "return_device": null,
+                "transform": {}
+            },
 
-        "TARGET_TRANSFORM": {}
+            "dataloader":
+            {
+                "name": "DefaultDataLoader",
+                "batch_size": 8,
+                "shuffle": true,
+                "num_workers": 4,
+                "drop_last": false,
+                "pin_memory": false,
+                "timeout": 10,
+                "multiprocessing_context": "fork",
+                "prefetch_factor": 2,
+                "persistent_workers": false,
+                "pin_memory_device": "cuda"}
+        },
+        /////////////////////////////////////////////////////////
+        "test":
+        {
+            "dataset":
+            {
+                "name": "VideoDataset",
+                "transform": {},
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "DefaultDataLoader"
+            }
+        }
     },
+
+//    "data":
+//    {
+//        "INPUT_SHAPE": [3, 224, 224],
+//        "DATASET": "DefaultDataset",
+//
+//        "train_dataset_args":
+//        {
+//            "root": "/home/trong/Downloads/Dataset/small_celeb_A/",
+//            "annotation": "/home/trong/Downloads/Dataset/small_celeb_A/train.csv"
+//        },
+//
+//        "VAL_DATASET_ARGS":
+//        {
+//            "root": "/home/trong/Downloads/Dataset/small_celeb_A/",
+//            "annotation": "/home/trong/Downloads/Dataset/small_celeb_A/val.csv"
+//        },
+//
+//        "TEST_DATASET_ARGS":
+//        {
+//            "root": "/home/trong/Downloads/Dataset/small_celeb_A/",
+//            "annotation": "/home/trong/Downloads/Dataset/small_celeb_A/test.csv"
+//        },
+//
+//        "DATALOADER": "DefaultDataLoader",
+//
+//        "TRAIN_DATALOADER_ARGS":
+//        {
+//            "batch_size": 1600,
+//            "shuffle": true,
+//            "num_workers": 4,
+//            "prefetch_factor": 2,
+//            "drop_last": false,
+//            "pin_memory": true,
+//            "pin_memory_device": "cuda",
+//            "multiprocessing_context": "fork"
+//        },
+//
+//        "NUM_CLASSES": 1,
+//
+//        "TRANSFORM":
+//        {
+//            "Resize":
+//            {
+//                "size": [224, 224],
+//                "interpolation": "BICUBIC",
+//                "antialias": true
+//            },
+//
+//            "PILToTensor": {},
+//
+//            "ToDtype":
+//            {
+//                "dtype": "float32",
+//                "scale": true
+//            },
+//
+//            "RandomRotation":
+//            {
+//                "degrees": [-10, 10],
+//                "interpolation": "NEAREST"
+//            }
+//        },
+//
+//        "TARGET_TRANSFORM": {}
+//    },
+//
+//
+//
+
+
 
     "CHECKPOINT":
     {

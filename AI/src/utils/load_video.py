@@ -1,15 +1,9 @@
 import torch
 
-from typing import Tuple
+from typing import Tuple, Dict, Callable
 
 
-__all__ = [
-    "load_video_v1",
-    "load_video_v2",
-]
-
-
-def load_video_v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
+def v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
     """
     :param path: path to video
     :param output_format: returned shape. Currently, THWC or TCHW
@@ -23,14 +17,14 @@ def load_video_v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
     return frames
 
 
-def load_video_v2(path: str,
-                  fps: int = None,
-                  chunk_multiplier: int = 50,
-                  buffer_multiplier: int = 3,
-                  threads: int = 32,
-                  thread_type: str = "slice",
-                  device: str = "cuda",
-                  output_shape: Tuple[int, int] = (224, 224),
+def v2(path: str,
+       fps: int = None,
+       chunk_multiplier: int = 5,
+       buffer_multiplier: int = 3,
+       threads: int = 32,
+       thread_type: str = "slice",
+       device: str = "cuda",
+       output_shape: Tuple[int, int] = (224, 224),
                   ) -> torch.Tensor:
     import torchaudio
     """
@@ -98,14 +92,19 @@ def load_video_v2(path: str,
         decoder=decoder,
         decoder_option=__DEFAULT_DECODER_CONFIG,
         hw_accel=device if device == "cuda" else None,
-
     )
 
     video: torch.Tensor | None = None
     for chunk in stream_reader.stream():
         frames = chunk[0]
-        frames = _yuv_to_rgb(frames)  # frames is in YUV444P format
+        frames = _yuv_to_rgb(frames)  # read frames is in YUV444P format
         video = frames if video is None else torch.vstack([video, frames])
-
-    # print(video.shape, stream_reader.get_src_stream_info(0).num_frames)
     return video
+
+
+video_loader: Dict[str, Callable] = {
+    "v1": v1,
+    "v2": v2
+}
+
+__all__ = [video_loader]

@@ -9,8 +9,8 @@ import warnings
 
 from AI.src.utils import ConfigReader
 from AI.src.utils.DotDict import DotDict
-from AI.src.data.dataset.VideoDataset import VideoDataset
-# from AI.src.data.dataset.VideoFolderDataset import VideoFolderDataset
+from AI.src.data import build_dataloader
+
 warnings.filterwarnings("once")
 
 
@@ -21,25 +21,8 @@ def main(args: argparse.Namespace) -> None:
     #
     config: DotDict = ConfigReader(args.config).config
 
-    import torch
-    import time
-    from AI.src.utils import load_video_v2, load_video_v1
-    from AI.src.utils.saving import save_video
-    ds: VideoDataset = VideoDataset(
-        "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
-        "mp4",
-        device="cpu",
-        loader=load_video_v2
-    )
-
-    start = time.time()
-    dl = torch.utils.data.DataLoader(ds, batch_size=16, num_workers=8, multiprocessing_context="fork", shuffle=False)
-    path, data = next(iter(dl))
-    print(data.shape)
-
-    print(time.time() - start)
-    # v1: 72.28s (1)
-    # v2:
+    train_dataloader = build_dataloader(config, "train")
+    val_dataloader = build_dataloader(config, "val")
     return None
 
 

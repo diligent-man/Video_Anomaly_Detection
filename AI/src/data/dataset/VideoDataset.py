@@ -3,7 +3,7 @@ import torch
 import inspect
 import functools
 
-from ...utils import load_video_v2
+from ...utils import video_loader
 from typing import Callable, Optional, Tuple, List
 
 
@@ -18,29 +18,33 @@ class VideoDataset(torch.utils.data.Dataset):
 
     def __init__(self,
                  root: str,
-                 extensions: Optional[Tuple[str, ...]],
+                 ext: str,
+                 loader: str = "v2",
                  device: str = "cpu",
                  return_device: str = "cpu",
                  transforms: Optional[Callable] = None,
-                 loader: Callable[[str], ...] = load_video_v2,
                  **kwargs
                  ) -> None:
         """
         :param root: dir of videos
-        :param extensions: tested with mp4
+        :param ext: video extension
         :param device: device that used to load video
         :param return_device: device that used to return read video
         :param transforms: transform function
-        :param loader: video loader function
+        :param loader: video loader api. Defaults to "v2"
         """
-        assert extensions in ["mp4"], "Currently only supports mp4 video"
         assert os.path.isdir(root), NotADirectoryError
+        assert ext in ["mp4"], "Currently only supports mp4 video"
+        assert loader in video_loader.keys(), NotImplementedError
+        assert device in ("cpu", "cuda"), "Currently only supports cpu/ cuda device"
+
+        loader: Callable = video_loader[loader]
 
         if "device" in inspect.signature(loader).parameters:
             kwargs = {"device": device, **kwargs}
 
         self.__root: root = root
-        self.__extensions: Tuple[str, ...] = extensions
+        self.__ext: str = ext
         self.__device: str = device
         self.__return_device: str = return_device
         self.__transforms: Callable = transforms

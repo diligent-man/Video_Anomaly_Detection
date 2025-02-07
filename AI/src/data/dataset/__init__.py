@@ -1,9 +1,12 @@
 from .VideoDataset import VideoDataset
-from .VideoFolderDataset import VideoFolderDataset
+
+# Resourcewarning bug
+# from .VideoFolderDataset import VideoFolderDataset
+
 
 datasets = {
     "VideoDataset": VideoDataset,
-    "VideoFolderDataset": VideoFolderDataset,
+    # "VideoFolderDataset": VideoFolderDataset,
 }
 
 __all__ = ["datasets"]

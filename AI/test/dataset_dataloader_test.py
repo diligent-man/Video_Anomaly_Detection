@@ -6,6 +6,7 @@ from AI.src.data.dataset import datasets
 def main() -> None:
     dataset_name = "VideoDataset"
     assert dataset_name in datasets, ValueError("Module is not supported")
+
     dataset = datasets[dataset_name](
             "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
             "mp4",
@@ -15,11 +16,12 @@ def main() -> None:
 
     dataloader = torch.utils.data.DataLoader(
         dataset,
-        batch_size=16,
-        num_workers=8,
-        multiprocessing_context="fork",
+        batch_size=8,
+        num_workers=6,
         shuffle=False,
         drop_last=False,
+        prefetch_factor=1,
+        multiprocessing_context="fork",
     )
 
     print(dataset)
@@ -28,6 +30,7 @@ def main() -> None:
     for i, batch in enumerate(dataloader):
         video_paths, videos = batch
         print(video_paths, videos.shape)
+        break
     return None
 
 
