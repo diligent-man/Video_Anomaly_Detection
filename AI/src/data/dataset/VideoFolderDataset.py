@@ -4,7 +4,7 @@ import torchvision
 from pathlib import Path
 from typing import Union, Callable, Any, Optional, Tuple
 
-from ...utils import load_video_v2
+from ...utils import video_loader
 
 
 __all__ = ["VideoFolderDataset"]
@@ -13,13 +13,16 @@ __all__ = ["VideoFolderDataset"]
 class VideoFolderDataset(torchvision.datasets.DatasetFolder):
     def __init__(self,
                  root: Union[str, Path],
-                 loader: Callable[[str], torch.Tensor] = load_video_v2,
+                 loader: str = "v2",
                  extensions: Optional[Tuple[str, ...]] = "mp4",
                  transform: Optional[Callable] = None,
                  target_transform: Optional[Callable] = None,
                  is_valid_file: Optional[Callable[[str], bool]] = None,
                  allow_empty: bool = False
                  ):
+        assert loader in video_loader.keys(), ValueError(f"Unsupported video loader. Currently {video_loader.keys()}")
+        loader: Callable[[str], torch.Tensor] = video_loader[loader]
+
         super().__init__(
             root,
             loader,
@@ -54,9 +57,11 @@ class VideoFolderDataset(torchvision.datasets.DatasetFolder):
     def __repr__(self) -> str:
         head = "Dataset " + self.__class__.__name__
         body = [f"Number of datapoints: {self.__len__()}"]
+
         if self.root is not None:
             body.append(f"Root location: {self.root}")
         body += self.extra_repr().splitlines()
+
         if hasattr(self, "transforms") and self.transforms is not None:
             body += [repr(self.transforms)]
         lines = [head] + [" " * self._repr_indent + line for line in body]

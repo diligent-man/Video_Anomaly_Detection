@@ -102,9 +102,17 @@ def v2(path: str,
     return video
 
 
+def v3(path: str):
+    import torchaudio
+    stream_reader: torchaudio.io.StreamReader = torchaudio.io.StreamReader(path)
+    stream_info = stream_reader.get_src_stream_info(0)
+    return stream_info
+
+
 video_loader: Dict[str, Callable] = {
     "v1": v1,
-    "v2": v2
+    "v2": v2,
+    "v3": v3
 }
 
 __all__ = [video_loader]

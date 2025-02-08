@@ -1,11 +1,8 @@
 #!/bin/bash
 # Create backend, auth db for mlflow service
-
 set -e
 
-psql --set ON_ERROR_STOP=1\
-     --username "$POSTGRES_USER"\
-     --dbname "$POSTGRES_DB"\
+psql --set ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB"
 <<-EOSQL
     CREATE DATABASE auth;
     CREATE DATABASE backend;

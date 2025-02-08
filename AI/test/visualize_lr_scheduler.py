@@ -1,8 +1,7 @@
 import torch
 
 from AI.src.utils import visualize_lr
-from AI.src.optim.lr_scheduler import CustomExponentialLR, CustomSequentialLR, WarmupCosineAnnealingWarmRestarts
-
+from AI.src.optimizer.scheduler import CustomExponentialLR, CustomSequentialLR, WarmupCosineAnnealingWarmRestarts
 
 def test_update_per_batch(epochs: int,
                           dataloader_len: int,
