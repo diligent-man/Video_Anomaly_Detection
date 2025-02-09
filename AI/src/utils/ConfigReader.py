@@ -1,21 +1,19 @@
 import os
 import pathlib
-import warnings
 
 from typing import Union, List, Dict, Any, Set
-
 from .DotDict import DotDict
-from .utils import load_config
-
+from .utils import load_config, create_increment_path
+from . import ANSIColor
 
 __all__ = ["ConfigReader"]
 
 
 class ConfigReader(object):
     __defaults: Dict[str, Any] = {
-        "save_dir": os.path.join(os.path.dirname(os.getcwd()), "training_results"),
+        "save_dir": os.path.join(os.path.dirname(os.getcwd()), "results"),
         "project_name": "nameless_project",
-        "experiment_name": "exp",
+        "experiment_name": "run",
         "technique": "single",
         "mode": "train"
     }
@@ -37,12 +35,14 @@ class ConfigReader(object):
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
 
         # Post-init setup
+        print("##################  Config post-init running  ######################### ")
         self._structure_check()
-        # self._create_save_dir()
+        self._create_save_dir()
+        print("############################################################################")
 
     def _structure_check(self):
-        print("##################  Config structure sanity check  #########################")
-        mode_to_check: Set[str] = {"train", "test"}
+        print("Config structure sanity check")
+        # mode_to_check: Set[str] = {"train", "test"}
         dataset_to_check: Set[str] = {"train", "val", "test"}
         arch_to_check: Dict[str, Set[str]] = {"optional": {"backbone"}, "compulsory": {"neck", "head"}}
         fields_to_check: Set[str] = {"global", "data", "architecture", "optimizer", "metric", "loss", "services"}
@@ -53,31 +53,35 @@ class ConfigReader(object):
         for field in config.keys():
             field = field.lower()
             assert field in self.__expected_vals["fields"], \
-            ValueError(f"'{field}' field is unexpected. Expect {len(fields_to_check)} fields, including {fields_to_check}")
+                ValueError(f"'{field}' field is unexpected. Expect {len(fields_to_check)} fields, including {fields_to_check}")
 
         # global field check
+        print("Global:")
         for name in ["save_dir", "project_name", "technique", "mode", "experiment_name"]:
             val: str = config["Global"].get(name)
 
             if val is None:
                 self.__config.Global[name] = self.__defaults[name]
-                print(f"{name} is not specified, default as:\n\t{self.__defaults[name]}")
+                print(f"\t{ANSIColor().CYAN}{name}{ANSIColor().RESET} is not specified, default as:\n\t\t{self.__defaults[name]}")
             else:
                 expected_val = self.__expected_vals.get(name)
 
                 if expected_val is not None:
                     assert val in expected_val, ValueError(f"Expect {expected_val}, but get '{val}' instead")
 
-                print(f"{name}: {val}")
-            print()
+                print(f"\t{ANSIColor().CYAN}{name}{ANSIColor().RESET}:\n\t\t{val}")
+        print()
 
         # data field check
         dataset: Set[str] = set(config["Data"].keys())
-        be = "is" if len(dataset) == 1 else "are"
 
+        print(f"Dataset config:")
         for i in dataset:
             assert i in self.__expected_vals["dataset"], ValueError(f"Only {len(dataset_to_check)} states are allowed. Get '{i}' instead.")
-        print(f"There {be} configurations for {', '.join(dataset_to_check)} dataset.")
+            assert config["Data"][i].get("dataset") is not None, ValueError(f"Dataset config for {i} set is None")
+            assert config["Data"][i].get("dataloader") is not None, ValueError(f"Dataloader config for {i} set is None")
+            print(f"\t{ANSIColor().CYAN}{i}{ANSIColor().RESET}: {config['Data'][i]['dataset'].get('name')}")
+        print()
 
         # architecture check
         arch: Set[str] = set(config["Architecture"].keys())
@@ -85,10 +89,12 @@ class ConfigReader(object):
 
         arch_to_check: List[str] = [*arch_to_check["compulsory"], *arch_to_check["optional"]]
 
+        print(f"Model config")
         for i in arch:
-            assert i in arch_to_check, ValueError(
-                f"Architecture must be in {arch}. Get '{i}' instead.")
-        print(f"Model contains {', '.join(arch)} parts")
+            assert i in arch_to_check, ValueError(f"Architecture must be in {arch}. Get '{i}' instead.")
+            assert config["Architecture"][i].get("name") is not None, ValueError(f"{i} name is None")
+            print(f"\t{ANSIColor().CYAN}{i}{ANSIColor().RESET}: {config['Architecture'][i].get('name')}")
+        print()
 
         # services check
         services: None | List[Dict[str, Any]] = config["Services"]
@@ -96,9 +102,11 @@ class ConfigReader(object):
         if services is None:
             print("No additional services are specified")
         else:
+            print("Services:")
             for service in services:
                 assert service.get("name") is not None, ValueError(f"Name to the following config was not specified:\n\t{service}")
-        print("############################################################################")
+                print(f"\t{ANSIColor().CYAN}{service['name']}{ANSIColor().RESET}")
+        print()
 
     def _create_save_dir(self) -> None:
         """
@@ -112,66 +120,29 @@ class ConfigReader(object):
             technique: normal
             services: namely tensorboard, etc.
         """
+        save_dir: List[str] = [self.__config.Global.save_dir,
+                               self.__config.Global.project_name,
+                               self.__config.Global.technique,
+                               self.__config.Global.mode,
+                               self.__config.Global.experiment_name
+                               ]
+        save_dir: str = f"{os.sep}".join(save_dir)
+        save_dir: pathlib.Path = create_increment_path(save_dir, False, "", True)
+
         services: List[str] = self._get_services()
-        output_path: str = self._resolve_save_dir()
+        dirs = ("ckpt", "log", *services)
 
-        dir_names = ("ckpt", "log", *services)
-
-
-        architecture_components = []
-        for component in ["backbone", "neck", "head"]:
-            component = self.__config.Architecture.get("component")
-
-            if component is not None:
-                names: None | str | List[str] = component.get("names")
-
-                if isinstance(names, str):
-                    names = [names]
-
-            architecture_components.append("-".join(names))
-
-        architecture_components = [self.__config.Architecture[component].name for component in ["backbone", "neck", "head"] if self.__config.Architecture.get(component) is not None]
-        print(architecture_components)
-
-        for directory in dir_names:
+        print("Save dir:")
+        for dir_name in dirs:
             # Add path to class attr
-            k: str = f"{directory}_path"
-            v: str = os.path.join(output_path, self.__config.Global.technique, "_".join(architecture_components), directory)
+            k: str = f"{dir_name}_path"
+            v: str = os.path.join(save_dir, dir_name)
+
             self.__config[k] = v
+            os.makedirs(v, exist_ok=True)
 
-            # Create dir if not exists
-            if not os.path.isdir(v):
-                os.makedirs(v, 0o777, True)
-                print(f"Dir for {k} is created.")
-            else:
-                print(f"Dir for {directory} has already been around and will be overridden.")
-
-            print(f"{k}: {v}") if directory == dir_names[-1] else print(f"{k}: {v}\n")
+            print(f"{ANSIColor().CYAN}\t{k}{ANSIColor().RESET}: \n\t\t{v}") if dir_name != dirs[-1] else print(f"\t{ANSIColor().CYAN}{k}{ANSIColor().RESET}: \n\t\t{v}\n")
         return None
-
-    def _check_model_architecture(self):
-        component_to_check = ["backbone", "neck", "head"]
-        for component in component_to_check:
-            component_config: None | Dict[str, Any] = self.__config.Architecture.get(component)
-
-    def _resolve_save_dir(self) -> str:
-        # <output_path>/ project_name/ < technique > / < mode > / < experiment_name > / ckpt
-
-        path_components: List[str] = ["save_dir", "project_name", "technique", "mode", "experiment_name"]
-
-
-        if project_name is None:
-            project_name: str = "nameless_project"
-
-        if output_path is None:
-            output_path: str = os.path.join(os.path.dirname(os.getcwd()), "training_results")
-
-
-        output_path = os.path.join(output_path, project_name)
-
-        print(f"Output path: {output_path}")
-        print(f"Project name: {project_name} (default: nameless_project)")
-        return output_path
 
     def _get_services(self) -> List[str]:
         services: List[str] = []
