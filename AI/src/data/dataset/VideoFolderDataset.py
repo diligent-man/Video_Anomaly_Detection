@@ -13,7 +13,7 @@ __all__ = ["VideoFolderDataset"]
 class VideoFolderDataset(torchvision.datasets.DatasetFolder):
     def __init__(self,
                  root: Union[str, Path],
-                 loader: str = "v2",
+                 loader: str = "v3",
                  extensions: Optional[Tuple[str, ...]] = "mp4",
                  transform: Optional[Callable] = None,
                  target_transform: Optional[Callable] = None,
