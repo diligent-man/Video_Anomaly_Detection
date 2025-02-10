@@ -2,7 +2,7 @@ from typing import Tuple, Union, Callable
 
 import torch
 
-from .._functional import compute_pad
+from ..functional import compute_pad
 
 
 __all__ = ["Unit3D"]

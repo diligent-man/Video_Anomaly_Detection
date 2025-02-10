@@ -84,14 +84,16 @@
         "backbone":
         {
             "name": ["rgb_i3d",  "s3d", "clip_vision"],
-            "compile": true,
+            "compile": false,
             "out_proj":
             {
-                "hidden_dim": [512],
-                "output_dim": 512,
-                "dropout": 0.5,
+                "hidden_dim": [512, 512],
                 "hidden_activation": "ReLU",
+
+                "out_channels": 512,
                 "out_activation": null,
+
+                "dropout": 0.5,
                 "layer_order": "fc->drop->act"
             }
 
@@ -99,14 +101,24 @@
 
         "neck":
         {
-            "name":"TAM",
-            "args": {}
+            "name":"TAN",
+            "num_backbones": 3,
+            "num_heads": 8,
+            "relative_attention": true
         },
 
         "head":
         {
-            "name":"cls",
-            "args": {}
+            "name":"SimpleClassifier",
+
+            "hidden_dim": [512, 32],
+            "hidden_activation": "ReLU",
+
+            "out_channels": 2,
+            "out_activation": "Sigmoid",
+
+            "dropout": 0.5,
+            "layer_order": "fc->drop->act"
         }
     },
 

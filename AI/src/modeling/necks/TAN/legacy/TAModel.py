@@ -2,7 +2,7 @@ from typing import Dict, Any, List, Tuple, Union
 
 import torch
 
-from .TAM import TAM
+from .TemporalAggregation import TAM
 from ...MLP import MLP
 
 __all__ = ["TAModel"]

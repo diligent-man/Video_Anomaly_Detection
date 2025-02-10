@@ -27,15 +27,15 @@ class MLP(torch.nn.Module):
     __layers: torch.nn.Sequential
 
     def __init__(self,
-                 input_dim: int,
+                 in_channels: int,
+                 out_channels: int,
                  hidden_dim: List[int] | Tuple[int] | int,
-                 output_dim: int,
-                 bias: bool = True,
-                 dropout: float = None,
                  hidden_activation: str = None,
                  hidden_activation_args: Dict[str, Any] = None,
                  out_activation: str = None,
                  out_activation_args: Dict[str, Any] = None,
+                 bias: bool = True,
+                 dropout: float = None,
                  layer_order: str = "fc->drop->act",
                  device: torch.device = None,
                  dtype: torch.dtype = None
@@ -53,12 +53,12 @@ class MLP(torch.nn.Module):
 
         dropout = torch.nn.Dropout(dropout) if dropout is not None and dropout > 0 else None
 
-        self._input_dim: int = input_dim
-        self._output_dim: int = output_dim
+        self._in_channels: int = in_channels
+        self._out_channels: int = out_channels
         self._layers = self.__make_layers(
-            self._input_dim,
+            self._in_channels,
             hidden_dim,
-            self._output_dim,
+            self._out_channels,
             bias,
             dropout,
             hidden_activation,
@@ -72,12 +72,12 @@ class MLP(torch.nn.Module):
         return self.__layers
 
     @property
-    def input_dim(self) -> int:
-        return self._input_dim
+    def in_channels(self) -> int:
+        return self._in_channels
 
     @property
-    def output_dim(self) -> int:
-        return self._output_dim
+    def out_channels(self) -> int:
+        return self._out_channels
 
     @staticmethod
     def _init_activation(activation: str, **kwargs) -> torch.nn.Module:

@@ -5,36 +5,52 @@ import torch
 
 from .QKV import QKV
 from .RelativePE import RelativePE
-from .._functional import dynamic_expand, transform_multihead
+from ..functional import dynamic_expand, transform_multihead
 
 
-__all__ = ["TAM"]
+__all__ = ["TemporalAggregation"]
 
 
-class TAM(torch.nn.Module):
+class TemporalAggregation(torch.nn.Module):
     def __init__(self,
                  num_backbones: int,
                  num_heads: int,
+                 in_channels: int | List[int],
+                 bias: bool = True,
                  relative_attention: bool = True,
                  max_relative_position: int = 10,
-                 embed_dim: int = 1024
                  ):
         super().__init__()
+        embed_dim: List[int] = [in_channels] if isinstance(in_channels, int) else in_channels
 
         assert max_relative_position >= 0, ValueError("max_relative_positions must be >= 0")
-        assert embed_dim >= 0, ValueError("hidden_size must be > 0")
+        for i in embed_dim:
+            assert i >= 0, ValueError(f"Embed_dim must be > 0. Get '{i}'")
+            assert i % num_heads == 0, ValueError(f"Embed_dim must be divisible by num_heads. Get '{i}' % {num_heads}")
 
-        self._num_backbones = num_backbones
-        self._num_heads = num_heads
-        self._embed_dim = embed_dim
-        self._content_qkv = torch.nn.ModuleList([QKV(embed_dim) for _ in range(num_backbones)])
+        self._out_channels: int | List[int] = embed_dim
+        self._num_backbones: int = num_backbones
+        self._num_heads: int = num_heads
+        self._embed_dim: List[int] = embed_dim
+        self._content_qkv: torch.nn.ModuleList = torch.nn.ModuleList([QKV(x, bias) for x in self._embed_dim])
 
         if relative_attention:
+            assert int(sum(self._embed_dim) // len(self._embed_dim)) == self._embed_dim[0], \
+                ValueError("All embed_dim must equal when relative_attention is True")
+
+            self._embed_dim: int = self._embed_dim[0]
+            self._out_channels = self._embed_dim
+
             if max_relative_position == 0:
                 max_relative_position = embed_dim
-            self._relative_pe = RelativePE(embed_dim, max_relative_position)
+
+            self._relative_pe = RelativePE(self._embed_dim, max_relative_position, bias)
         else:
             self.register_parameter("_relative_pe", None)
+
+    @property
+    def out_channels(self) -> int | List[int]:
+        return self._out_channels
 
     def _compute_hidden_state(self,
                               q: torch.Tensor,
@@ -43,7 +59,6 @@ class TAM(torch.nn.Module):
                               next_k: torch.Tensor = None
                               ) -> torch.Tensor:
         """
-        :param seq_len: sequence length
         :param q: query of current seq. Shape [batch_size, seq_len, embed_dim]
         :param k: key of current seq. Shape [batch_size, seq_len, embed_dim]
         :param v: value of current seq. Shape [batch_size, seq_len, embed_dim]
@@ -65,7 +80,7 @@ class TAM(torch.nn.Module):
             rel_q, rel_k = transform_multihead(rel_q, self._num_heads), transform_multihead(rel_k, self._num_heads)
 
             # [batch_size, num_heads, seq_len, head_dim] x [batch_size, num_heads, seq_len, head_dim]
-            c2p_attn: torch.Tensor = q @ rel_k.transpose(-1,-2)
+            c2p_attn: torch.Tensor = q @ rel_k.transpose(-1, -2)
             c2p_attn = torch.gather(c2p_attn, dim=-1, index=dynamic_expand(c2p_rel_pos, q, [0, 1, 2, 2]))
 
             # [batch, seq_len, hidden_dim] x [1, attn_span, embed_dim]
@@ -76,7 +91,7 @@ class TAM(torch.nn.Module):
 
         # 4 attn scores return shape [batch, seq_len, seq_len]
         c2c_attn: torch.Tensor = q @ k.transpose(-2, -1)  # self-attn
-        cross_c2c_attn: torch.Tensor | None = q @ next_k.transpose(-2, -1) if next_k is not None else torch.tensor(0) # cross-attn
+        cross_c2c_attn: torch.Tensor | None = q @ next_k.transpose(-2, -1) if next_k is not None else torch.tensor(0)  # cross-attn
 
         attn_score: torch.Tensor = c2c_attn + cross_c2c_attn + c2p_attn + p2c_attn
         attn_score /= (((self._num_backbones + 2) * self._embed_dim) ** .5)
@@ -92,8 +107,9 @@ class TAM(torch.nn.Module):
         :param x: hidden states of shape (num_backbones, batch_size, seq_len, embed_dim)
         :return: embedded tensor of shape [batch_size, seq_len, embed_dim]
         """
-        assert x.dim() == 4, "Required dimension is not satisfied"
         num_backbones, _, seq_len, embed_dim = x.size()
+        assert x.dim() == 4, "Required dimension is not satisfied"
+        assert self._num_backbones == num_backbones, "Input tensor has different number of backbones"
 
         output: torch.Tensor | None = None
         if self._num_backbones == 1:

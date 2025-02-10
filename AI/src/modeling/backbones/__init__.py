@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Union
 
 
 import torch
@@ -11,7 +11,6 @@ from ...utils import DotDict, create_feature_extractor
 from .S3D import s3d
 from .CLIP import clip_vision
 from .InceptionI3D import inception_i3d
-
 
 
 __all__ = ["build_backbone"]
@@ -40,14 +39,17 @@ backbones: Dict[str, Dict[str, Any]] = {
 }
 
 
-def build_backbone(config: DotDict) -> Tuple[torch.nn.ModuleList, List[int]]:
+def build_backbone(config: DotDict) -> Union[Tuple[torch.nn.ModuleList, List[str], List[int]], \
+                                             Tuple[torch.nn.ModuleList, List[str], torch.nn.ModuleList, List[int]]]:
     build_result: Dict[str, Any] = {
+        "name": [],
         "backbone": torch.nn.ModuleList(),
-        "out_channel": []
+        "out_channels": []
     }
 
     for name in config.Architecture.backbone.name:
-        assert name in backbones.keys(), ValueError(f"Provided backbone name is unavailable. Get '{name}'")
+        assert name in backbones.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
+        build_result["name"].append(name)
 
         model_args = config.Architecture.backbone.get(f"{name}_args")
         model_args = {} if model_args is None else config.Architecture.backbone.get_dict(f"{name}_args")
@@ -62,26 +64,29 @@ def build_backbone(config: DotDict) -> Tuple[torch.nn.ModuleList, List[int]]:
         model = _freeze_layer(model)
         model.eval()
 
-        if config.Architecture.compile:
+        if config.Architecture.backbone.get("compile"):
             model.compile()
 
-        out_channel: int = _get_out_channel(model, name)
+        out_channels: int = _get_out_channels(model, name)
 
         if config.Architecture.backbone.get("out_proj") is not None:
-            mlp = MLP(out_channel, **config.Architecture.backbone.get_dict("out_proj"))
-            out_channel: int = mlp.output_dim
+            out_proj = MLP(out_channels, **config.Architecture.backbone.get_dict("out_proj"))
+            out_channels: int = out_proj.out_channels
 
-            build_result["backbone"].append(torch.nn.Sequential(model, mlp))
-            build_result["out_channel"].append(out_channel)
+            build_result["backbone"].append(model)
+            build_result["out_channels"].append(out_channels)
+
+            if "out_proj" not in build_result.keys():
+                build_result["out_proj"] = torch.nn.ModuleList([out_proj])
+            else:
+                build_result["out_proj"].append(out_proj)
         else:
             build_result["backbone"].append(model)
-            build_result["out_channel"].append(out_channel)
-    return build_result["backbone"], build_result["out_channel"]
+            build_result["out_channels"].append(out_channels)
+    return build_result["backbone"], build_result["name"], build_result.get("out_proj"), build_result["out_channels"]
 
 
-def _get_out_channel(model: torch.nn.Module | torch.fx.GraphModule,
-                     name: str,
-                     ) -> int:
+def _get_out_channels(model: torch.nn.Module | torch.fx.GraphModule, name: str) -> int:
     dummy_input = torch.rand(backbones[name]["dummy_input"])
     output = model(dummy_input)["features"]
 

@@ -29,6 +29,9 @@ def main(args: argparse.Namespace) -> None:
     val_dataloader = build_dataloader(copy.deepcopy(config), "val")
 
     model = build_model(copy.deepcopy(config))
+
+    import torch
+    model(torch.randn(32, 3, 13, 224, 224, device="cuda"))
     return None
 
 
