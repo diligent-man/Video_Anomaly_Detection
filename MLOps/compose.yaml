@@ -186,20 +186,9 @@ services:
             MINIO_PORT: ${MINIO_PORT}
             MINIO_ROOT_USER: ${MINIO_ROOT_USER}
             MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-#            LAKEFS_LOGGING_LEVEL: INFO
-#            LAKEFS_STATS_ENABLED: 1
-#            LAKEFS_AUTH_ENCRYPT_SECRET_KEY: some random secret string
-#
-#            LAKEFS_BLOCKSTORE_TYPE: s3
-#            LAKEFS_BLOCKSTORE_S3_FORCE_PATH_STYLE: true
-#            LAKEFS_BLOCKSTORE_S3_DISCOVER_BUCKET_REGION: false
-#            LAKEFS_BLOCKSTORE_S3_ENDPOINT: http://minio:${MINIO_PORT}
-#            LAKEFS_BLOCKSTORE_S3_CREDENTIALS_ACCESS_KEY_ID: $MINIO_ROOT_USER
-#            LAKEFS_BLOCKSTORE_S3_CREDENTIALS_SECRET_ACCESS_KEY: $MINIO_ROOT_PASSWORD
-#
-#             Postgres for synchronizing actions on data repo (version >= 11.)
-#            LAKEFS_DATABASE_TYPE: postgres
-#            LAKEFS_DATABASE_POSTGRES_CONNECTION_STRING: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/lakefs
+
+            LAKEFS_BLOCKSTORE_S3_ENDPOINT: http://minio:${MINIO_PORT}
+
 
         networks:
             - MLOps

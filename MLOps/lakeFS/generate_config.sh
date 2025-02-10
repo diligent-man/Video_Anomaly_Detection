@@ -33,7 +33,8 @@ blockstore:
         credentials:
             access_key_id: ${MINIO_ROOT_USER}
             secret_access_key: ${MINIO_ROOT_PASSWORD}
-        endpoint: http://0.0.0.0:${MINIO_PORT}
+        # endpoint is specified in docker compose instead in this
+
 
 auth:
     login_duration: "24h"
@@ -59,7 +60,4 @@ auth:
 #    user_name: trong
 #    access_key_id: AKIAIOSFOLKFSSAMPLES
 #    secret_access_key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-
 EOF
-
-#cat $HOME/config.yaml
