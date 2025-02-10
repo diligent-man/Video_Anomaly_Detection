@@ -1,18 +1,19 @@
 import os
 import yaml
 import pathlib
+import warnings
 import commentjson
 
 from typing import Union, Dict, Any
 
-__all__ = ["convert_config_json_to_yaml", "load_config"]
+__all__ = ["convert_config_json_to_yaml", "load_config", "create_increment_path"]
 
 
-def convert_config_json_to_yaml(srcpath: Union[str, pathlib.Path],
-                                dstpath: Union[str, pathlib.Path]
+def convert_config_json_to_yaml(src: Union[str, pathlib.Path],
+                                dst: Union[str, pathlib.Path]
                                 ) -> None:
-    reader = open(srcpath, "r", encoding="utf-8", errors="ignore")
-    writer = open(dstpath, "w", encoding="utf-8", errors="ignore")
+    reader = open(src, "r", encoding="utf-8", errors="ignore")
+    writer = open(dst, "w", encoding="utf-8", errors="ignore")
 
     config: dict = commentjson.loads(reader.read())
     yaml.safe_dump(config, writer, indent=4, sort_keys=False)
@@ -24,10 +25,9 @@ def convert_config_json_to_yaml(srcpath: Union[str, pathlib.Path],
 
 def load_config(fpath: Union[str, pathlib.Path]) -> Dict[str, Any]:
     """
-    :param fpath: path to config file. Currently support json
+    :param fpath: path to config file. Currently, support json
     :return: config dict
     """
-    import json
     JSON_EXT = [".json"]
     YAML_EXT = [".yml", ".yaml"]
     SUPPORTED_CONFIG_EXT = [*JSON_EXT, *YAML_EXT]
@@ -44,56 +44,48 @@ def load_config(fpath: Union[str, pathlib.Path]) -> Dict[str, Any]:
     return config
 
 
-def get_save_dir(save_dir: str, name=None, *args, **kwargs) -> str:
+def create_increment_path(path: str,
+                          exist_ok: bool = False,
+                          sep: str = "",
+                          mkdir: bool = False,
+                          ) -> pathlib.Path:
     """
-    Returns the directory path for saving outputs, derived from arguments or default settings.
+    Increments a file or directory path, i.e.,
+        runs/exp --> runs/exp{sep}2, runs/exp{sep}3, ... etc.
 
-    Args:
-        args (SimpleNamespace): Namespace object containing configurations such as 'project', 'name', 'task',
-            'mode', and 'save_dir'.
-        name (str | None): Optional name for the output directory. If not provided, it defaults to 'args.name'
-            or the 'args.mode'.
+    Cases:
+        1/ path exists and `exist_ok` is not True,
+            the path will be incremented by appending a number and `sep` to the end of the path.
+        2/ path is a file, the file extension will be preserved.
+        3/ path is a directory, the number will be appended directly to the end of the path.
 
-    Returns:
-        (pathlib.Path): Directory path where outputs should be saved.
+    If `mkdir` is set to True, the path will be created as a directory if it does not already exist.
+
+    Note: This fn is adopted from https://github.com/ultralytics/ultralytics/blob/main/ultralytics/utils/files.py
+
+    :param: path (str | pathlib.Path): Path to increment.
+    :param: exist_ok (bool): If True, the path will not be incremented and returned as-is.
+    :param: sep (str): Separator to use between the path and the incrementation number.
+    :param: mkdir (bool): Create a directory if it does not exist.
+    :return (pathlib.Path): Incremented path.
     """
-    # project = args.project or (ROOT.parent / "tests/tmp/runs" if TESTS_RUNNING else RUNS_DIR) / args.task
-    if name is not None:
-        save_dir: str = os.path.join(save_dir, name)
+    path: pathlib.Path = pathlib.Path(path)
 
-    save_dir = increment_path(save_dir, exist_ok=False, *args, **kwargs)
-    return pathlib.Path(save_dir)
-
-
-
-def increment_path(path: str, exist_ok=False, sep="", mkdir=False):
-    """
-    Increments a file or directory path, i.e., runs/exp --> runs/exp{sep}2, runs/exp{sep}3, ... etc.
-
-    If the path exists and `exist_ok` is not True, the path will be incremented by appending a number and `sep` to
-    the end of the path. If the path is a file, the file extension will be preserved. If the path is a directory, the
-    number will be appended directly to the end of the path. If `mkdir` is set to True, the path will be created as a
-    directory if it does not already exist.
-
-    Args:
-        path (str | pathlib.Path): Path to increment.
-        exist_ok (bool): If True, the path will not be incremented and returned as-is.
-        sep (str): Separator to use between the path and the incrementation number.
-        mkdir (bool): Create a directory if it does not exist.
-
-    Returns:
-        (pathlib.Path): Incremented path.
-    """
-    path = pathlib.Path(path)
     if path.exists() and not exist_ok:
         path, suffix = (path.with_suffix(""), path.suffix) if path.is_file() else (path, "")
 
-        # Method 1
-        for n in range(2, 9999):
-            p = f"{path}{sep}{n}{suffix}"
-            if not os.path.exists(p):
+        i = 2
+        while True:
+            dir_name = f"{path}{sep}{i}{suffix}"
+
+            if not os.path.exists(dir_name):
                 break
-        path = pathlib.Path(p)
+            else:
+                i += 1
+
+        path = pathlib.Path(dir_name)
+    else:
+        warnings.warn("Currently using old save dir for saving results, old data will be overwritten.")
 
     if mkdir:
         path.mkdir(parents=True, exist_ok=True)

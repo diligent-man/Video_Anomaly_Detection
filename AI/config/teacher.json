@@ -2,10 +2,9 @@
     "global":
     {
 //        "save_dir": "/home/trong/Downloads/training_results/",
-//        "project_name": "AIP391",
-//        "experiment_name": "1",
-
-        "technique": "single",
+        "project_name": "AIP391",
+//        "experiment_name": "run 1",
+//        "technique": "single",
 //        "mode": "train",
         "seed": 12345,
         "device": "cuda",
@@ -74,7 +73,10 @@
                 "pin_memory_device": "cuda"}
         },
         /////////////////////////////////////////////////////////
-        "test": {}
+        "test": {
+            "dataset":{},
+            "dataloader":{}
+        }
     },
 
     "architecture":
@@ -82,7 +84,7 @@
         "backbone":
         {
             "type": "single",
-//            "name": "i3ds"
+            "name": "i3d"
 
         },
 
