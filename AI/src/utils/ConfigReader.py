@@ -25,11 +25,6 @@ class ConfigReader(object):
         "fields": ["global", "data", "architecture", "optimizer", "metric", "loss", "services"]
     }
 
-    # mode_to_check: Set[str]"mode" = {"train", "test"}
-    # dataset_to_check: Set[str] = {"train", "val", "test"}
-    # arch_to_check: Dict[str, Set[str]] = {"optional": {"backbone"}, "compulsory": {"neck", "head"}}
-    # fields_to_check: Set[str] =
-
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
@@ -41,19 +36,17 @@ class ConfigReader(object):
         print("############################################################################")
 
     def _structure_check(self):
+        # TODO: Optimize checking process
         print("Config structure sanity check")
-        # mode_to_check: Set[str] = {"train", "test"}
-        dataset_to_check: Set[str] = {"train", "val", "test"}
-        arch_to_check: Dict[str, Set[str]] = {"optional": {"backbone"}, "compulsory": {"neck", "head"}}
-        fields_to_check: Set[str] = {"global", "data", "architecture", "optimizer", "metric", "loss", "services"}
-
         config: Dict[str, Any] = self.__config.get_dict()
+        arch_to_check: Dict[str, Set[str]] = {"optional": {"backbone"}, "compulsory": {"neck", "head"}}
 
         # Fields check
         for field in config.keys():
             field = field.lower()
             assert field in self.__expected_vals["fields"], \
-                ValueError(f"'{field}' field is unexpected. Expect {len(fields_to_check)} fields, including {fields_to_check}")
+                ValueError(f"'{field}' field is unexpected. Expect {len(self.__expected_vals['fields'])} fields\
+                 ({', '.join(self.__expected_vals['fields'])})")
 
         # global field check
         print("Global:")
@@ -77,7 +70,7 @@ class ConfigReader(object):
 
         print(f"Dataset config:")
         for i in dataset:
-            assert i in self.__expected_vals["dataset"], ValueError(f"Only {len(dataset_to_check)} states are allowed. Get '{i}' instead.")
+            assert i in self.__expected_vals["dataset"], ValueError(f"Only {len(self.__expected_vals['dataset'])} states ({', '.join(self.__expected_vals['dataset'])}) are allowed. Get '{i}' instead.")
             assert config["Data"][i].get("dataset") is not None, ValueError(f"Dataset config for {i} set is None")
             assert config["Data"][i].get("dataloader") is not None, ValueError(f"Dataloader config for {i} set is None")
             print(f"\t{ANSIColor().CYAN}{i}{ANSIColor().RESET}: {config['Data'][i]['dataset'].get('name')}")

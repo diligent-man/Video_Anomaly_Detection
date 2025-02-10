@@ -4,7 +4,7 @@ import torch
 
 from ...utils import DotDict
 from ..backbones import build_backbone
-# from ..necks import build_neck
+from ..necks import build_neck
 # from ..heads import build_head
 
 __all__ = ["BaseModel"]
@@ -24,22 +24,19 @@ class BaseModel(torch.nn.Module):
         #     config["Transform"]["in_channels"] = in_channels
         #     self.transform = build_transform(config["Transform"])
         #     in_channels = self.transform.out_channels
-        if config.Architecture.backbone is None:
-            self.use_backbone = False
+
+        if config.Architecture.get("backbone") is None:
+            self._backbone = None
         else:
-            self.use_backbone = True
-            # config.Backbone["in_channels"] = in_channels
-            self.backbone = build_backbone(copy.deepcopy(config))
-            # in_channels = self.backbone.out_channels
+            backbone, out_channel = build_backbone(copy.deepcopy(config))
+            self._backbone = backbone
 
         # build neck
-        # for rec, neck can be cnn,rnn or reshape(None)
-        # for det, neck can be FPN, BIFPN and so on.
-        # for cls, neck should be none
-        # if "Neck" not in config or config["Neck"] is None:
-        #     self.use_neck = False
-        # else:
-        #     self.use_neck = True
+        if config.Architecture.get("neck") is None:
+            self._neck = None
+        else:
+            self._neck = build_neck(copy.deepcopy(config))
+
         #     config["Neck"]["in_channels"] = in_channels
         #     self.neck = build_neck(config["Neck"])
         #     in_channels = self.neck.out_channels

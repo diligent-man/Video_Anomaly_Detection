@@ -23,13 +23,12 @@ def main(args: argparse.Namespace) -> None:
     # if config["Global"]["distributed"]:
     #     dist.init_parallel_env()
     #
-    # TODO: implement global_check_field
     config: DotDict = ConfigReader(args.config).config
 
-    # train_dataloader = build_dataloader(copy.deepcopy(config), "train")
-    # val_dataloader = build_dataloader(copy.deepcopy(config), "val")
-    #
-    # model = build_model(copy.deepcopy(config))
+    train_dataloader = build_dataloader(copy.deepcopy(config), "train")
+    val_dataloader = build_dataloader(copy.deepcopy(config), "val")
+
+    model = build_model(copy.deepcopy(config))
     return None
 
 

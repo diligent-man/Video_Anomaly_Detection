@@ -4,6 +4,12 @@ from .ConfigReader import ConfigReader
 
 from .load_video import video_loader
 from .visualize_lr import visualize_lr
+from .create_feature_extractor import create_feature_extractor
+from .utils import (
+    convert_config_json_to_yaml,
+    load_config,
+    create_increment_path,
+)
 
 __all__ = [
     "DotDict",
@@ -11,5 +17,10 @@ __all__ = [
     "ConfigReader",
 
     "video_loader",
-    "visualize_lr"
+    "visualize_lr",
+    "create_feature_extractor",
+
+    "convert_config_json_to_yaml",
+    "load_config",
+    "create_increment_path"
 ]

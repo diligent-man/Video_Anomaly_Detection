@@ -129,6 +129,7 @@ class InceptionI3d(torch.nn.Module):
         :param x: input tensor of shape (B, C, T, H, W)
         :return: Logits with shape (B, T, C) if spatial_squeeze else (B, T, C, 1, 1)
         """
+
         for layer in self.__end_points.values():
             x = layer(x)
 
@@ -140,8 +141,8 @@ class InceptionI3d(torch.nn.Module):
         return x
 
 
-def inception_i3d(*, weights: str = None, **kwargs: Any) -> InceptionI3d:
-    model = InceptionI3d(**kwargs)
+def inception_i3d(weights: str = None, **kwargs) -> torch.nn.Module:
+    model: InceptionI3d = InceptionI3d(**kwargs)
 
     if weights is not None:
         model.load_state_dict(torch.load(weights, weights_only=True))

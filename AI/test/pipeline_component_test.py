@@ -13,7 +13,7 @@ from AI.src.model.InceptionI3D import inception_i3d
 from AI.src.utils.Tracer import LeafModuleAwareTracer
 from AI.src.utils.tensor_hook import pack_hook, unpack_hook
 from AI.src.utils.ModelArchInspector import ModelArchInspector
-from AI.src.utils.pseudo_label_refinement import PseudoLabelRefiner
+from AI.src.postprocessing import PseudoLabelRefiner
 from AI.src.utils.create_feature_extractor import create_feature_extractor
 
 
@@ -115,8 +115,8 @@ def test_2D_extract_feature(device: str = "cuda") -> None:
         #     **inputs
         # )()
 
-        # graph: torch.fx.graph.Graph = tracer.trace(model, concrete_args={"return_loss": None, "return_dict": None})
-        # graph.print_tabular()
+        graph: torch.fx.graph.Graph = tracer.trace(model, concrete_args={"return_loss": None, "return_dict": None})
+        graph.print_tabular()
 
         feature_extractor: torch.fx.graph_module.GraphModule = create_feature_extractor(
             model,
@@ -353,7 +353,7 @@ def test_model() -> None:
 
 def main() -> None:
     # test_3D_extract_feature()
-    # test_2D_extract_feature()
+    test_2D_extract_feature()
     # test_mlp()
     # test_TAM()
     # test_pseudo_label_refiner()
