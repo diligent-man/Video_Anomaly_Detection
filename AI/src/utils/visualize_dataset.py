@@ -49,35 +49,47 @@ def draw_bar_chart(x, y, title, xlabel, ylabel):
 def plot_dataset_statistics(dataset: VideoFolderDataset):
     """
     Vẽ các biểu đồ thống kê dataset:
-    - Biểu đồ cột (số lượng video theo class)
+    - Biểu đồ cột (số lượng video anomalies & normal)
+    - Biểu đồ cột (số lượng video theo từng class)
     - Histogram FPS
     - Histogram thời gian video
     """
     class_counts = defaultdict(int)
     fps_list = []
-    durations = []  # Danh sách thời gian video
-    resolutions = []
+    durations = []  
 
-    for stream_info, video_class in dataset:
+    for stream_info, target in dataset:
+        video_class = dataset.classes[target]  # Lấy tên class thay vì số
         class_counts[video_class] += 1
         fps = getattr(stream_info, "frame_rate", 0)
         num_frames = getattr(stream_info, "num_frames", 0)
-        resolution = (getattr(stream_info, "width", 0), getattr(stream_info, "height", 0))
 
         duration = num_frames / fps if fps > 0 else 0
         fps_list.append(fps)
-        resolutions.append(resolution)
         durations.append(duration)
 
-    # Tính thời gian ngắn nhất, dài nhất và trung bình
-    min_duration = np.min(durations) if durations else 0
-    max_duration = np.max(durations) if durations else 0
-    avg_duration = np.mean(durations) if durations else 0
+    # **Tách riêng anomalies & normal**
+    num_anomalies = sum(count for cls, count in class_counts.items() if cls.lower() != "normal")
+    num_normal = class_counts.get("Normal", 0)
 
-    # 1. Biểu đồ cột - Số lượng video theo class
-    draw_bar_chart(list(class_counts.keys()), list(class_counts.values()), "Số lượng video theo lớp", "Lớp", "Số video")
+    # **1️⃣ Biểu đồ cột - Số lượng video anomalies vs normal**
+    plt.figure(figsize=(8, 5))
+    sns.barplot(x=["Anomalies", "Normal"], y=[num_anomalies, num_normal], palette=["red", "blue"])
+    plt.title("Số lượng video Anomalies vs Normal")
+    plt.xlabel("Loại video")
+    plt.ylabel("Số lượng video")
+    plt.show(block=False)
 
-    # 2. Histogram - Phân phối FPS
+    # **2️⃣ Biểu đồ cột - Số lượng video theo từng class**
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x=list(class_counts.keys()), y=list(class_counts.values()), palette="viridis")
+    plt.xticks(rotation=45, ha="right")  # Xoay tên class dễ nhìn
+    plt.title("Số lượng video theo lớp")
+    plt.xlabel("Lớp")
+    plt.ylabel("Số video")
+    plt.show(block=False)
+
+    # **3️⃣ Histogram - Phân phối FPS**
     plt.figure(figsize=(10, 6))
     sns.histplot(fps_list, bins=10, kde=True, color="blue")
     plt.title("Phân phối FPS")
@@ -85,13 +97,21 @@ def plot_dataset_statistics(dataset: VideoFolderDataset):
     plt.ylabel("Số lượng video")
     plt.show(block=False)
 
-    # 3. Histogram - Phân phối thời gian video
+    # **4️⃣ Histogram - Phân phối thời gian video**
     plt.figure(figsize=(10, 6))
     sns.histplot(durations, bins=10, kde=True, color="red")
     plt.title("Phân phối thời gian video")
     plt.xlabel("Thời gian (giây)")
     plt.ylabel("Số lượng video")
     plt.show(block=False)
+
+    # **5️⃣ In thông tin thống kê**
+    total_videos = num_anomalies + num_normal
+    print("=" * 50)
+    print(f"Tổng số video: {total_videos}")
+    print(f"Anomalies: {num_anomalies} ({(num_anomalies / total_videos) * 100:.2f}%)")
+    print(f"Normal: {num_normal} ({(num_normal / total_videos) * 100:.2f}%)")
+    print("=" * 50)
 
 # def plot_dataset_statistics(dataset: VideoFolderDataset):
 #     """
