@@ -1,14 +1,18 @@
 # Dirty workaround for module import, which violates PEP8: E402
 import os
 import sys
+
 sys.path.append(os.path.join(os.getcwd(), "../../"))
 
+import copy
 import pathlib
 import argparse
 import warnings
 
 from AI.src.utils import ConfigReader
 from AI.src.utils.DotDict import DotDict
+
+from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 
 warnings.filterwarnings("once")
@@ -19,10 +23,13 @@ def main(args: argparse.Namespace) -> None:
     # if config["Global"]["distributed"]:
     #     dist.init_parallel_env()
     #
+    # TODO: implement global_check_field
     config: DotDict = ConfigReader(args.config).config
 
-    train_dataloader = build_dataloader(config, "train")
-    val_dataloader = build_dataloader(config, "val")
+    # train_dataloader = build_dataloader(copy.deepcopy(config), "train")
+    # val_dataloader = build_dataloader(copy.deepcopy(config), "val")
+    #
+    # model = build_model(copy.deepcopy(config))
     return None
 
 

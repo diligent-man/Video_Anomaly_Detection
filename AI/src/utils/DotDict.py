@@ -1,6 +1,7 @@
 import copy
 import warnings
 import itertools
+import overrides
 
 from typing import Any, Dict, Iterable, List
 
@@ -53,9 +54,14 @@ class DotDict(dict):
             elif self._key_error_handling == "warn":
                 warnings.warn(f"{self.__class__.__name__} has no attribute '{k}' so returns None")
 
+    def __dict__(self) -> Dict[str, Any]:
+        return self._parse_dict(dict(self))
+
+    @overrides.override
     def __setattr__(self, k: str, v: Any) -> None:
         self[k] = v
 
+    @overrides.override
     def __delattr__(self, k: str) -> None:
         try:
             del self[k]
@@ -103,15 +109,18 @@ class DotDict(dict):
                 parsed_dict[k] = v
         return parsed_dict
 
-    def get_dict(self, k: str) -> Dict[str, Any]:
+    def get_dict(self, k: str = None) -> Dict[str, Any]:
         return_dict: Dict[str, Any] = {}
 
-        for k, v in self[k].items():
-            if self._is_public(k):
-                if isinstance(v, dict):
-                    v: Dict[str, Any] = self._parse_dict(v)
-                elif isinstance(v, (tuple, list)):
-                    v: List[Any] = [self._parse_dict(x) if isinstance(x, dict) else x for x in v]
+        if k is not None:
+            for k, v in self[k].items():
+                if self._is_public(k):
+                    if isinstance(v, dict):
+                        v: Dict[str, Any] = self._parse_dict(v)
+                    elif isinstance(v, (tuple, list)):
+                        v: List[Any] = [self._parse_dict(x) if isinstance(x, dict) else x for x in v]
 
-                return_dict[k] = v
+                    return_dict[k] = v
+        else:
+            return_dict = self.__dict__()
         return return_dict

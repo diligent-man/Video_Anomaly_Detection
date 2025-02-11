@@ -1,7 +1,6 @@
-import copy
 import torch
 
-from ..utils import ConfigReader
+from ..utils import DotDict
 from .dataset import datasets
 from .dataloader import dataloaders
 
@@ -10,11 +9,9 @@ def _post_init_check(dl: torch.utils.data.DataLoader) -> None:
     assert len(dl) > 0, "There must be at least one batch in dataloader"
 
 
-def build_dataloader(config: ConfigReader,
+def build_dataloader(config: DotDict,
                      mode: str
                      ) -> torch.utils.data.DataLoader:
-    config: ConfigReader = copy.deepcopy(config)
-
     dataset_name: str = config.Data[mode].dataset.pop("name")
     dataloader_name: str = config.Data[mode].dataloader.pop("name")
 
