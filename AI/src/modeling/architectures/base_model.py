@@ -2,6 +2,8 @@ import copy
 from typing import List, Dict, Any
 
 import torch
+
+from  multipledispatch import dispatch
 from transformers.modeling_outputs import BaseModelOutputWithPooling
 
 from ...utils import DotDict
@@ -59,23 +61,14 @@ class BaseModel(torch.nn.Module):
             backbone = backbone.to(x.device)
 
             if name in ("rgb_i3d", "s3d"):
-                feats: Any = backbone(x.clone())
+                feats = forward_2d_net(backbone, x.clone(), self._reduce)
             elif name in ("clip_vision"):
-                feats: Any = backbone.to(x.device)(x.clone().view(B * T, C, H, W))
-
-            if not isinstance(feats, torch.Tensor):
-                feats: torch.Tensor = self._resolve_backbone_feat(feats)
-
-
-            # if self._out_proj is not None:
-            #     feats = self._out_proj[i].to(feats.device)(feats)
-
-            # feats: torch.Tensor = self._resolve_backbone_feat(feats)
+                continue
+                # feats: Any = backbone.to(x.device)(x.clone().permute(0, 2, 1, 3, 4).reshape(-1, C, H, W))
 
 
 
-            # print(feats.shape)
-            # backbone_out = feats if backbone_out is None else torch.stack([backbone_out, feats], dim=0)
+
         # print(backbone_out.shape)
         # neck_out = self._neck(backbone_out)
         # preds = self._head(neck_out)
@@ -85,7 +78,7 @@ class BaseModel(torch.nn.Module):
         #     neck_out if self._return_backbone_feats else None
         # )
 
-    def _resolve_backbone_feat(self, feats: Any) -> torch.Tensor:
+    def _resolve_backbone_feat(self, feats: Any, B, C, T) -> torch.Tensor:
         """
         :param feats: extracted feature from backbone. Feats can be any datatype
         :return: tensor feats with shape (batch_size, hidden_dim)
@@ -107,3 +100,22 @@ class BaseModel(torch.nn.Module):
         #     elif self._reduce == "first":
         #         feats = feats[..., 0]
         return feats
+
+
+@dispatch(dict)
+def resolve_net_output(x: Dict[str, Any]) -> Any:
+    if "features" in x.keys():
+        x = x["features"]
+    return x
+
+
+def forward_2d_net(model: torch.nn.Module, x: torch.Tensor, reduce: str) -> torch.Tensor:
+    x: Any = model(x)
+    x: torch.Tensor = resolve_net_output(x)
+
+    # x = x.mean(dim=[2, 3, 4])
+    print(x.shape)
+    # if reduce == "mean":
+    #     x = x.mean(dim=, keepdim=False)
+    # elif reduce == "first":
+    return x

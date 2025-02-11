@@ -57,6 +57,11 @@ def build_backbone(config: DotDict) -> Union[Tuple[torch.nn.ModuleList, List[str
             model_args["weights"] = backbones[name]["default_weight"]
 
         model: torch.nn.Module = backbones[name]["model"](**model_args)
+
+        from ...utils.Tracer import LeafModuleAwareTracer
+        LeafModuleAwareTracer().trace(model, concrete_args=backbones[name].get("concrete_args")).print_tabular()
+
+
         model: torch.fx.GraphModule = create_feature_extractor(
             model, backbones[name]["return_node"],
             concrete_args=backbones[name].get("concrete_args")
