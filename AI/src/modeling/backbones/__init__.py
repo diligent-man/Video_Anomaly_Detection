@@ -1,100 +1,105 @@
+import functools
 from typing import Dict, Any, List, Tuple, Union
-
 
 import torch
 from transformers.modeling_outputs import BaseModelOutputWithPooling
 
+from .ModelForwarder import ModelForwarder
+from .constant import (
+    NET_DEFAULT_CONFIG,
+    NET_2D, NET_3D,
+    NET_2D_REDUCE, NET_3D_REDUCE,
+    DEFAULT_2D_REDUCE, DEFAULT_3D_REDUCE
+)
 
-from ..MLP import MLP
+
+from ..nn import MLP
+
 from ...utils import DotDict, create_feature_extractor
 
-from .S3D import s3d, S3D_Weights
-from .InceptionI3D import inception_i3d, InceptionI3D_Weights
-from .CLIP import clip_vision
+
+__all__ = [
+    "build_backbone",
+    "NET_2D", "NET_3D",
+    "NET_2D_REDUCE", "NET_3D_REDUCE",
+    "ModelForwarder"
+]
 
 
-__all__ = ["build_backbone"]
-
-backbones: Dict[str, Dict[str, Any]] = {
-    # These models are from pytorch code base
-    "rgb_i3d": {
-        "model": inception_i3d,
-        "weight": InceptionI3D_Weights.DEFAULT,
-        "return_node": {"avg_pool": "features"},
-        "dummy_input": [1, 3, 13, 224, 224]
-    },
-
-    "s3d": {
-        "model": s3d,
-        "weight": S3D_Weights.DEFAULT,
-        "return_node": {"avgpool": "features"},
-        "dummy_input": [1, 3, 13, 224, 224]
-    },
-
-    # These models are from huggingface code base
-    "clip_vision": {
-        "model": clip_vision,
-        "weight": "../weights/CLIP/vit-base-patch16",
-        "return_node": {"vision_model": "features"},
-        "dummy_input": [1, 3, 224, 224],
-    }
-}
-
-
-def build_backbone(config: DotDict) -> Union[Tuple[torch.nn.ModuleList, List[str], List[int]], \
-                                             Tuple[torch.nn.ModuleList, List[str], torch.nn.ModuleList, List[int]]]:
+def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[str], List[torch.nn.Module], List[int]],
+                                             Tuple[torch.nn.ModuleList, List[str], List[torch.nn.Module], torch.nn.ModuleList, List[int]]]:
     build_result: Dict[str, Any] = {
         "name": [],
-        "backbone": torch.nn.ModuleList(),
+        "backbone": [],
+        "reduce": [],
         "out_channels": []
     }
 
-    for name in config.Architecture.backbone.name:
-        assert name in backbones.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
+    out_proj: Dict[str, Any] = config.Architecture.backbone.pop("out_proj", DotDict({})).get_dict()
+    compile_model: bool = config.Architecture.backbone.pop("compile", False)
+
+    for name in config.Architecture.backbone.pop("name"):
+        assert name in NET_DEFAULT_CONFIG.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
         build_result["name"].append(name)
+        model_args: Dict = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
 
-        model_args = config.Architecture.backbone.get(f"{name}_args")
-        model_args = {} if model_args is None else config.Architecture.backbone.get_dict(f"{name}_args")
         if model_args.get("weights") is None:
-            model_args["weights"] = backbones[name]["weight"]
+            model_args["weights"] = NET_DEFAULT_CONFIG[name]["weights"]
 
-        model: torch.nn.Module = backbones[name]["model"](**model_args)
-
-        from ...utils.Tracer import LeafModuleAwareTracer
-        LeafModuleAwareTracer().trace(model, concrete_args=backbones[name].get("concrete_args")).print_tabular()
-
-
+        model: torch.nn.Module = NET_DEFAULT_CONFIG[name]["model"](**model_args)
         model: torch.fx.GraphModule = create_feature_extractor(
-            model, backbones[name]["return_node"],
-            concrete_args=backbones[name].get("concrete_args")
+            model, NET_DEFAULT_CONFIG[name]["return_node"],
+            concrete_args=NET_DEFAULT_CONFIG[name].get("concrete_args")
         )
         model = _freeze_layer(model)
         model.eval()
 
-        if config.Architecture.backbone.get("compile"):
+        if compile_model:
             model.compile()
 
         out_channels: int = _get_out_channels(model, name)
 
-        if config.Architecture.backbone.get("out_proj") is not None:
-            out_proj = MLP(out_channels, **config.Architecture.backbone.get_dict("out_proj"))
-            out_channels: int = out_proj.out_channels
+        if out_proj:
+            mlp: torch.nn.Module = MLP(out_channels, **out_proj)
+            out_channels: int = mlp.out_channels
 
             build_result["backbone"].append(model)
             build_result["out_channels"].append(out_channels)
 
             if "out_proj" not in build_result.keys():
-                build_result["out_proj"] = torch.nn.ModuleList([out_proj])
+                build_result["out_proj"] = torch.nn.ModuleList([mlp])
             else:
-                build_result["out_proj"].append(out_proj)
+                build_result["out_proj"].append(mlp)
         else:
             build_result["backbone"].append(model)
             build_result["out_channels"].append(out_channels)
-    return build_result["backbone"], build_result["name"], build_result.get("out_proj"), build_result["out_channels"]
+
+        build_result["reduce"].append(build_reduce(name, config))
+    return (build_result["backbone"],
+            build_result["name"],
+            build_result["reduce"],
+            build_result.get("out_proj"),
+            build_result["out_channels"]
+            )
+
+
+def build_reduce(name: str, config: DotDict) -> functools.partial:
+    reduce_config: Dict[str, Any] = config.Architecture.backbone.pop(f"{name}_reduce", DotDict({})).get_dict()
+    if name in NET_2D:
+        reduce_name = reduce_config.pop("name", DEFAULT_2D_REDUCE)
+        assert reduce_name in NET_2D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
+        reduce: torch.nn.Module = NET_2D_REDUCE[reduce_name]
+    else:
+        reduce_name = reduce_config.get("name", DEFAULT_3D_REDUCE)
+        assert reduce_name in NET_3D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
+        reduce: torch.nn.Module = NET_3D_REDUCE[reduce_name]
+    reduce: functools.partial = functools.partial(reduce, **reduce_config)
+    return reduce
+########################################################################################################################
 
 
 def _get_out_channels(model: torch.nn.Module | torch.fx.GraphModule, name: str) -> int:
-    dummy_input = torch.rand(backbones[name]["dummy_input"])
+    dummy_input = torch.rand(NET_DEFAULT_CONFIG[name]["dummy_input"])
     output = model(dummy_input)["features"]
 
     # Rule-based approach due to various model output

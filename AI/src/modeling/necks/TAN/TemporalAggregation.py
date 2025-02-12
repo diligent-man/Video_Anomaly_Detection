@@ -2,7 +2,6 @@ from typing import List, Dict
 
 import torch
 
-
 from .QKV import QKV
 from .RelativePE import RelativePE
 from ..functional import dynamic_expand, transform_multihead

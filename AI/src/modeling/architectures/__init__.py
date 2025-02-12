@@ -1,7 +1,7 @@
 import copy
 
 from ...utils import DotDict
-from .base_model import BaseModel
+from .BaseModel import BaseModel
 
 
 __all__ = ["build_model"]

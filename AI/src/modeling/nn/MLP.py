@@ -3,11 +3,9 @@ import collections
 
 from typing import List, Tuple, Dict, Any
 
-
 import torch
 
-
-from ..opensrc.pytorch import available_layer
+from ...opensrc.pytorch import available_layer
 __all__ = ["MLP"]
 
 

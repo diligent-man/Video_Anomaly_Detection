@@ -1,5 +1,7 @@
 """
 Temporary code for demo. Reimplement later on !
+Ref: https://github.com/craston/MARS?tab=readme-ov-file#models
+     https://github.com/seominseok0429/Real-world-Anomaly-Detection-in-Surveillance-Videos-pytorch/blob/main/vis.py
 """
 import os
 import time

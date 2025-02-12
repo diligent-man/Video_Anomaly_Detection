@@ -84,6 +84,8 @@
         "backbone":
         {
             "name": ["rgb_i3d", "s3d", "clip_vision"],
+//            "name": ["clip_vision"],
+//            "name": ["rgb_i3d"],
             "compile": false,
             "out_proj":
             {
@@ -130,7 +132,7 @@
             "ARGS":
             {
                 "lr": 1e-6,
-                "amsgrad": true,
+                "amsgrad": true
             }
         },
 

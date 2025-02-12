@@ -112,7 +112,7 @@ class DotDict(dict):
     def get_dict(self, k: str = None) -> Dict[str, Any]:
         return_dict: Dict[str, Any] = {}
 
-        if not (k is None and self.get(k) is None):
+        if k is not None and self.get(k) is not None:
             for k, v in self[k].items():
                 if self._is_public(k):
                     if isinstance(v, dict):
