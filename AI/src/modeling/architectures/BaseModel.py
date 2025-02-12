@@ -51,10 +51,17 @@ class BaseModel(torch.nn.Module):
 
     def forward(self, x: torch.Tensor) -> BaseModelOutput:
         """
-        :param x: list of input tensors for corresponding backbones. Shape (B, C, T, H, W)
+        :param x: list of input tensors for corresponding backbones.
+                  Shape (S,C,T,H,W) or (B,S,C,T,H,W)
         :return:
         """
-        assert x.dim() == 5, ValueError("Input tensor should have dim 5 with shape (B, C, T, H, W)")
+        assert x.dim() in (5, 6), ValueError(
+            "Input tensor should have dim 5 with shape (S, C, T, H, W) or (B, S, C, T, H, W)"
+        )
+
+        if x.dim() == 5:
+            x = x.unsqueeze(0)
+
         # B, C, T, H, W = x.shape
 
         # Rule-based approach

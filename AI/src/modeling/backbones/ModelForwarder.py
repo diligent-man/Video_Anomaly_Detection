@@ -23,6 +23,11 @@ class ModelForwarder(torch.nn.Module):
         self.__reduce = reduce
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        assert x.dim() in (5, 6), ValueError("Input tensor should have dim 5 with shape (S, C, T, H, W) or (B, S, C, T, H, W)")
+
+        if x.dim() == 5:
+            x = x.unsqueeze(0)
+
         if self.__name in NET_2D:
             x: torch.Tensor = self._forward_2D_net(x)
         elif self.__name in NET_3D:
@@ -30,22 +35,35 @@ class ModelForwarder(torch.nn.Module):
         return x
 
     def _forward_2D_net(self, x: torch.Tensor) -> torch.Tensor:
-        assert x.dim() == 5, ValueError("Input tensor should have dim 5 with shape (B, C, T, H, W)")
-        B, C, T, H, W = x.shape
+        B, S, C, T, H, W = x.shape
 
-        # (B, C, T, H, W) -> (B, T, C, H, W) -> (-1, C, H, W)
-        x = x.permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
-        x = _resolve_backbone_output(self.__model(x))
-        x = x.view(B, T, -1).permute(0, -1, 1)  # (B, T, Hid_dim) -> # (B, Hid_dim, T)
-        x = self.__reduce(**{"kernel_size": x.shape[-1]})(x)  # (B, Hid_dim, 1)
-        x = x.squeeze(-1)
+        # (B,S,C,T,H,W) -> (B*S,T,C,H,W) -> (B*S*T,C,H,W)
+        try:
+            tmp: torch.Tensor = x.view(-1, C, T, H, W).permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
+            x: torch.Tensor = self.__model(tmp)
+            x: torch.Tensor = _resolve_backbone_output(x)
+            x = x.view(B * S, T, -1)
+        except torch.OutOfMemoryError:
+            cache: None | torch.Tensor = None
+
+            for i in range(B):
+                tmp: torch.Tensor = x[i, ...].permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
+                tmp: torch.Tensor = self.__model(tmp)
+                tmp: torch.Tensor = _resolve_backbone_output(tmp)
+                cache = tmp if cache is None else torch.cat((cache, tmp), dim=0)
+            x = cache.view(B*S, T, -1)
+        x = x.permute(0, -1, -2)  # (B*S,T,Hid_dim) -> # (B*S,Hid_dim,T)
+        x = self.__reduce(**{"kernel_size": x.shape[-1]})(x)  # (B*S,Hid_dim,1)
+        x = x.squeeze(-1).view(B, S, -1)  # (B*S,Hid_dim) -> (B,S,Hid_dim)
         return x
 
     def _forward_3D_net(self, x: torch.Tensor) -> torch.Tensor:
-        assert x.dim() == 5, ValueError("Input tensor should have dim 5 with shape (B, C, T, H, W)")
-        x = _resolve_backbone_output(self.__model(x))
+        B, S, C, T, H, W = x.shape
+        x = x.view(-1, C, T, H, W)
+        x: torch.Tensor = _resolve_backbone_output(self.__model(x))
         x = self.__reduce(**{"kernel_size": x.shape[2:]})(x)
-        x = x.squeeze(dim=[2, 3, 4])  # (B, Hid_dim, T, H, W) -> (B, Hid_dim, 1, 1, 1)
+        x = x.squeeze(dim=[2, 3, 4])  # (B,Hid_dim,T,H,W) -> (B, Hid_dim,1,1,1)
+        x = x.view(B, S, -1)  # (B,S,Hid_dim)
         return x
 
 
