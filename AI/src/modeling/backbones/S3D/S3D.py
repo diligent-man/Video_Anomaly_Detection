@@ -1,9 +1,11 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 from functools import partial
 
 import torch
 from torchvision.ops import Conv3dNormActivation
 
+from ....utils import load_weights
+from .S3D_Weights import S3D_Weights
 from .TemporalSeparableConv import TemporalSeparableConv
 from .SepInceptionBlock3D import SepInceptionBlock3D
 
@@ -12,10 +14,10 @@ __all__ = ["s3d"]
 
 class S3D(torch.nn.Module):
     def __init__(
-        self,
-        num_classes: int = 400,
-        dropout: float = 0.2,
-        norm_layer: Optional[Callable[..., torch.nn.Module]] = None,
+            self,
+            num_classes: int = 400,
+            dropout: float = 0.2,
+            norm_layer: Optional[Callable[..., torch.nn.Module]] = None,
     ) -> None:
         """
         :param num_class (int): number of classes for the classification task.
@@ -69,9 +71,10 @@ class S3D(torch.nn.Module):
         return x
 
 
-def s3d(weights: str = None, **kwargs) -> torch.nn.Module:
+def s3d(weights: None | str | S3D_Weights = True, **kwargs) -> torch.nn.Module:
     model: S3D = S3D(**kwargs)
+    weights: None | dict[str, Any] = load_weights(weights)
 
     if weights is not None:
-        model.load_state_dict(torch.load(weights, weights_only=True))
+        model.load_state_dict(weights)
     return model

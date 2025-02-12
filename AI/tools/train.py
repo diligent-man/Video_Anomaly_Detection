@@ -32,9 +32,7 @@ def main(args: argparse.Namespace) -> None:
 
     import torch
     with torch.amp.autocast(config.Global.device, torch.float16):
-        # model(torch.randn(3, 3, 16, 240, 320, device="cuda"))
-        # model(torch.randn(3, 3, 39, 512, 512, device="cuda"))
-        model(torch.randn(32, 3, 40, 224, 224, device="cuda"))
+        model(torch.randn(32, 3, 13, 224, 224, device="cuda"))
     return None
 
 

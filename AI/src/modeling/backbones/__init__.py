@@ -8,31 +8,33 @@ from transformers.modeling_outputs import BaseModelOutputWithPooling
 from ..MLP import MLP
 from ...utils import DotDict, create_feature_extractor
 
-from .S3D import s3d
+from .S3D import s3d, S3D_Weights
+from .InceptionI3D import inception_i3d, InceptionI3D_Weights
 from .CLIP import clip_vision
-from .InceptionI3D import inception_i3d
 
 
 __all__ = ["build_backbone"]
 
 backbones: Dict[str, Dict[str, Any]] = {
+    # These models are from pytorch code base
     "rgb_i3d": {
         "model": inception_i3d,
-        "default_weight": "../weights/I3D/rgb.pt",
+        "weight": InceptionI3D_Weights.DEFAULT,
         "return_node": {"avg_pool": "features"},
         "dummy_input": [1, 3, 13, 224, 224]
     },
 
     "s3d": {
         "model": s3d,
-        "default_weight": "../weights/S3D/model.pth",
+        "weight": S3D_Weights.DEFAULT,
         "return_node": {"avgpool": "features"},
         "dummy_input": [1, 3, 13, 224, 224]
     },
 
+    # These models are from huggingface code base
     "clip_vision": {
         "model": clip_vision,
-        "default_weight": "../weights/CLIP/vit-base-patch16",
+        "weight": "../weights/CLIP/vit-base-patch16",
         "return_node": {"vision_model": "features"},
         "dummy_input": [1, 3, 224, 224],
     }
@@ -54,7 +56,7 @@ def build_backbone(config: DotDict) -> Union[Tuple[torch.nn.ModuleList, List[str
         model_args = config.Architecture.backbone.get(f"{name}_args")
         model_args = {} if model_args is None else config.Architecture.backbone.get_dict(f"{name}_args")
         if model_args.get("weights") is None:
-            model_args["weights"] = backbones[name]["default_weight"]
+            model_args["weights"] = backbones[name]["weight"]
 
         model: torch.nn.Module = backbones[name]["model"](**model_args)
 

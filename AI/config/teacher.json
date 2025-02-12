@@ -83,7 +83,7 @@
     {
         "backbone":
         {
-            "name": ["rgb_i3d",  "s3d", "clip_vision"],
+            "name": ["rgb_i3d", "s3d", "clip_vision"],
             "compile": false,
             "out_proj":
             {

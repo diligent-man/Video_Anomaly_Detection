@@ -3,9 +3,10 @@ from collections import OrderedDict
 
 import torch
 
+from ....utils import load_weights
 from .Unit3D import Unit3D
-from .MaxPool3dSamePadding import MaxPool3dSamePadding
 from .InceptionBlock import InceptionBlock
+from .MaxPool3dSamePadding import MaxPool3dSamePadding
 
 
 __all__ = ["inception_i3d"]
@@ -145,5 +146,5 @@ def inception_i3d(weights: str = None, **kwargs) -> torch.nn.Module:
     model: InceptionI3d = InceptionI3d(**kwargs)
 
     if weights is not None:
-        model.load_state_dict(torch.load(weights, weights_only=True))
+        model.load_state_dict(load_weights(weights))
     return model

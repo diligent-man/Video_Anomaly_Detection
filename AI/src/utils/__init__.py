@@ -4,6 +4,7 @@ from .ConfigReader import ConfigReader
 
 from .load_video import video_loader
 from .visualize_lr import visualize_lr
+from .load_weights import load_weights
 from .visualize_dataset import prompt_dataset_statistics, plot_dataset_statistics
 from .create_feature_extractor import create_feature_extractor
 from .utils import (
@@ -16,8 +17,10 @@ __all__ = [
     "DotDict",
     "ANSIColor",
     "ConfigReader",
+
     "video_loader",
     "visualize_lr",
+    "load_weights",
     "create_feature_extractor",
     "convert_config_json_to_yaml",
     "load_config",
