@@ -2,7 +2,7 @@ from typing import Dict, Any
 
 import torch
 
-from .CLIP import clip_vision
+from .CLIP import clip_vision, CLIP_Weights
 from .S3D import s3d, S3D_Weights
 from .InceptionI3D import inception_i3d, InceptionI3D_Weights
 
@@ -34,16 +34,36 @@ NET_DEFAULT_CONFIG: Dict[str, Dict[str, Any]] = \
     },
 
     # These models are from huggingface code base
-    "clip_vision": {
+    "clip_vit/b16": {
         "model": clip_vision,
-        "weights": "../weights/CLIP/vit-base-patch16",
+        "weights": CLIP_Weights.BASE_PATCH16_224,
         "return_node": {"vision_model": "features"},
         "dummy_input": [1, 3, 224, 224],
-        # "concrete_args": {"return_dict": None},
+    },
+
+    "clip_vit/b32": {
+        "model": clip_vision,
+        "weights": CLIP_Weights.BASE_PATCH32_224,
+        "return_node": {"vision_model": "features"},
+        "dummy_input": [1, 3, 224, 224],
+    },
+
+    "clip_vit/l14": {
+        "model": clip_vision,
+        "weights": CLIP_Weights.LARGE_PATCH14_224,
+        "return_node": {"vision_model": "features"},
+        "dummy_input": [1, 3, 224, 224],
+    },
+
+    "clip_vit/l14_336": {
+        "model": clip_vision,
+        "weights": CLIP_Weights.LARGE_PATCH14_336,
+        "return_node": {"vision_model": "features"},
+        "dummy_input": [1, 3, 336, 336],
     }
 }
 
-NET_2D = {"clip_vision"}
+NET_2D = {"clip_vit/b16", "clip_vit/b32", "clip_vit/l14", "clip_vit/l14_336"}
 NET_3D = {"rgb_i3d", "s3d"}
 
 DEFAULT_2D_REDUCE = "max"

@@ -12,17 +12,17 @@ from .constant import (
     DEFAULT_2D_REDUCE, DEFAULT_3D_REDUCE
 )
 
-
 from ..nn import MLP
-
 from ...utils import DotDict, create_feature_extractor
 
 
 __all__ = [
     "build_backbone",
+    "ModelForwarder",
+    "NET_DEFAULT_CONFIG",
     "NET_2D", "NET_3D",
     "NET_2D_REDUCE", "NET_3D_REDUCE",
-    "ModelForwarder"
+    "DEFAULT_2D_REDUCE", "DEFAULT_3D_REDUCE"
 ]
 
 

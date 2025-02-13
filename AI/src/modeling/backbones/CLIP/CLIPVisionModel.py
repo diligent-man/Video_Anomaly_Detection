@@ -71,4 +71,4 @@ class CLIPVisionModel(CLIPPreTrainedModel):
 
 
 def clip_vision(weights: str) -> torch.nn.Module:
-    return CLIPVisionModel.from_pretrained(weights, use_safetensors=True)
+    return CLIPVisionModel.from_pretrained(weights)

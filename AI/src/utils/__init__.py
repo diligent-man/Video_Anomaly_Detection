@@ -1,6 +1,7 @@
 from .DotDict import DotDict
 from .ANSIColor import ANSIColor
 from .ConfigReader import ConfigReader
+from .ModelArchInspector import ModelArchInspector
 
 from .load_video import video_loader
 from .visualize_lr import visualize_lr
@@ -17,14 +18,15 @@ __all__ = [
     "DotDict",
     "ANSIColor",
     "ConfigReader",
+    "ModelArchInspector",
 
     "video_loader",
     "visualize_lr",
     "load_weights",
+    "prompt_dataset_statistics",
+    "plot_dataset_statistics",
     "create_feature_extractor",
     "convert_config_json_to_yaml",
     "load_config",
-    "create_increment_path",
-    "prompt_dataset_statistics",
-    "plot_dataset_statistics",
+    "create_increment_path"
 ]
