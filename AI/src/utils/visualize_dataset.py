@@ -35,7 +35,7 @@ def prompt_dataset_statistics(stats: Dict[str, Any]) -> str:
     return prompt
 
 def draw_bar_chart(x, y, title, xlabel, ylabel):
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 6))
     ax = sns.barplot(x=x, y=y, palette="viridis")
 
     # Display count on each bar
@@ -45,7 +45,8 @@ def draw_bar_chart(x, y, title, xlabel, ylabel):
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=45, ha="right")
+    plt.subplots_adjust(bottom=0.3)
     plt.show(block=False)
 
 def plot_dataset_statistics(dataset: VideoFolderDataset):
@@ -88,7 +89,7 @@ def plot_dataset_statistics(dataset: VideoFolderDataset):
     labels = ["Anomalies", "Normal"]
     values = [anomaly_count, normal_count]
 
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(12, 6))
     ax = sns.barplot(x=labels, y=values, palette="coolwarm")
 
     # Add count on each bar
@@ -101,95 +102,37 @@ def plot_dataset_statistics(dataset: VideoFolderDataset):
     plt.show(block=False)
 
     # 3. Histogram - Video Duration Distribution
-    plt.figure(figsize=(10, 6))
-    ax = sns.histplot(durations, bins='auto', kde=True, color="red")
-    plt.title("Video Duration Distribution")
-    plt.xlabel("Duration (seconds)")
-    plt.ylabel("Number of Videos")
 
-    # Add count on each bar
-    for patch in ax.patches:
-        if patch.get_height() > 0:
-            ax.text(patch.get_x() + patch.get_width()/2, patch.get_height() + 0.5, 
-                    str(int(patch.get_height())), ha="center", va="bottom", fontsize=10, fontweight="bold")
-    # Limit x-axis if outliers exist
-    plt.xlim(0, np.percentile(durations, 99))  # Trim the top 1% of values
+# Giả sử durations chứa danh sách thời lượng video
+    
 
-    plt.show(block=False)
+# Xác định các khoảng thời lượng
+    # bins = [0, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 1000,1200,1800,2000,2500,3000,3500, np.inf]
+    bins = [0, 60, 120, 180, 240, 300, 360, 420, 480, 540,  np.inf]
+    bin_labels = [f"[{int(bins[i])}, {int(bins[i+1])}[" if bins[i+1] != np.inf else f"[{int(bins[i])}, ∞[" for i in range(len(bins)-1)]
 
 
-# def plot_dataset_statistics(dataset: VideoFolderDataset):
-#     """
-#     Vẽ các biểu đồ thống kê dataset:
-#     - Biểu đồ cột (số lượng video theo class)
-#     - Histogram FPS
-#     - Histogram thời gian video
-#     """
-#     class_counts = defaultdict(int)
-#     fps_list = []
-#     durations = []  # Danh sách thời gian video
-#     resolutions = []
+# Phân loại số lượng video trong từng khoảng
+    bin_counts = np.histogram(durations, bins=bins)[0]
 
-#     for stream_info, video_class in dataset:
-#         class_counts[video_class] += 1
-#         fps = getattr(stream_info, "frame_rate", 0)
-#         num_frames = getattr(stream_info, "num_frames", 0)
-#         resolution = (getattr(stream_info, "width", 0), getattr(stream_info, "height", 0))
+# Vẽ biểu đồ cột
+    plt.figure(figsize=(12, 6))
+    plt.bar(bin_labels, bin_counts, color='blue')
 
-#         duration = num_frames / fps if fps > 0 else 0
-#         fps_list.append(fps)
-#         resolutions.append(resolution)
-#         durations.append(duration)
+# Thêm số lượng video lên từng cột
+    for i, count in enumerate(bin_counts):
+        plt.text(i, count + 2, str(count), ha='center', fontsize=12)
 
-#     # Tính thời gian ngắn nhất, dài nhất và trung bình
-#     min_duration = np.min(durations) if durations else 0
-#     max_duration = np.max(durations) if durations else 0
-#     avg_duration = np.mean(durations) if durations else 0
+    plt.xlabel("Seconds")
+    plt.ylabel("Number of videos")
+    plt.title("Videos Durations Distribution")
+    plt.xticks(rotation=45, ha='right')
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.xticks(fontsize=8)
+    plt.yticks(fontsize=8)
+    plt.subplots_adjust(bottom=0.2)
 
-#     # Đổi nhãn 0 -> "anomaly", 1 -> "normal"
-#     class_labels = {0: "anomaly", 1: "normal"}
-#     class_names = [class_labels.get(cls, str(cls)) for cls in class_counts.keys()]
-#     class_values = list(class_counts.values())
+    plt.show()
 
-#     # 1. Biểu đồ cột - Số lượng video theo class
-#     plt.figure(figsize=(8, 5))
-#     ax = sns.barplot(x=class_names, y=class_values, palette="coolwarm")
-#     plt.title("Số lượng video theo lớp")
-#     plt.xlabel("Lớp")
-#     plt.ylabel("Số video")
 
-#     # Thêm số lượng trên đầu cột
-#     for i, value in enumerate(class_values):
-#         ax.text(i, value + 1, str(value), ha="center", va="bottom", fontsize=12, fontweight="bold")
 
-#     plt.show(block=False)
-
-#     # 2. Histogram - Phân phối FPS
-#     plt.figure(figsize=(10, 6))
-#     ax = sns.histplot(fps_list, bins=10, kde=True, color="blue")
-#     plt.title("Phân phối FPS")
-#     plt.xlabel("FPS")
-#     plt.ylabel("Số lượng video")
-
-#     # Thêm số lượng trên đầu cột
-#     for patch in ax.patches:
-#         if patch.get_height() > 0:
-#             ax.text(patch.get_x() + patch.get_width()/2, patch.get_height() + 0.5, 
-#                     str(int(patch.get_height())), ha="center", va="bottom", fontsize=10, fontweight="bold")
-
-#     plt.show(block=False)
-
-#     # 3. Histogram - Phân phối thời gian video
-#     plt.figure(figsize=(10, 6))
-#     ax = sns.histplot(durations, bins=10, kde=True, color="red")
-#     plt.title("Phân phối thời gian video")
-#     plt.xlabel("Thời gian (giây)")
-#     plt.ylabel("Số lượng video")
-
-#     # Thêm số lượng trên đầu cột
-#     for patch in ax.patches:
-#         if patch.get_height() > 0:
-#             ax.text(patch.get_x() + patch.get_width()/2, patch.get_height() + 0.5, 
-#                     str(int(patch.get_height())), ha="center", va="bottom", fontsize=10, fontweight="bold")
-
-#     plt.show(block=False)
