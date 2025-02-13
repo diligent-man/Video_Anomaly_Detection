@@ -84,9 +84,7 @@
         "backbone":
         {
             "name": ["rgb_i3d", "s3d", "clip_vision"],
-//            "name": ["clip_vision"],
-//            "name": ["rgb_i3d"],
-            "compile": false,
+            "compile": true,
             "out_proj":
             {
                 "hidden_dim": [512, 512],
@@ -116,12 +114,13 @@
             "hidden_dim": [512, 32],
             "hidden_activation": "ReLU",
 
-            "out_channels": 2,
+            "out_channels": 1,
             "out_activation": "Sigmoid",
 
             "dropout": 0.5,
             "layer_order": "fc->drop->act"
-        }
+        },
+//        "postprocessing": {}
     },
 
     "optimizer":

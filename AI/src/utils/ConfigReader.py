@@ -39,7 +39,7 @@ class ConfigReader(object):
         # TODO: Optimize checking process
         print("Config structure sanity check")
         config: Dict[str, Any] = self.__config.get_dict()
-        arch_to_check: Dict[str, Set[str]] = {"optional": {"transform"}, "compulsory": {"backbone", "neck", "head"}}
+        arch_to_check: Dict[str, Set[str]] = {"optional": {"transform", "postprocessing"}, "compulsory": {"backbone", "neck", "head"}}
 
         # Fields check
         for field in config.keys():

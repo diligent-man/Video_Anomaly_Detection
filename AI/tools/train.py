@@ -31,8 +31,12 @@ def main(args: argparse.Namespace) -> None:
     model = build_model(copy.deepcopy(config))
 
     import torch
+    from AI.src.modeling.architectures.BaseModelOutput import BaseModelOutput
+    print("start")
     with torch.amp.autocast(config.Global.device, torch.float16):
-        model(torch.randn(4, 32, 3, 15, 224, 224, device="cuda"))
+        for i in range(100):
+            outs: BaseModelOutput = model(torch.randn(2, 32, 3, 15, 224, 224, device="cuda"))
+            print(i)
     return None
 
 

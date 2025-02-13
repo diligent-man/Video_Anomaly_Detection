@@ -40,18 +40,17 @@ class ModelForwarder(torch.nn.Module):
         # (B,S,C,T,H,W) -> (B*S,T,C,H,W) -> (B*S*T,C,H,W)
         try:
             tmp: torch.Tensor = x.view(-1, C, T, H, W).permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
-            x: torch.Tensor = self.__model(tmp)
-            x: torch.Tensor = _resolve_backbone_output(x)
+            x: torch.Tensor = _resolve_backbone_output(self.__model(tmp))
             x = x.view(B * S, T, -1)
         except torch.OutOfMemoryError:
             cache: None | torch.Tensor = None
-
             for i in range(B):
                 tmp: torch.Tensor = x[i, ...].permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
-                tmp: torch.Tensor = self.__model(tmp)
-                tmp: torch.Tensor = _resolve_backbone_output(tmp)
+                tmp: torch.Tensor = _resolve_backbone_output(self.__model(tmp))
                 cache = tmp if cache is None else torch.cat((cache, tmp), dim=0)
+
             x = cache.view(B*S, T, -1)
+
         x = x.permute(0, -1, -2)  # (B*S,T,Hid_dim) -> # (B*S,Hid_dim,T)
         x = self.__reduce(**{"kernel_size": x.shape[-1]})(x)  # (B*S,Hid_dim,1)
         x = x.squeeze(-1).view(B, S, -1)  # (B*S,Hid_dim) -> (B,S,Hid_dim)
