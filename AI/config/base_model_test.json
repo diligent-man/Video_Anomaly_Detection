@@ -1,3 +1,4 @@
+// Copied from teacher.json
 {
     "global":
     {
@@ -84,7 +85,10 @@
         "backbone":
         {
             "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
-            "compile": true,
+            "rgb_i3d_args": {"weights": "../weights/I3D/RGB_Kinetics400.pt"},
+            "s3d_args": {"weights": "../weights/S3D/RGB_Kinetics400.pth"},
+            "clip_vit/b16_args": {"weights": "../weights/CLIP/vit-base-patch16-224/"},
+            "compile": false,
             "out_proj":
             {
                 "hidden_dim": [512, 512],

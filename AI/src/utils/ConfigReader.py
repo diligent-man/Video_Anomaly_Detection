@@ -30,10 +30,10 @@ class ConfigReader(object):
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
 
         # Post-init setup
-        print("##################  Config post-init running  ######################### ")
+        print("################################  Config post-init running  #############################################")
         self._structure_check()
         self._create_save_dir()
-        print("############################################################################")
+        print("#########################################################################################################")
 
     def _structure_check(self):
         # TODO: Optimize checking process
@@ -134,7 +134,12 @@ class ConfigReader(object):
             self.__config[k] = v
             os.makedirs(v, exist_ok=True)
 
-            print(f"{ANSIColor().CYAN}\t{k}{ANSIColor().RESET}: \n\t\t{v}") if dir_name != dirs[-1] else print(f"\t{ANSIColor().CYAN}{k}{ANSIColor().RESET}: \n\t\t{v}\n")
+            if dir_name == dirs[-1]:
+                print(f"{ANSIColor().CYAN}\t{k}{ANSIColor().RESET}: \n\t\t{v}") if dir_name != dirs[-1] else \
+                    print(f"\t{ANSIColor().CYAN}{k}{ANSIColor().RESET}: \n\t\t{v}")
+            else:
+                print(f"{ANSIColor().CYAN}\t{k}{ANSIColor().RESET}: \n\t\t{v}") if dir_name != dirs[-1] else \
+                    print(f"\t{ANSIColor().CYAN}{k}{ANSIColor().RESET}: \n\t\t{v}\n")
         return None
 
     def _get_services(self) -> List[str]:
