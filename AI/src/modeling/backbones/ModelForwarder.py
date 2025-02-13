@@ -59,7 +59,7 @@ class ModelForwarder(torch.nn.Module):
     def _forward_3D_net(self, x: torch.Tensor) -> torch.Tensor:
         B, S, C, T, H, W = x.shape
         x = x.view(-1, C, T, H, W)
-        x: torch.Tensor = _resolve_backbone_output(self.__model(x))
+        x: torch.Tensor = _resolve_backbone_output(self.__model.to(x.device)(x))
         x = self.__reduce(**{"kernel_size": x.shape[2:]})(x)
         x = x.squeeze(dim=[2, 3, 4])  # (B,Hid_dim,T,H,W) -> (B, Hid_dim,1,1,1)
         x = x.view(B, S, -1)  # (B,S,Hid_dim)

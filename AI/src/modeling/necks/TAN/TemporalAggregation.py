@@ -20,18 +20,16 @@ class TemporalAggregation(torch.nn.Module):
                  max_relative_position: int = 10,
                  ):
         super().__init__()
-        embed_dim: List[int] = [in_channels] if isinstance(in_channels, int) else in_channels
-
+        embed_dim: List[int] = [in_channels] * num_backbones if isinstance(in_channels, int) else in_channels
         assert max_relative_position >= 0, ValueError("max_relative_positions must be >= 0")
-        for i in embed_dim:
-            assert i >= 0, ValueError(f"Embed_dim must be > 0. Get '{i}'")
-            assert i % num_heads == 0, ValueError(f"Embed_dim must be divisible by num_heads. Get '{i}' % {num_heads}")
+        assert embed_dim[0] > 0, ValueError(f"Embed_dim must be > 0. Get '{i}'")
+        assert embed_dim[0] % num_heads == 0, ValueError(f"Embed_dim must be divisible by num_heads. Get '{i}' % {num_heads}")
 
         self._out_channels: int | List[int] = embed_dim
         self._num_backbones: int = num_backbones
         self._num_heads: int = num_heads
         self._embed_dim: List[int] = embed_dim
-        self._content_qkv: torch.nn.ModuleList = torch.nn.ModuleList([QKV(x, bias) for x in self._embed_dim])
+        self._content_qkv: torch.nn.ModuleList = torch.nn.ModuleList([QKV(self._embed_dim[i], bias) for i in range(self._num_backbones)])
 
         if relative_attention:
             assert int(sum(self._embed_dim) // len(self._embed_dim)) == self._embed_dim[0], \
@@ -106,7 +104,7 @@ class TemporalAggregation(torch.nn.Module):
         :param x: hidden states of shape (num_backbones, batch_size, seq_len, embed_dim)
         :return: embedded tensor of shape [batch_size, seq_len, embed_dim]
         """
-        num_backbones, _, seq_len, embed_dim = x.size()
+        num_backbones, _, seq_len, _ = x.size()
         assert x.dim() == 4, "Required dimension is not satisfied"
         assert self._num_backbones == num_backbones, "Input tensor has different number of backbones"
 
@@ -114,11 +112,10 @@ class TemporalAggregation(torch.nn.Module):
         if self._num_backbones == 1:
             x = x.squeeze(dim=0)
             q, k, v = self._content_qkv[0](x)  # [batch_size, seq_len, hidden_dim]
-            output = self._compute_hidden_state(seq_len, q, k, v)
+            output = self._compute_hidden_state(q, k, v)
         else:
             hidden_state: None = None
             cache: Dict[str, torch.Tensor | List[torch.Tensor]] = {}
-
             for i in range(self._num_backbones):
                 q, k, v = self._content_qkv[i](x[i])  # [batch_size, seq_len, hidden_dim]
                 current_backbone = [q, k, v]

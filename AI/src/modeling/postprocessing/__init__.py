@@ -6,7 +6,7 @@ from ...utils import DotDict
 from .PseudoLabelRefiner import PseudoLabelRefiner
 
 
-__all__ = ["build_postprocessing"]
+__all__ = ["build_postprocessing", "PseudoLabelRefiner"]
 
 
 POSTPROCESSINGS: Dict[str, Any] = {

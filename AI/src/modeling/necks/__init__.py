@@ -6,7 +6,7 @@ from ...utils import DotDict
 from .TAN import TemporalAggregation
 
 
-__all__ = ["build_neck"]
+__all__ = ["build_neck", "TemporalAggregation"]
 
 
 NECKS = {

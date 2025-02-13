@@ -1,20 +1,24 @@
-import torch
-from AI.src.utils import load_video_v2
+"""
+Test dataset and dataloader.
+"""
 from AI.src.data.dataset import datasets
+from AI.src.data.dataloader import dataloaders
 
 
 def main() -> None:
     dataset_name = "VideoDataset"
-    assert dataset_name in datasets, ValueError("Module is not supported")
+    dataloader_name = "DefaultDataLoader"
+    assert dataset_name in datasets.keys(), ValueError("Module is not supported")
+    assert dataloader_name in dataloaders.keys(), ValueError("Module is not supported")
 
     dataset = datasets[dataset_name](
             "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
             "mp4",
             device="cpu",
-            loader=load_video_v2
+            loader="v2"
     )
 
-    dataloader = torch.utils.data.DataLoader(
+    dataloader = dataloaders[dataloader_name](
         dataset,
         batch_size=8,
         num_workers=6,
