@@ -15,6 +15,7 @@ from AI.src.utils.DotDict import DotDict
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 from AI.src.optimizer import build_optimizer
+from AI.src.metrics import build_metric
 warnings.filterwarnings("once")
 
 
@@ -31,7 +32,7 @@ def main(args: argparse.Namespace) -> None:
     model = build_model(copy.deepcopy(config))
     # loss_class = build_loss(config["Loss"])
     optimizer, lr_scheduler = build_optimizer(copy.deepcopy(config), model)
-
+    metrics = build_metric(copy.deepcopy(config))
     return None
 
 
