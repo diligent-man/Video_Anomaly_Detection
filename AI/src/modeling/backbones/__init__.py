@@ -11,6 +11,7 @@ from ...utils import DotDict, create_feature_extractor
 from .S3D import s3d, S3D_Weights
 from .InceptionI3D import inception_i3d, InceptionI3D_Weights
 from .CLIP import clip_vision
+from .TSN import tsn,TSN_Weights
 
 
 __all__ = ["build_backbone"]
@@ -37,7 +38,13 @@ backbones: Dict[str, Dict[str, Any]] = {
         "weight": "../weights/CLIP/vit-base-patch16",
         "return_node": {"vision_model": "features"},
         "dummy_input": [1, 3, 224, 224],
-    }
+    },
+    "rgb_i3d": {
+        "model": tsn,
+        "weight": TSN_Weights.DEFAULT,
+        "return_node": {"avg_pool": "features"},
+        "dummy_input": [1, 3, 13, 224, 224]
+    },
 }
 
 

@@ -78,3 +78,4 @@ def s3d(weights: None | str | S3D_Weights = True, **kwargs) -> torch.nn.Module:
     if weights is not None:
         model.load_state_dict(weights)
     return model
+
