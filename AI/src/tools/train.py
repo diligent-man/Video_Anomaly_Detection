@@ -10,6 +10,7 @@ import pathlib
 import argparse
 import warnings
 
+from .Trainer import BaseTrainer
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 from AI.src.optimizer import build_optimizer
@@ -36,6 +37,7 @@ def main(args: argparse.Namespace) -> None:
     metrics = build_metric(copy.deepcopy(config))
 
     autocast_config, grad_scaler = get_amp_status(config)
+    trainer = Trainer()
     return None
 
 
