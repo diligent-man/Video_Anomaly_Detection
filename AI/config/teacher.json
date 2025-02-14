@@ -83,8 +83,9 @@
     {
         "backbone":
         {
-            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
-            "compile": true,
+//            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+            "name": ["rgb_i3d"],
+            "compile": false,
             "out_proj":
             {
                 "hidden_dim": [512, 512],
@@ -102,7 +103,7 @@
         "neck":
         {
             "name":"TAN",
-            "num_backbones": 3,
+            "num_backbones": 1,
             "num_heads": 8,
             "relative_attention": true
         },
@@ -123,16 +124,12 @@
 //        "postprocessing": {}
     },
 
-    "optimizer":
+    "optim":
     {
         "lr":
         {
-            "NAME": "Adam",
-            "ARGS":
-            {
-                "lr": 1e-6,
-                "amsgrad": true
-            }
+            "name": "SGD",
+            "lr": 1e-6
         },
 
         "scheduler":

@@ -14,7 +14,7 @@ from AI.src.utils.DotDict import DotDict
 
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
-
+from AI.src.optimizer import build_optimizer
 warnings.filterwarnings("once")
 
 
@@ -29,14 +29,9 @@ def main(args: argparse.Namespace) -> None:
     val_dataloader = build_dataloader(copy.deepcopy(config), "val")
 
     model = build_model(copy.deepcopy(config))
+    # loss_class = build_loss(config["Loss"])
+    optimizer, lr_scheduler = build_optimizer(copy.deepcopy(config), model)
 
-    import torch
-    from AI.src.modeling.architectures.BaseModelOutput import BaseModelOutput
-    print("start")
-    with torch.amp.autocast(config.Global.device, torch.float16):
-        for i in range(100):
-            outs: BaseModelOutput = model(torch.randn(2, 32, 3, 15, 224, 224, device="cuda"))
-            print(i)
     return None
 
 

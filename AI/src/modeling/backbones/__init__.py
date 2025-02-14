@@ -30,15 +30,18 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
                                              Tuple[torch.nn.ModuleList, List[str], List[torch.nn.Module], torch.nn.ModuleList, List[int]]]:
     build_result: Dict[str, Any] = {
         "name": [],
-        "backbone": [],
+        "backbone": torch.nn.ModuleList(),
         "reduce": [],
         "out_channels": []
     }
-
-    out_proj: Dict[str, Any] = config.Architecture.backbone.pop("out_proj", DotDict({})).get_dict()
+    names: None | List[str] = config.Architecture.backbone.pop("name", None)
     compile_model: bool = config.Architecture.backbone.pop("compile", False)
+    out_proj: Dict[str, Any] = config.Architecture.backbone.pop("out_proj", DotDict({})).get_dict()
 
-    for name in config.Architecture.backbone.pop("name"):
+    assert isinstance(names, list), ValueError(f"Name for feat extractor backbone must be string list. Get '{type(names)}'")
+    assert len(names) > 0, ValueError("Number of backbone must be > 0")
+
+    for name in names:
         assert name in NET_DEFAULT_CONFIG.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
         build_result["name"].append(name)
         model_args: Dict = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
@@ -63,24 +66,21 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
             mlp: torch.nn.Module = MLP(out_channels, **out_proj)
             out_channels: int = mlp.out_channels
 
-            build_result["backbone"].append(model)
-            build_result["out_channels"].append(out_channels)
-
             if "out_proj" not in build_result.keys():
                 build_result["out_proj"] = torch.nn.ModuleList([mlp])
             else:
                 build_result["out_proj"].append(mlp)
-        else:
-            build_result["backbone"].append(model)
-            build_result["out_channels"].append(out_channels)
 
+        build_result["backbone"].append(model)
+        build_result["out_channels"].append(out_channels)
         build_result["reduce"].append(build_reduce(name, config))
-    return (build_result["backbone"],
-            build_result["name"],
-            build_result["reduce"],
-            build_result.get("out_proj"),
-            build_result["out_channels"]
-            )
+    return (
+        build_result["backbone"],
+        build_result["name"],
+        build_result["reduce"],
+        build_result.get("out_proj"),
+        build_result["out_channels"]
+    )
 
 
 def build_reduce(name: str, config: DotDict) -> functools.partial:

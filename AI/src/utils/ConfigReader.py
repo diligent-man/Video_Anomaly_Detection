@@ -1,10 +1,13 @@
+# TODO: Optimize checking process
 import os
 import pathlib
 
 from typing import Union, List, Dict, Any, Set
+
+from . import ANSIColor
 from .DotDict import DotDict
 from .utils import load_config, create_increment_path
-from . import ANSIColor
+
 
 __all__ = ["ConfigReader"]
 
@@ -22,7 +25,7 @@ class ConfigReader(object):
         "mode": ["train", "test"],
         "dataset": ["train", "val", "test"],
         "technique": ["single", "distillation"],
-        "fields": ["global", "data", "architecture", "optimizer", "metric", "loss", "services"]
+        "fields": ["global", "data", "architecture", "optim", "metric", "loss", "services"]
     }
 
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
@@ -30,13 +33,12 @@ class ConfigReader(object):
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
 
         # Post-init setup
-        print("################################  Config post-init running  #############################################")
+        print(f"{ANSIColor().CYAN}--------------------------------  Config post-init running  --------------------------------{ANSIColor().RESET}")
         self._structure_check()
         self._create_save_dir()
-        print("#########################################################################################################")
+        print(f"{ANSIColor().CYAN}------------------------------------------------------------------------------------------------{ANSIColor().RESET}")
 
     def _structure_check(self):
-        # TODO: Optimize checking process
         print("Config structure sanity check")
         config: Dict[str, Any] = self.__config.get_dict()
         arch_to_check: Dict[str, Set[str]] = {"optional": {"transform", "postprocessing"}, "compulsory": {"backbone", "neck", "head"}}
