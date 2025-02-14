@@ -1,33 +1,17 @@
 import os
+import yaml
 import pathlib
 import warnings
+import commentjson
 
 from typing import Union, Dict, Any
 
-import torch
-import yaml
-import commentjson
-
 
 __all__ = [
-    "convert_config_json_to_yaml",
     "load_config",
-    "create_increment_path",
+    "convert_config_json_to_yaml",
+    "create_increment_path"
 ]
-
-
-def convert_config_json_to_yaml(src: Union[str, pathlib.Path],
-                                dst: Union[str, pathlib.Path]
-                                ) -> None:
-    reader = open(src, "r", encoding="utf-8", errors="ignore")
-    writer = open(dst, "w", encoding="utf-8", errors="ignore")
-
-    config: dict = commentjson.loads(reader.read())
-    yaml.safe_dump(config, writer, indent=4, sort_keys=False)
-
-    reader.close()
-    writer.close()
-    return None
 
 
 def load_config(fpath: Union[str, pathlib.Path]) -> Dict[str, Any]:
@@ -49,6 +33,20 @@ def load_config(fpath: Union[str, pathlib.Path]) -> Dict[str, Any]:
         elif ext in YAML_EXT:
             config = yaml.safe_load(f.read())
     return config
+
+
+def convert_config_json_to_yaml(src: Union[str, pathlib.Path],
+                                dst: Union[str, pathlib.Path]
+                                ) -> None:
+    reader = open(src, "r", encoding="utf-8", errors="ignore")
+    writer = open(dst, "w", encoding="utf-8", errors="ignore")
+
+    config: dict = commentjson.loads(reader.read())
+    yaml.safe_dump(config, writer, indent=4, sort_keys=False)
+
+    reader.close()
+    writer.close()
+    return None
 
 
 def create_increment_path(path: str,

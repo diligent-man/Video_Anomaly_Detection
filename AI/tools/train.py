@@ -1,6 +1,7 @@
 # Dirty workaround for module import, which violates PEP8: E402
 import os
 import sys
+import torch
 
 sys.path.append(os.path.join(os.getcwd(), "../../"))
 
@@ -9,15 +10,13 @@ import pathlib
 import argparse
 import warnings
 
-from AI.src.utils import ConfigReader
-from AI.src.utils.DotDict import DotDict
-
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 from AI.src.optimizer import build_optimizer
 from AI.src.metrics import build_metric
-warnings.filterwarnings("once")
+from AI.src.utils import DotDict, ConfigReader, load_ckpt, get_amp_status
 
+warnings.filterwarnings("once")
 
 def main(args: argparse.Namespace) -> None:
     # init dist environment
@@ -29,10 +28,14 @@ def main(args: argparse.Namespace) -> None:
     train_dataloader = build_dataloader(copy.deepcopy(config), "train")
     val_dataloader = build_dataloader(copy.deepcopy(config), "val")
 
-    model = build_model(copy.deepcopy(config))
-    # loss_class = build_loss(config["Loss"])
+    model: torch.nn.Module = build_model(copy.deepcopy(config))
     optimizer, lr_scheduler = build_optimizer(copy.deepcopy(config), model)
+    model, optimizer = load_ckpt(copy.deepcopy(config), model, optimizer)
+
+    # loss_class = build_loss(config["Loss"])
     metrics = build_metric(copy.deepcopy(config))
+
+    autocast_config, grad_scaler = get_amp_status(config)
     return None
 
 

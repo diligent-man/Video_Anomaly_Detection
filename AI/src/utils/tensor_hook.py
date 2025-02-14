@@ -1,6 +1,6 @@
+import torch
 import tempfile
 
-import torch
 
 __all__ = ["pack_hook", "unpack_hook"]
 

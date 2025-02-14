@@ -4,9 +4,9 @@ import pathlib
 
 from typing import Union, List, Dict, Any, Set
 
-from . import ANSIColor
-from .DotDict import DotDict
-from .utils import load_config, create_increment_path
+from .misc import DotDict
+from .ANSIColor import ANSIColor
+from .file_ops import load_config, create_increment_path
 
 
 __all__ = ["ConfigReader"]
@@ -25,7 +25,7 @@ class ConfigReader(object):
         "mode": ["train", "test"],
         "dataset": ["train", "val", "test"],
         "technique": ["single", "distillation"],
-        "fields": ["global", "data", "architecture", "optim", "metric", "loss", "services"]
+        "fields": ["global", "data", "architecture", "checkpoint", "optim", "metric", "loss", "services"]
     }
 
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
@@ -133,7 +133,7 @@ class ConfigReader(object):
             k: str = f"{dir_name}_path"
             v: str = os.path.join(save_dir, dir_name)
 
-            self.__config[k] = v
+            self.__config.Global[k] = v
             os.makedirs(v, exist_ok=True)
 
             if dir_name == dirs[-1]:
