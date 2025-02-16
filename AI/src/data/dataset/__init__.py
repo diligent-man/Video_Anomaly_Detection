@@ -9,4 +9,4 @@ datasets = {
     "VideoFolderDataset": VideoFolderDataset,
 }
 
-__all__ = ["datasets"]
+__all__ = ["datasets", "VideoDataset", "VideoFolderDataset"]

@@ -4,8 +4,8 @@ import pathlib
 
 from typing import Union, List, Dict, Any, Set
 
-from .misc import DotDict
-from .ANSIColor import ANSIColor
+from . import DotDict, ANSIColor
+from .misc import get_services
 from .file_ops import load_config, create_increment_path
 
 
@@ -124,7 +124,7 @@ class ConfigReader(object):
         save_dir: str = f"{os.sep}".join(save_dir)
         save_dir: pathlib.Path = create_increment_path(save_dir, False, "", True)
 
-        services: List[str] = self._get_services()
+        services: List[str] = get_services(self.__config)
         dirs = ("ckpt", "log", *services)
 
         print("Save dir:")
@@ -143,22 +143,6 @@ class ConfigReader(object):
                 print(f"{ANSIColor().CYAN}\t{k}{ANSIColor().RESET}: \n\t\t{v}") if dir_name != dirs[-1] else \
                     print(f"\t{ANSIColor().CYAN}{k}{ANSIColor().RESET}: \n\t\t{v}\n")
         return None
-
-    def _get_services(self) -> List[str]:
-        services: List[str] = []
-        service_config: List[Dict[str, Any]] = self.__config.get("Services")
-
-        if service_config is None:
-            print("No additional service is specified")
-        else:
-            for service in service_config:
-                apply_status = service.get("apply", False)
-
-                if apply_status:
-                    services.append(service.name)
-                else:
-                    setattr(service, "apply", False)
-        return services
 
     @property
     def config(self):

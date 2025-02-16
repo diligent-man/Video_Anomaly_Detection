@@ -23,9 +23,10 @@ from .model_ops import (
 )
 
 from .misc import (
-    get_amp_status,
+    get_amp_cfg,
+    visualize_lr,
+    get_services,
     inspect_ffmpeg,
-    visualize_lr
 )
 
 
@@ -48,7 +49,8 @@ __all__ = [
     "load_weights",
     "load_ckpt",
 
-    "get_amp_status",
-    "inspect_ffmpeg",
+    "get_amp_cfg",
     "visualize_lr",
+    "get_services",
+    "inspect_ffmpeg"
 ]

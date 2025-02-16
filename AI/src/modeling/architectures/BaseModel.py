@@ -8,7 +8,6 @@ from ..heads import build_head
 from ..postprocessing import build_postprocessing
 from ..backbones import build_backbone, ModelForwarder
 
-
 from ...utils import DotDict
 from .BaseModelOutput import BaseModelOutput
 

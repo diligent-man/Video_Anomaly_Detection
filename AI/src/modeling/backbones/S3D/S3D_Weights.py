@@ -7,7 +7,7 @@ __all__ = ["S3D_Weights"]
 
 class S3D_Weights(WeightsEnum):
     KINETICS400_V1 = Weights(
-        url=os.path.join(os.path.dirname(os.getcwd()), "weights", "S3D", "RGB_Kinetics400.pth"),
+        url=os.path.join("weights", "S3D", "RGB_Kinetics400.pth"),
         # url="https://download.pytorch.org/models/s3d-d76dad2f.pth",
         transforms=Transform(),
 

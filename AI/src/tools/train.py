@@ -1,23 +1,23 @@
 # Dirty workaround for module import, which violates PEP8: E402
 import os
 import sys
-import torch
-
-sys.path.append(os.path.join(os.getcwd(), "../../"))
-
 import copy
 import pathlib
 import argparse
 import warnings
+sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
 
-from .Trainer import BaseTrainer
+import torch
+
+from AI.src.tools.Trainer import Trainer
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 from AI.src.optimizer import build_optimizer
 from AI.src.metrics import build_metric
-from AI.src.utils import DotDict, ConfigReader, load_ckpt, get_amp_status
+from AI.src.utils import DotDict, ConfigReader, load_ckpt
 
 warnings.filterwarnings("once")
+
 
 def main(args: argparse.Namespace) -> None:
     # init dist environment
@@ -30,24 +30,24 @@ def main(args: argparse.Namespace) -> None:
     val_dataloader = build_dataloader(copy.deepcopy(config), "val")
 
     model: torch.nn.Module = build_model(copy.deepcopy(config))
-    optimizer, lr_scheduler = build_optimizer(copy.deepcopy(config), model)
-    model, optimizer = load_ckpt(copy.deepcopy(config), model, optimizer)
+    optim, scheduler = build_optimizer(copy.deepcopy(config), model)
+    model, optim = load_ckpt(copy.deepcopy(config), model, optim)
 
     # loss_class = build_loss(config["Loss"])
     metrics = build_metric(copy.deepcopy(config))
 
-    autocast_config, grad_scaler = get_amp_status(config)
-    trainer = Trainer()
+    trainer = Trainer(config, model, optim, scheduler, metrics, train_dataloader, val_dataloader)
+    trainer.train()
     return None
 
 
 if __name__ == "__main__":
-    args = argparse.ArgumentParser()
-    args.add_argument("--config",
-                      default=pathlib.Path("../config/teacher.json"),
-                      type=str,
-                      help="Path to config file"
-                      )
+    argument_parser = argparse.ArgumentParser()
+    argument_parser.add_argument("--config",
+                                 default=pathlib.Path("../../config/teacher.json"),
+                                 type=str,
+                                 help="Path to config file"
+                                 )
 
-    args = args.parse_args()
-    main(args)
+    parsed_args = argument_parser.parse_args()
+    main(parsed_args)

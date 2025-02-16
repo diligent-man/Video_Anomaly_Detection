@@ -1,5 +1,5 @@
-import os.path
-from typing import Any, Mapping, Tuple
+import os
+from typing import Any, Mapping, Tuple, Dict
 
 import torch
 from torchvision.models import WeightsEnum
@@ -12,8 +12,11 @@ __all__ = ["load_weights", "load_ckpt"]
 
 def load_weights(weights: str | WeightsEnum) -> Mapping[str, Any]:
     if isinstance(weights, WeightsEnum):
-        if os.path.exists(weights.url):
-            weights: Mapping[str, Any] = torch.load(weights.url, weights_only=True)
+        # Consider path from this file
+        rel_path: str = str(os.path.join(os.path.dirname(__file__), "..", "..", weights.url))
+
+        if os.path.exists(rel_path):
+            weights: Mapping[str, Any] = torch.load(rel_path, weights_only=True)
         else:
             weights: Mapping[str, Any] = weights.get_state_dict(progress=True)
     elif isinstance(weights, str):
@@ -28,7 +31,18 @@ def load_ckpt(config: DotDict,
     """
     Implement after finish. training lop
     """
-    config.Global.get("checkpoint", DotDict({}))
+    load = config.Checkpoint.get("checkpoint", False)
+
+    if load:
+        ckpt_path = config.Checkpoint.get("resume_name", None)
+        assert ckpt_path is not None, ValueError(f"Get '{ckpt_path}' for resume path while loading checkpoint")
+
+        try:
+            ckpt: Dict[str, torch.Tensor] = torch.load(ckpt_path, weights_only=True)
+        except FileNotFoundError as e:
+            ckpt = torch.hub.load_state_dict_from_url(ckpt_path)
+            raise e
+
     # ckpt_cfg = config.Global.get("checkpoint", DotDict({}))
     # load: bool = config.Global.get("load", False)
 

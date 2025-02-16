@@ -1,18 +1,26 @@
-from typing import *
+import os.path
+from typing import Dict, Any
 from collections import defaultdict
+
 import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
-from AI.src.data.dataset import VideoFolderDataset
-from AI.src.data.model import VideoMetadata
+from matplotlib import pyplot as plt
+from matplotlib.ticker import MaxNLocator
+
+from .ANSIColor import ANSIColor
+from ..data.dataset import VideoFolderDataset
+
 
 __all__ = ["prompt_dataset_statistics", "plot_dataset_statistics"]
 
+
 def prompt_dataset_statistics(stats: Dict[str, Any]) -> str:
-    prompt = "=" * 50 + "\n"
-    prompt += "DATASET STATISTICS\n"
-    prompt += f"Total number of videos: {stats['total_samples']}\n"
-    prompt += "Number of videos per class:\n"
+    prompt = f"""{'-' * 40}  {ANSIColor().CYAN}DATASET STATISTICS{ANSIColor().RESET}  {'-' * 40}
+DATASET STATISTICS
+Total number of videos: {stats['total_samples']}
+Number of videos per class:
+"""
+
     for class_name, count in stats['class_count'].items():
         prompt += f"  - {class_name}: {count} videos\n"
     
@@ -25,114 +33,123 @@ def prompt_dataset_statistics(stats: Dict[str, Any]) -> str:
     max_duration = max(stats['duration'].keys()) if stats['duration'] else 0
     avg_duration = np.mean(list(stats['duration'].keys())) if stats['duration'] else 0
 
-    prompt += f"Average FPS: {avg_fps:.2f}\n"
-    prompt += f"Average resolution: {avg_resolution}\n"
-    prompt += f"Shortest duration: {min_duration:.2f} seconds\n"
-    prompt += f"Longest duration: {max_duration:.2f} seconds\n"
-    prompt += f"Average duration: {avg_duration:.2f} seconds\n"
-    prompt += "=" * 50 + "\n"
-    
+    prompt += f"""Average FPS: {avg_fps:.2f}
+Average resolution: {avg_resolution}
+Shortest duration: {min_duration:.2f} seconds
+Longest duration: {max_duration:.2f} seconds
+Average duration: {avg_duration:.2f} seconds
+{'-' * (84 + len("DATASET STATISTICS"))}
+"""
     return prompt
 
-def draw_bar_chart(x, y, title, xlabel, ylabel):
-    plt.figure(figsize=(12, 6))
-    ax = sns.barplot(x=x, y=y, palette="viridis")
 
-    # Display count on each bar
-    for i, value in enumerate(y):
-        ax.text(i, value + 0.5, str(value), ha="center", va="bottom", fontsize=12, fontweight="bold")
+def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
+    """Vẽ các biểu đồ thống kê từ dataset."""
+    class_counts = defaultdict(int)  # Số lượng video theo từng lớp
+    fps_list = []  # Danh sách FPS của video
+    durations = []  # Danh sách thời gian video
+    resolutions = []  # Danh sách độ phân giải video
 
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.xticks(rotation=45, ha="right")
-    plt.subplots_adjust(bottom=0.3)
-    plt.show(block=False)
-
-def plot_dataset_statistics(dataset: VideoFolderDataset):
-    """
-    Plot dataset statistics:
-    - Bar chart (number of videos per class)
-    - Histogram FPS
-    - Histogram video duration
-    """
-    class_counts = defaultdict(int)
-    fps_list = []
-    durations = []  # List of video durations
-    resolutions = []
-
+    # Duyệt qua dataset và thu thập thông tin
     for stream_info, video_class in dataset:
-        class_name = dataset.classes[video_class]  # Convert from index -> class name
+        class_name = dataset.classes[video_class]  # Lấy tên lớp video
         class_counts[class_name] += 1
 
+        # Lấy thông tin về FPS, số frame, độ phân giải
         fps = getattr(stream_info, "frame_rate", 0)
         num_frames = getattr(stream_info, "num_frames", 0)
         resolution = (getattr(stream_info, "width", 0), getattr(stream_info, "height", 0))
 
+        # Tính thời gian video (tránh chia cho 0)
         duration = num_frames / fps if fps > 0 else 0
         fps_list.append(fps)
         resolutions.append(resolution)
         durations.append(duration)
 
-    # Calculate min, max, and average duration
-    min_duration = np.min(durations) if durations else 0
-    max_duration = np.max(durations) if durations else 0
-    avg_duration = np.mean(durations) if durations else 0
+    # Sắp xếp số lượng video theo lớp
+    sorted_classes = sorted(class_counts.items(), key=lambda item: item[1])
+    sorted_class_names, sorted_class_counts = zip(*sorted_classes)
 
-    # 1. Bar chart - Number of videos per class (Ensure x is a list of class names)
-    draw_bar_chart(list(class_counts.keys()), list(class_counts.values()), "Number of Videos per Class", "Class", "Number of Videos")
+    # 1. Vẽ biểu đồ số video theo lớp
+    draw_bar_chart(list(sorted_class_names),
+                   list(sorted_class_counts),
+                   "Number of Videos per Class",
+                   "Class", "Number of Videos",
+                   {"rotation": 45, "ha": "right"}, None,
+                   None, {"bottom": 0, "top": max(list(sorted_class_counts)) * 1.2},
+                   **kwargs
+                   )
 
-    # 2. Histogram - FPS Distribution
+    # 2. So sánh số lượng video bất thường và bình thường
     anomaly_count = sum(count for cls, count in class_counts.items() if cls != "Normal")
     normal_count = class_counts.get("Normal", 0)
 
-    labels = ["Anomalies", "Normal"]
-    values = [anomaly_count, normal_count]
+    draw_bar_chart(["Anomalies", "Normal"], [anomaly_count, normal_count],
+                   "Anomaly vs Normal videos",
+                   None, None,
+                   {"rotation": 45, "ha": "right"}, None,
+                   None,  {"bottom": 0, "top": max([anomaly_count, normal_count]) * 1.2},
+                   True,
+                   **kwargs
+                   )
 
-    plt.figure(figsize=(12, 6))
-    ax = sns.barplot(x=labels, y=values, palette="coolwarm")
+    # 3. Phân phối độ dài video
+    bins = np.arange(0, 700, 100)  # Chia bins mỗi 100 giây
+    bin_counts, _ = np.histogram(durations, bins=bins)
+    bin_labels = [f"[{bins[i]}, {bins[i + 1]})" for i in range(len(bins) - 1)]
 
-    # Add count on each bar
-    for i, value in enumerate(values):
-        ax.text(i, value + 0.5, str(value), ha="center", va="bottom", fontsize=12, fontweight="bold")
-
-    plt.title("Comparison of Anomalies vs Normal Videos")
-    plt.xlabel("Video Type")
-    plt.ylabel("Number of Videos")
-    plt.show(block=False)
-
-    # 3. Histogram - Video Duration Distribution
-
-# Giả sử durations chứa danh sách thời lượng video
-    
-
-# Xác định các khoảng thời lượng
-    # bins = [0, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 1000,1200,1800,2000,2500,3000,3500, np.inf]
-    bins = [0, 60, 120, 180, 240, 300, 360, 420, 480, 540,  np.inf]
-    bin_labels = [f"[{int(bins[i])}, {int(bins[i+1])}[" if bins[i+1] != np.inf else f"[{int(bins[i])}, ∞[" for i in range(len(bins)-1)]
+    draw_bar_chart(bin_labels, bin_counts.tolist(),
+                   "Duration Distribution",
+                   "Seconds", "Number of Videos",
+                   {"rotation": 45, "ha": "right"}, None,
+                   None, {"bottom": 0, "top": max(bin_counts.tolist()) * 1.2},
+                   **kwargs
+                   )
+########################################################################################################################
 
 
-# Phân loại số lượng video trong từng khoảng
-    bin_counts = np.histogram(durations, bins=bins)[0]
+def draw_bar_chart(x: Any, y: Any, title: str,
+                   xlabel: str = None, ylabel: str = None,
+                   xticks: dict = None, yticks: dict = None,
+                   xlim: dict = None, ylim: dict = None,
+                   force_y_int: bool = False,
+                   fpath: str = None
+                   ) -> None:
+    if xticks is None:
+        xticks = {}
 
-# Vẽ biểu đồ cột
-    plt.figure(figsize=(12, 6))
-    plt.bar(bin_labels, bin_counts, color='blue')
+    if yticks is None:
+        yticks = {}
 
-# Thêm số lượng video lên từng cột
-    for i, count in enumerate(bin_counts):
-        plt.text(i, count + 2, str(count), ha='center', fontsize=12)
+    if xlim is None:
+        xlim = {}
 
-    plt.xlabel("Seconds")
-    plt.ylabel("Number of videos")
-    plt.title("Videos Durations Distribution")
-    plt.xticks(rotation=45, ha='right')
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
-    plt.xticks(fontsize=8)
-    plt.yticks(fontsize=8)
-    plt.subplots_adjust(bottom=0.2)
+    if ylim is None:
+        ylim = {}
 
-    plt.show()
+    plt.figure(figsize=(8, 6))
+    ax = sns.barplot(x=x, y=y, hue=y, palette="viridis", legend=False)
 
+    if force_y_int:
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
+    # Hiển thị số trên thanh, căn chỉnh để tránh đụng vào mép trên
+    for i, value in enumerate(y):
+        ax.text(i, value + max(y) * 0.02, str(value), ha="center", va="bottom", fontsize=8)
 
+    plt.title(title)
+
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+
+    plt.xticks(**xticks)
+    plt.yticks(**yticks)
+
+    plt.xlim(**xlim)
+    plt.ylim(**ylim)  # Mở rộng trục Y để số liệu không bị che
+    plt.subplots_adjust(bottom=0.3)
+
+    if fpath is not None and os.path.isdir(fpath):
+        plt.savefig(f"{fpath}{os.sep}{title}")
+    else:
+        plt.show()

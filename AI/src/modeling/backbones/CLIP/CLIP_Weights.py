@@ -7,7 +7,7 @@ __all__ = ["CLIP_Weights"]
 
 class CLIP_Weights(WeightsEnum):
      BASE_PATCH16_224 = Weights(
-        url=os.path.join(os.path.dirname(os.getcwd()), "weights", "CLIP", "vit-base-patch16-224"),
+        url=os.path.join("weights", "CLIP", "vit-base-patch16-224"),
         transforms=Transform(),
         meta={
             "min_size": (224, 224),
@@ -30,7 +30,7 @@ class CLIP_Weights(WeightsEnum):
     )
 
      BASE_PATCH32_224 = Weights(
-         url=os.path.join(os.path.dirname(os.getcwd()), "weights", "CLIP", "vit-base-patch32-224"),
+         url=os.path.join("weights", "CLIP", "vit-base-patch32-224"),
          transforms=Transform(),
          meta={
              "min_size": (224, 224),
@@ -53,7 +53,7 @@ class CLIP_Weights(WeightsEnum):
      )
 
      LARGE_PATCH14_224 = Weights(
-         url=os.path.join(os.path.dirname(os.getcwd()), "weights", "CLIP", "vit-large-patch14-224"),
+         url=os.path.join("weights", "CLIP", "vit-large-patch14-224"),
          transforms=Transform(),
          meta={
              "min_size": (224, 224),
@@ -76,7 +76,7 @@ class CLIP_Weights(WeightsEnum):
      )
 
      LARGE_PATCH14_336 = Weights(
-         url=os.path.join(os.path.dirname(os.getcwd()), "weights", "CLIP", "vit-base-patch14-336"),
+         url=os.path.join("weights", "CLIP", "vit-base-patch14-336"),
          transforms=Transform(),
          meta={
              "min_size": (336, 336),

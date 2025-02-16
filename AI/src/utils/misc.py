@@ -4,16 +4,17 @@ import torch
 import torchaudio
 
 from . import DotDict
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, List
 from matplotlib import pyplot as plt
 
 plt.switch_backend("tkagg")
 
 
 __all__ = [
-    "get_amp_status",
-    "inspect_ffmpeg",
-    "visualize_lr"
+    "get_amp_cfg",
+    "get_services",
+    "visualize_lr",
+    "inspect_ffmpeg"
 ]
 
 
@@ -73,7 +74,7 @@ def visualize_lr(optimizer: torch.optim.Optimizer,
     return None
 
 
-def get_amp_status(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScaler]:
+def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScaler]:
     use_amp: bool = config.Global.get("use_amp", False)
     use_grad_scaler: bool = config.Global.get("use_grad_scaler", False)
 
@@ -93,3 +94,20 @@ def get_amp_status(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradSc
 
     autocast_config: Dict[str, Any] = {"device": device, "dtype": amp_dtype}
     return autocast_config, scaler
+
+
+def get_services(config: DotDict) -> List[str]:
+    services: List[str] = []
+    service_config: List[Dict[str, Any]] = config.get("Services")
+
+    if service_config is None:
+        print("No additional service is specified")
+    else:
+        for service in service_config:
+            apply_status = service.get("apply", False)
+
+            if apply_status:
+                services.append(service.name)
+            else:
+                setattr(service, "apply", False)
+    return services

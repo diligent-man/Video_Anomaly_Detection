@@ -36,21 +36,21 @@ NET_DEFAULT_CONFIG: Dict[str, Dict[str, Any]] = \
     # These models are from huggingface code base
     "clip_vit/b16": {
         "model": clip_vision,
-        "weights": CLIP_Weights.BASE_PATCH16_224.url,
+        "weights": CLIP_Weights.BASE_PATCH16_224,
         "return_node": {"vision_model": "features"},
         "dummy_input": [1, 3, 224, 224],
     },
 
     "clip_vit/b32": {
         "model": clip_vision,
-        "weights": CLIP_Weights.BASE_PATCH32_224.url,
+        "weights": CLIP_Weights.BASE_PATCH32_224,
         "return_node": {"vision_model": "features"},
         "dummy_input": [1, 3, 224, 224],
     },
 
     "clip_vit/l14": {
         "model": clip_vision,
-        "weights": CLIP_Weights.LARGE_PATCH14_224.url,
+        "weights": CLIP_Weights.LARGE_PATCH14_224,
         "return_node": {"vision_model": "features"},
         "dummy_input": [1, 3, 224, 224],
     },
