@@ -1,4 +1,5 @@
-FROM ghcr.io/mlflow/mlflow:v2.17.0
+#FROM ghcr.io/mlflow/mlflow:v2.17.0
+FROM ghcr.io/mlflow/mlflow:v2.20.2
 
 ARG DEBIAN_FRONTEND=noninteractive
 
