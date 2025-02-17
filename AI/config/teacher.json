@@ -166,11 +166,9 @@
     "early_stopping":
     {
         "apply": false,
-        "args":
-        {
-            "patience": 10,
-            "min_delta": 0
-        }
+        "patience": 10,
+        "min_delta": 0
+
     },
 
     "services": [

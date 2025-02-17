@@ -58,29 +58,45 @@ class Trainer(object):
         for callback in self.__callbacks.get(event, []):
             callback(self)
 
+    def _get_best_val_loss(self) -> float:
+        ckpth_path: str = self.__config.Global.ckpt_path
+
+        if self.__config.Checkpoint.get("load", False) and os.path.exists(ckpt_path):
+            if "best_checkpoint.pt" in os.listdir(ckpt_path):
+                return torch.load(f=os.path.join(ckpth_path, "best_checkpoint.pt"))["val_loss"]
+        else:
+            return float("inf")
+
     def _setup_train(self):
-        self.run_callbacks("on_pretrain_routine_start")
         self.__start_epoch: int = 1
+        self.__best_val_loss = self._get_best_val_loss()
         self.__amp_cfg, self.__grad_scaler = get_amp_cfg(self.__config)
+
+        self.run_callbacks("on_pretrain_routine_start")
 
         # Load trained checkpoint for continue
         if self.__config.Checkpoint.load:
-            ckpt_path = self.__config.Checkpoint.resume_name
-            assert os.path.exists(ckpt_path), FileNotFoundError
+            ckpth_path: str = self.__config.Global.ckpt_path
+            resume_name: str = self.__config.Checkpoint.get("resume_name", "")
 
-            checkpoint = torch.load(f=ckpt_path, map_location=self.__config.Global.device)
+            ckpt_path = os.path.join(ckpth_path, resume_name)
+            assert os.path.isfile(ckpt_path), FileNotFoundError
 
-            self.__start_epoch = checkpoint["epoch"] + 1
-            self.__model.load_state_dict(checkpoint["model_state_dict"])
-            self.__optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-            del checkpoint
+            ckpt = torch.load(f=ckpth_path, map_location="cpu")
+            self.__start_epoch = ckpt["epoch"] + 1
+            self.__model.load_state_dict(ckpt["model_state_dict"])
+            self.__optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+
+            del ckpt
 
         # Early stopping
-        self.__early_stopping = EarlyStopping(self.__config.Early_stopping)
-
-
+        apply_early_stopping = self.__config.Early_stopping.pop("apply", False)
+        if apply_early_stopping:
+            self.__early_stopping = EarlyStopping(self.__best_val_loss,
+                                                  **self.__config.Early_stopping.get("args", DotDict({})).get_dict()
+                                                  )
+        else:
+            self.__early_stopping = None
 
     def fit(self):
-
-        # self.run_callbacks("on_pretrain_routine_end")
-        print(range(self.__start_epoch, self.__start_epoch+10))
+        print(self.__start_epoch)
