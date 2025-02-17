@@ -1,1 +1,0 @@
-{'load': False, 'resume_name': '../results', 'save': False, 'save_step': True, 'save_weight_only': True, 'include_config': True}

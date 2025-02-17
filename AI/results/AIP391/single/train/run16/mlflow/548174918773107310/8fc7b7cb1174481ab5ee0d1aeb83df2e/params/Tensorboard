@@ -1,1 +1,0 @@
-{'name': 'tensorboard', 'apply': False, 'inspect_model': True, 'tracking_metric': ['BinaryAccuracy', 'BinaryF1Score']}
