@@ -98,7 +98,7 @@ def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScale
 
 def get_services(config: DotDict) -> List[str]:
     services: List[str] = []
-    service_config: List[Dict[str, Any]] = config.get("Services")
+    service_config: List[Dict[str, Any]] = config.Services
 
     if service_config is None:
         print("No additional service is specified")

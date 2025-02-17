@@ -173,7 +173,11 @@
 
         {
             "name": "mlflow",
-            "apply": true
+            "apply": true,
+//            "tracking_uri": "http://58.187.115.100:5000",
+            "tracking_uri": "http://58.187.115.100:5000",
+//            "username": "root" ,
+//            "password":  "Root123!"
         }
     ]
 //    "EVALUATION_STRATEGY": "no"

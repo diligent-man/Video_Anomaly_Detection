@@ -53,5 +53,5 @@ class Trainer(object):
         for callback in self.__callbacks.get(event, []):
             callback(self)
 
-    def train(self):
+    def fit(self):
         self.run_callbacks("on_pretrain_routine_end")

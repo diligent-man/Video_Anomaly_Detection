@@ -37,7 +37,7 @@ def main(args: argparse.Namespace) -> None:
     metrics = build_metric(copy.deepcopy(config))
 
     trainer = Trainer(config, model, optim, scheduler, metrics, train_dataloader, val_dataloader)
-    trainer.train()
+    trainer.fit()
     return None
 
 

@@ -17,7 +17,7 @@ services:
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
         networks:
-            -   MLOps
+            - MLOps
 
         ports:
             - "${POSTGRES_PORT}:${POSTGRES_PORT}"
@@ -123,10 +123,16 @@ services:
         environment:
             MINIO_ROOT_USER: ${MINIO_ROOT_USER}
             MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
             MINIO_PORT: ${MINIO_PORT}
-            MINIO_ADDRESS: ${MINIO_ADDRESS}
-            MINIO_STORAGE_USE_HTTPS: ${MINIO_STORAGE_USE_HTTPS}
+            MINIO_CONSOLE_PORT: ${MINIO_CONSOLE_PORT}
+
+            MINIO_ADDRESS: ${MINIO_PORT}
             MINIO_CONSOLE_ADDRESS: ${MINIO_CONSOLE_ADDRESS}
+            MINIO_STORAGE_USE_HTTPS: ${MINIO_STORAGE_USE_HTTPS}
+
+#            MINIO_SERVER_URL: Does not need specified
+#            MINIO_BROWSER_REDIRECT_URL: Does not need specified
 
         networks:
             - MLOps
@@ -140,7 +146,7 @@ services:
 
         restart: on-failure
 
-        entrypoint: ["minio", "server", "/data"]
+        entrypoint: ["minio", "server", "/data", "--address", "${MINIO_ADDRESS}", "--console-address", "${MINIO_CONSOLE_ADDRESS}"]
 
         healthcheck:
             test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
@@ -186,9 +192,7 @@ services:
             MINIO_PORT: ${MINIO_PORT}
             MINIO_ROOT_USER: ${MINIO_ROOT_USER}
             MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-
             LAKEFS_BLOCKSTORE_S3_ENDPOINT: http://minio:${MINIO_PORT}
-
 
         networks:
             - MLOps
@@ -204,8 +208,8 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
-            mlflow:
-                condition: service_healthy
+            minio:
+                condition: service_started
 
         command:
             - |

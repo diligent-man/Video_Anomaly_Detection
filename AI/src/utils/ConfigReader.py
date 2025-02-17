@@ -2,12 +2,11 @@
 import os
 import pathlib
 
-from typing import Union, List, Dict, Any, Set
+from typing import Union, List, Dict, Any, Set, Tuple
 
 from . import DotDict, ANSIColor
 from .misc import get_services
 from .file_ops import load_config, create_increment_path
-
 
 __all__ = ["ConfigReader"]
 
@@ -28,6 +27,8 @@ class ConfigReader(object):
         "fields": ["global", "data", "architecture", "checkpoint", "optim", "metric", "loss", "services"]
     }
 
+    __supported_services: Tuple[str, ...] = ("tensorboard", "mlflow")
+
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
@@ -36,6 +37,7 @@ class ConfigReader(object):
         print(f"{ANSIColor().CYAN}--------------------------------  Config post-init running  --------------------------------{ANSIColor().RESET}")
         self._structure_check()
         self._create_save_dir()
+        self._flatten_service_config()
         print(f"{ANSIColor().CYAN}------------------------------------------------------------------------------------------------{ANSIColor().RESET}")
 
     def _structure_check(self):
@@ -100,6 +102,7 @@ class ConfigReader(object):
             print("Services:")
             for service in services:
                 assert service.get("name") is not None, ValueError(f"Name to the following config was not specified:\n\t{service}")
+                assert service["name"] in self.__supported_services, ValueError(f"\n\t{service} is currently unsupported")
                 print(f"\t{ANSIColor().CYAN}{service['name']}{ANSIColor().RESET}")
         print()
 
@@ -143,6 +146,14 @@ class ConfigReader(object):
                 print(f"{ANSIColor().CYAN}\t{k}{ANSIColor().RESET}: \n\t\t{v}") if dir_name != dirs[-1] else \
                     print(f"\t{ANSIColor().CYAN}{k}{ANSIColor().RESET}: \n\t\t{v}\n")
         return None
+
+    def _flatten_service_config(self):
+        service_configs: None | List[DotDict] = self.__config.get("Services", [])
+
+        if len(service_configs) >= 0:
+            for service_config in service_configs:
+                name: str = service_config.get("name")
+                self.__config[name.capitalize()] = service_config
 
     @property
     def config(self):
