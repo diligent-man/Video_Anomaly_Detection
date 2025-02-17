@@ -13,7 +13,7 @@ __all__ = ["ConfigReader"]
 
 class ConfigReader(object):
     __defaults: Dict[str, Any] = {
-        "save_dir": os.path.join(os.path.dirname(os.getcwd()), "results"),
+        "save_dir": os.path.join(os.path.dirname(os.getcwd()), "..", "results"),
         "project_name": "nameless_project",
         "experiment_name": "run",
         "technique": "single",
@@ -32,6 +32,7 @@ class ConfigReader(object):
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
+        self.__config.Global["config_path"] = config_path
 
         # Post-init setup
         print(f"{ANSIColor().CYAN}--------------------------------  Config post-init running  --------------------------------{ANSIColor().RESET}")
@@ -124,6 +125,7 @@ class ConfigReader(object):
                                self.__config.Global.mode,
                                self.__config.Global.experiment_name
                                ]
+
         save_dir: str = f"{os.sep}".join(save_dir)
         save_dir: pathlib.Path = create_increment_path(save_dir, False, "", True)
 

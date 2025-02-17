@@ -115,6 +115,7 @@ services:
                     memory: 1024M
 
     minio:
+        # Note: add hostname as minio to /etc/hosts
         image: minio/minio:RELEASE.2023-05-18T00-05-36Z
         # minio/minio:RELEASE.2024-11-07T00-52-20Z
 
@@ -131,7 +132,7 @@ services:
             MINIO_CONSOLE_ADDRESS: ${MINIO_CONSOLE_ADDRESS}
             MINIO_STORAGE_USE_HTTPS: ${MINIO_STORAGE_USE_HTTPS}
 
-#            MINIO_SERVER_URL: Does not need specified
+            MINIO_SERVER_URL: "http://127.0.0.1:9000"
 #            MINIO_BROWSER_REDIRECT_URL: Does not need specified
 
         networks:

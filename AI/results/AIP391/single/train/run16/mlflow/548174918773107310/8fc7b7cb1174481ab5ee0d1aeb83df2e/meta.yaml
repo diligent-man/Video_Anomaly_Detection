@@ -1,0 +1,15 @@
+artifact_uri: /mnt/DATA/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/src/../results/AIP391/single/train/run16/mlflow/548174918773107310/8fc7b7cb1174481ab5ee0d1aeb83df2e/artifacts
+end_time: 1739807703051
+entry_point_name: ''
+experiment_id: '548174918773107310'
+lifecycle_stage: active
+run_id: 8fc7b7cb1174481ab5ee0d1aeb83df2e
+run_name: dapper-goose-617
+run_uuid: 8fc7b7cb1174481ab5ee0d1aeb83df2e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1739807703044
+status: 3
+tags: []
+user_id: trong

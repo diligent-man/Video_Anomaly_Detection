@@ -1,50 +1,10 @@
-"""
-MLflow Logging for Ultralytics YOLO.
-
-This module enables MLflow logging for Ultralytics YOLO. It logs metrics, parameters, and model artifacts.
-For setting up, a tracking URI should be specified. The logging can be customized using environment variables.
-
-Commands:
-    1. To set a project name:
-        `export MLFLOW_EXPERIMENT_NAME=<your_experiment_name>` or use the project=<project> argument
-
-    2. To set a run name:
-        `export MLFLOW_RUN=<your_run_name>` or use the name=<name> argument
-
-    3. To start a local MLflow server:
-        mlflow server --backend-store-uri runs/mlflow
-       It will by default start a local server at http://127.0.0.1:5000.
-       To specify a different URI, set the MLFLOW_TRACKING_URI environment variable.
-
-    4. To kill all running MLflow server instances:
-        ps aux | grep 'mlflow' | grep -v 'grep' | awk '{print $2}' | xargs kill -9
-"""
-
-# from ultralytics.utils import LOGGER, RUNS_DIR, SETTINGS, TESTS_RUNNING, colorstr
-#
-# try:
-#     import os
-#
-#     assert not TESTS_RUNNING or "test_mlflow" in os.environ.get("PYTEST_CURRENT_TEST", "")  # do not log pytest
-#     assert SETTINGS["mlflow"] is True  # verify integration is enabled
-#     import mlflow
-#
-#     assert hasattr(mlflow, "__version__")  # verify package is not directory
-#     from pathlib import Path
-#
-#     PREFIX = colorstr("MLflow: ")
-#
-# except (ImportError, AssertionError):
-#     mlflow = None
+"""MLflow Logging service. Adopted and modified from Ultralytics src code"""
 import os
+import pathlib
 import warnings
+import requests as rq
 
 import mlflow
-
-
-from typing import Tuple
-
-import requests.exceptions
 
 from ..tools import Trainer
 from ..utils import ANSIColor
@@ -54,21 +14,18 @@ from ..utils.service import ping_server
 def sanitize_dict(x):
     """Sanitize dictionary keys by removing parentheses and converting values to floats."""
     return {k.replace("(", "").replace(")", ""): float(v) for k, v in x.items()}
+########################################################################################################################
 
 
-def on_pretrain_routine_end(instance: Trainer):
+def on_pretrain_routine_end(instance: Trainer) -> None:
     """
     Log training parameters to MLflow at the end of the pretraining routine.
 
-    This function sets up MLflow logging based on environment variables and trainer arguments. It sets the tracking URI,
-    experiment name, and run name, then starts the MLflow run if not already active. It finally logs the parameters
-    from the trainer.
+    This function sets up MLflow logging based on environment variables and trainer arguments.
+    It sets the tracking URI, experiment name, and run name, then starts the MLflow run if not already active.
+    It finally logs the parameters from the trainer.
 
-    Args:
-        trainer (ultralytics.engine.trainer.BaseTrainer): The training object with arguments and parameters to log.
-
-    Global:
-        mlflow: The imported mlflow module to use for logging.
+    :param: trainer (src.tools.Trainer): The training object with arguments and parameters to log.
 
     Environment Variables:
         MLFLOW_TRACKING_URI: The URI for MLflow tracking. If not set, defaults to 'runs/mlflow'.
@@ -79,37 +36,40 @@ def on_pretrain_routine_end(instance: Trainer):
     uri: str = instance.config.Mlflow.get("tracking_uri", "")
 
     username = instance.config.Mlflow.get("username", None)
-    passwod = instance.config.Mlflow.get("password", None)
-    auth = (username, passwod) if username and passwod else None
+    password = instance.config.Mlflow.get("password", None)
+    auth = (username, password) if username and password else None
 
     mlflow_path: str = instance.config.Global.mlflow_path
     experiment_name: str = mlflow_path.split(os.sep)[-5]  # project_name
     run_name: str = "_".join(mlflow_path.split(os.sep)[-4: -1])  # technique_mode_experiment_name
 
-    if ping_server(uri, auth=auth, timeout=.1, total=1) == 404:
-        warnings.warn(f"Remote tracking server is inaccessible. Tracking uri is set to {ANSIColor().YELLOW}mlflow_path{ANSIColor().RESET}")
+    try:
+        ping_server(uri, auth=auth, timeout=(.5, .5), total=3)
+        mlflow.set_tracking_uri(uri)
+        mlflow.set_experiment(experiment_name)
+    except (rq.exceptions.Timeout, mlflow.exceptions.MlflowException) as e:
+        warnings.warn(f"Get '{e}'.\nTracking uri is set to {ANSIColor().CYAN}mlflow_path{ANSIColor().RESET}")
+
         uri = instance.config.Global.mlflow_path
+        mlflow.set_tracking_uri(uri)
+        mlflow.set_experiment(experiment_name)
 
-    # mlflow.set_tracking_uri(uri)
-    # mlflow.set_experiment(experiment_name)
-    print(experiment_name)
-    print(run_name)
+    active_run = mlflow.active_run() or mlflow.start_run(
+        run_name=run_name,
+        tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
+        description=instance.config.Mlflow.get("description", None),
+        log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
+    )
 
-    # try:
-    #     os.environ["MLFLOW_TRACKING_USERNAME"] = instance.config.Mlflow.get("username", "")
-    #     os.environ["MLFLOW_TRACKING_PASSWORD"] = instance.config.Mlflow.get("password", "")
-    #
-    #     # Set experiment and run names
-    #     mlflow.set_tracking_uri(uri)
-    #     mlflow.set_experiment(experiment_name)
-    #     active_run = mlflow.active_run() or mlflow.start_run(run_name=run_name)
-    # except Exception as e:
-    #     if pathlib.Path(uri).is_dir():
-    #         print(f"view at http://localhost:5000 with 'mlflow server --backend-store-uri {uri}'")
-    #     ValueError(f"WARNING ⚠️ Failed to initialize: {e}\nWARNING ⚠️ Not tracking this run")
-    #
-    # mlflow.log_params(instance.config.get_dict())
-    # print(f"Logging run_id({active_run.info.run_id}) to {uri}. Disabling by services.mlflow.apply=false in config file")
+    mlflow.log_dict(instance.config.get_dict(), f"config{pathlib.Path(instance.config.Global.config_path).suffixes[0]}")
+
+    if pathlib.Path(uri).is_dir():
+        print(f"View at http://localhost:5000 with 'mlflow server --backend-store-uri {uri}'")
+    ValueError(f"WARNING ⚠️ Failed to initialize: \nWARNING ⚠️ Not tracking this run")
+
+    print(f"Logging run_id({active_run.info.run_id}) to {uri}. Disabling by services.mlflow.apply=false in config file\n")
+    return None
+
 
 def on_train_epoch_end(trainer: Trainer):
     """Log training metrics at the end of each train epoch to MLflow."""
@@ -149,13 +109,9 @@ def on_train_end(trainer):
     )
 
 
-callbacks = (
-    {
-        "on_pretrain_routine_end": on_pretrain_routine_end,
-        "on_train_epoch_end": on_train_epoch_end,
-        "on_fit_epoch_end": on_fit_epoch_end,
-        "on_train_end": on_train_end,
-    }
-    if mlflow
-    else {}
-)
+callbacks = {
+    "on_pretrain_routine_end": on_pretrain_routine_end,
+    "on_train_epoch_end": on_train_epoch_end,
+    "on_fit_epoch_end": on_fit_epoch_end,
+    "on_train_end": on_train_end,
+}

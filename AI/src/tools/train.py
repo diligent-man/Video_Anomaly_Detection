@@ -17,6 +17,7 @@ from AI.src.metrics import build_metric
 from AI.src.utils import DotDict, ConfigReader, load_ckpt
 
 warnings.filterwarnings("once")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 def main(args: argparse.Namespace) -> None:

@@ -28,11 +28,13 @@ blockstore:
 
         # Use path-style S3 url in lieu of http(s)://
         force_path_style: true
+        disable_ssl: true
 
         # MinIO endpoint
         credentials:
             access_key_id: ${MINIO_ROOT_USER}
             secret_access_key: ${MINIO_ROOT_PASSWORD}
+
         # endpoint is specified in docker compose instead in this
 
 

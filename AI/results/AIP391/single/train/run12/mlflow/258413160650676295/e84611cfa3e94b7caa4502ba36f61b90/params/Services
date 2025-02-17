@@ -1,0 +1,1 @@
+[{'name': 'tensorboard', 'apply': False, 'inspect_model': True, 'tracking_metric': ['BinaryAccuracy', 'BinaryF1Score']}, {'name': 'mlflow', 'apply': True, 'tracking_uri': 'http://183.80.97.114:5000'}]

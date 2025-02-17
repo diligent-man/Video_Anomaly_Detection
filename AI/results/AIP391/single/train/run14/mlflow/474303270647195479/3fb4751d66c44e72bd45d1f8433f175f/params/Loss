@@ -1,0 +1,1 @@
+{'name': 'BCELoss', 'args': {'reduction': 'mean'}}
