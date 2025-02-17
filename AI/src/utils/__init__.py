@@ -1,6 +1,7 @@
 from .DotDict import DotDict
 from .ANSIColor import ANSIColor
 from .ConfigReader import ConfigReader
+from .EarlyStopping import EarlyStopping
 from .ModelArchInspector import ModelArchInspector
 
 from .load_video import video_loader
@@ -27,6 +28,7 @@ from .misc import (
     visualize_lr,
     get_services,
     inspect_ffmpeg,
+    make_border
 )
 
 
@@ -34,7 +36,9 @@ __all__ = [
     "DotDict",
     "ANSIColor",
     "ConfigReader",
+    "EarlyStopping",
     "ModelArchInspector",
+
     "video_loader",
 
     "prompt_dataset_statistics",
@@ -52,5 +56,6 @@ __all__ = [
     "get_amp_cfg",
     "visualize_lr",
     "get_services",
-    "inspect_ffmpeg"
+    "inspect_ffmpeg",
+    "make_border"
 ]

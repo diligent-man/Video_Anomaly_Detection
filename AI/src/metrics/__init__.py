@@ -35,7 +35,7 @@ from torcheval.metrics import (
     TopKMultilabelAccuracy,
 )
 
-from ..utils import DotDict, ANSIColor
+from ..utils import DotDict, ANSIColor, make_border
 
 
 METRICS: Dict[str, Callable] = {
@@ -77,7 +77,8 @@ __all__ = ["build_metric"]
 
 
 def build_metric(config: DotDict) -> List[Metric]:
-    print(f"{ANSIColor().CYAN}--------------- Building metric ---------------{ANSIColor().RESET}")
+    top, bottom = make_border("Build metric")
+    print(top)
     in_train: bool = config.Metric.pop("in_train", False)
     metrics: List[DotDict] = config.Metric.pop("metrics", [])
     assert len(metrics) > 0, ValueError("At least one metric is required")
@@ -92,5 +93,5 @@ def build_metric(config: DotDict) -> List[Metric]:
         built_metrics.append(metric)
         print(f"Metric {i}: {metric.__class__.__name__}")
     print(f"Use metric during training: {in_train}")
-    print(f"{ANSIColor().CYAN}-----------------------------------------------{ANSIColor().RESET}\n")
+    print(bottom)
     return built_metrics

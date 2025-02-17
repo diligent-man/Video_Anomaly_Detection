@@ -1,9 +1,11 @@
 import warnings
+import platform
+from importlib import metadata
 
 import torch
 import torchaudio
 
-from . import DotDict
+from . import DotDict, ANSIColor
 from typing import Tuple, Dict, Any, List
 from matplotlib import pyplot as plt
 
@@ -14,7 +16,9 @@ __all__ = [
     "get_amp_cfg",
     "get_services",
     "visualize_lr",
-    "inspect_ffmpeg"
+    "inspect_ffmpeg",
+    "check_version",
+    "make_border"
 ]
 
 
@@ -86,7 +90,7 @@ def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScale
 
         # currently use default arg for GradScaler
         if use_grad_scaler:
-            scaler: torch.GradScaler = torch.amp.GradScaler(device, enabled=use_amp)
+            scaler: torch.GradScaler = torch.amp.GradScaler("cuda", enabled=use_amp) if TORCH_2_4 else torch.cuda.amp.GradScaler(enabled=use_amp)
         else:
             warnings.warn("use_grad_scaler should be True if use_amp=True")
     else:
@@ -111,3 +115,83 @@ def get_services(config: DotDict) -> List[str]:
             else:
                 setattr(service, "apply", False)
     return services
+
+
+def emojis(string=""):
+    """Return platform-dependent emoji-safe version of string."""
+    return string.encode().decode("ascii", "ignore") if WINDOWS else string
+
+
+def check_version(
+    current: str = "0.0.0",
+    required: str = "0.0.0",
+    hard: bool = False
+) -> bool:
+    """
+    Adopted from Ultralytics
+    Check current version against the required version or range.
+
+    Args:
+        current (str): Current version or package name to get version from.
+        required (str): Required version or range (in pip-style format).
+        hard (bool, optional): If True, raise an AssertionError if the requirement is not met.
+
+    Returns:
+        (bool): True if requirement is met, False otherwise.
+
+    Example:
+        ```python
+        # Check if current version is exactly 22.04
+        check_version(current="22.04", required="==22.04")
+
+        # Check if current version is greater than or equal to 22.04
+        check_version(current="22.10", required="22.04")  # assumes '>=' inequality if none passed
+
+        # Check if current version is less than or equal to 22.04
+        check_version(current="22.04", required="<=22.04")
+
+        # Check if current version is between 20.04 (inclusive) and 22.04 (exclusive)
+        check_version(current="21.10", required=">20.04,<22.04")
+        ```
+    """
+    if not current:  # if current is '' or None
+        warnings.warn(f"WARNING ⚠️ invalid check_version({current}, {required}) requested, please check values.")
+        return True
+    elif not current[0].isdigit():  # current is package name rather than version string, i.e. current='ultralytics'
+        try:
+            current = metadata.version(current)  # get version string from package name
+        except metadata.PackageNotFoundError as e:
+            if hard:
+                raise ModuleNotFoundError(emojis(f"WARNING ⚠️ {current} package is required but not installed")) from e
+            else:
+                return False
+
+    if not required:  # if required is '' or None
+        return True
+
+    if "sys_platform" in required and (  # i.e. required='<2.4.0,>=1.8.0; sys_platform == "win32"'
+        (WINDOWS and "win32" not in required)
+        or (LINUX and "linux" not in required)
+        or (MACOS and "macos" not in required and "darwin" not in required)
+    ):
+        return True
+
+
+def make_border(headline: str) -> Tuple[str, str]:
+    MAX_LINE_LEN: int = 80
+
+    if len(headline) > MAX_LINE_LEN:
+        headline = headline
+    else:
+        headline = f"{'-' * (MAX_LINE_LEN - len(headline))}"\
+                   f"  {headline}  "\
+                   f"{'-' * (MAX_LINE_LEN - len(headline))}"
+
+    top: str = f"{ANSIColor().CYAN}{headline}{ANSIColor().RESET}"
+    bottom: str = f"{ANSIColor().CYAN}{'-' * len(headline)}{ANSIColor().RESET}\n\n\n"
+    return top, bottom
+########################################################################################################################
+
+
+TORCH_2_4 = check_version(torch.__version__, "2.4.0")
+MACOS, LINUX, WINDOWS = (platform.system() == x for x in ["Darwin", "Linux", "Windows"])  # environment booleans

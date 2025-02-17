@@ -6,7 +6,7 @@ from .optimizer import OPTIMIZERS
 from .lr_scheduler import SCHEDULERS
 from .regularizer import REGULARIZERS
 
-from ..utils import DotDict, ANSIColor
+from ..utils import DotDict, ANSIColor, make_border
 
 
 __all__ = ["build_optimizer", "OPTIMIZERS", "SCHEDULERS"]
@@ -15,7 +15,8 @@ __all__ = ["build_optimizer", "OPTIMIZERS", "SCHEDULERS"]
 def build_optimizer(config: DotDict,
                     model: torch.nn.Module
                     ) -> Tuple[torch.optim.Optimizer, None | torch.optim.lr_scheduler.LRScheduler]:
-    print(f"{ANSIColor().CYAN}--------------- Building optimizer ---------------{ANSIColor().RESET}")
+    top, bottom = make_border("Build optim")
+    print(top)
     # step 1: build scheduler
     lr_config: DotDict = config.Optim.pop("lr", DotDict({}))
     name: None | str = lr_config.pop("name", None)
@@ -42,6 +43,6 @@ def build_optimizer(config: DotDict,
 
     print(f"""Optimizer: {optim.__class__.__name__}
 Scheduler: {scheduler if scheduler is None else scheduler.__class__.__name__}
-Regularizer: {reg}
-{ANSIColor().CYAN}--------------------------------------------------{ANSIColor().RESET}\n""")
+Regularizer: {reg}""")
+    print(bottom)
     return optim, scheduler

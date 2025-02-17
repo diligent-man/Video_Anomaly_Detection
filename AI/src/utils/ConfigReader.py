@@ -5,7 +5,7 @@ import pathlib
 from typing import Union, List, Dict, Any, Set, Tuple
 
 from . import DotDict, ANSIColor
-from .misc import get_services
+from .misc import get_services, make_border
 from .file_ops import load_config, create_increment_path
 
 __all__ = ["ConfigReader"]
@@ -24,7 +24,7 @@ class ConfigReader(object):
         "mode": ["train", "test"],
         "dataset": ["train", "val", "test"],
         "technique": ["single", "distillation"],
-        "fields": ["global", "data", "architecture", "checkpoint", "optim", "metric", "loss", "services"]
+        "fields": ["global", "data", "architecture", "optim", "metric", "loss", "checkpoint", "early_stopping", "services"]
     }
 
     __supported_services: Tuple[str, ...] = ("tensorboard", "mlflow")
@@ -35,11 +35,12 @@ class ConfigReader(object):
         self.__config.Global["config_path"] = config_path
 
         # Post-init setup
-        print(f"{ANSIColor().CYAN}--------------------------------  Config post-init running  --------------------------------{ANSIColor().RESET}")
+        top, bottom = make_border("Config post-init running")
+        print(top)
         self._structure_check()
         self._create_save_dir()
         self._flatten_service_config()
-        print(f"{ANSIColor().CYAN}------------------------------------------------------------------------------------------------{ANSIColor().RESET}")
+        print(bottom)
 
     def _structure_check(self):
         print("Config structure sanity check")

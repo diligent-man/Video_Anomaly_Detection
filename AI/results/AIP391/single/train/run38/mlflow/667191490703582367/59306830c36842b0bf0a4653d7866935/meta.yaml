@@ -1,0 +1,15 @@
+artifact_uri: /mnt/DATA/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/src/../results/AIP391/single/train/run38/mlflow/667191490703582367/59306830c36842b0bf0a4653d7866935/artifacts
+end_time: 1739815659113
+entry_point_name: ''
+experiment_id: '667191490703582367'
+lifecycle_stage: active
+run_id: 59306830c36842b0bf0a4653d7866935
+run_name: single_train_run38
+run_uuid: 59306830c36842b0bf0a4653d7866935
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1739815659047
+status: 3
+tags: []
+user_id: trong
