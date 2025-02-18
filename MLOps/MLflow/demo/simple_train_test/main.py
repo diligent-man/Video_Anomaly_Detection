@@ -28,8 +28,11 @@ from MLOps.MLflow.demo.simple_train_test.ImageClassifier import ImageClassifier
 os.environ["MLFLOW_TRACKING_USERNAME"] = "root"
 os.environ["MLFLOW_TRACKING_PASSWORD"] = "Root123!"
 
-mlflow.set_tracking_uri(uri="http://localhost:5000")
+
+mlflow.set_tracking_uri(uri=f"file:{os.path.join(os.getcwd(), 'mlruns')}")
 mlflow.set_experiment("pytorch_demo")
+print(f"View at: mlflow server --backend-store-uri {os.path.join(os.getcwd(), 'mlruns')}")
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
@@ -119,7 +122,7 @@ def test_with_mlflow(test_loader: torch.utils.data.DataLoader,
 
 
 def main() -> None:
-    epochs = 1
+    epochs = 10
     lr = 1e-3
     batch_size = 1024
 
@@ -133,7 +136,7 @@ def main() -> None:
     output_schema = Schema([TensorSpec(np.dtype(np.float32), (-1, 10), "output")])
     signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
-    for i in range(4):
+    for i in range(1):
         run_name = f"run {i}"
         model = ImageClassifier().to(device)
         loss = torch.nn.CrossEntropyLoss()

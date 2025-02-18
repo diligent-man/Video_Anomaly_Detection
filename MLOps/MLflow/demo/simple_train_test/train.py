@@ -21,14 +21,14 @@ def get_dataset(root: str = "./MNIST"):
     train = torchvision.datasets.MNIST(
         root=root,
         train=True,
-        download=True,
+        download=False,
         transform=transform
     )
 
     test = torchvision.datasets.MNIST(
         root=root,
         train=False,
-        download=True,
+        download=False,
         transform=transform
     )
     return train, test
@@ -66,7 +66,7 @@ def train(epochs: int,
         curr_metrics: List[float] = [metric.compute().item() for metric in metric_lst]
 
         curr_step += 1
-
+        print(curr_loss, curr_metrics)
         mlflow.log_metric("train_loss", curr_loss, step=curr_step)
 
         for i in range(len(metric_lst)):
