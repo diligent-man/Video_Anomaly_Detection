@@ -325,4 +325,31 @@ pyrightconfig.json
 
 AI/weights/
 AI/results/
+AI/dataset/
+MLOps/MLflow/demo/simple_train_test/mlruns/
 MLOps/.env
+
+# ignored by lakectl local
+AI/dataset/ubifights3/*
+!AI/dataset/ubifights3/.lakefs_ref.yaml
+AI/dataset/ubifights4/*
+!AI/dataset/ubifights4/.lakefs_ref.yaml
+AI/dataset/ubifights5/*
+!AI/dataset/ubifights5/.lakefs_ref.yaml
+AI/dataset/ubifights6/*
+!AI/dataset/ubifights6/.lakefs_ref.yaml
+AI/dataset/ubifights7/*
+!AI/dataset/ubifights7/.lakefs_ref.yaml
+AI/dataset/ubifights8/*
+!AI/dataset/ubifights8/.lakefs_ref.yaml
+AI/dataset/ubifights9/*
+!AI/dataset/ubifights9/.lakefs_ref.yaml
+AI/dataset/ubifights/*
+!AI/dataset/ubifights/.lakefs_ref.yaml
+AI/dataset/*
+!AI/dataset/.lakefs_ref.yaml
+AI/dataset/ubifights1/*
+!AI/dataset/ubifights1/.lakefs_ref.yaml
+AI/dataset/ubifights2/*
+!AI/dataset/ubifights2/.lakefs_ref.yaml
+# End ignored by lakectl local

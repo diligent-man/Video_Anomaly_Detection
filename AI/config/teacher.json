@@ -6,13 +6,15 @@
 //        "experiment_name": "run",
 //        "technique": "single",
 //        "mode": "train",
-        "seed": 12345,
-        "device": "cuda",
-        "epochs": 100,
-        "print_batch_step": 1,
-        "save_epoch_step": 1,
+
+        "epochs": 2,
+        "print_step": 1,
+        "save_step": 1,
+
         "use_amp": true,
-        "use_grad_scaler": true
+        "use_grad_scaler": true,
+        "seed": 12345,
+        "device": "cuda"
     },
 
     "data":
@@ -26,7 +28,7 @@
                 "ext": "mp4",
                 "loader": "v2",
                 "device": "cpu",
-                "transform": {},
+                "transforms": null,
                 "return_device": null
             },
 
@@ -37,14 +39,11 @@
                 "shuffle": true,
                 "num_workers": 4,
                 "drop_last": false,
-                "pin_memory": false,
-                "timeout": 10,
                 "multiprocessing_context": "fork",
                 "prefetch_factor": 2,
-                "persistent_workers": false,
-                "pin_memory_device": "cuda"
-            }
-
+                "persistent_workers": false
+            },
+            "forward_strategy": "v2"
         },
         /////////////////////////////////////////////////////////
         "val":
@@ -57,7 +56,7 @@
                 "loader": "v2",
                 "device": "cpu",
                 "return_device": null,
-                "transform": {}
+                "transforms": null
             },
 
             "dataloader":
@@ -67,12 +66,11 @@
                 "shuffle": true,
                 "num_workers": 4,
                 "drop_last": false,
-                "pin_memory": false,
-                "timeout": 10,
                 "multiprocessing_context": "fork",
                 "prefetch_factor": 2,
-                "persistent_workers": false,
-                "pin_memory_device": "cuda"}
+                "persistent_workers": false
+            },
+            "forward_strategy": "v2"
         },
         /////////////////////////////////////////////////////////
         "test": {

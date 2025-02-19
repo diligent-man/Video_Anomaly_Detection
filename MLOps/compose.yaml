@@ -45,11 +45,10 @@ services:
             resources:
                 limits:
                     cpus: "4"
-                    memory: 2048M
+                    memory: 4096M
                 reservations:
-                    cpus: "2"
-                    memory: 1024M
-
+                    cpus: "4"
+                    memory: 2048M
 
     mlflow:
         build:
@@ -109,10 +108,10 @@ services:
             resources:
                 limits:
                     cpus: "4"
-                    memory: 2048M
+                    memory: 4096M
                 reservations:
                     cpus: "2"
-                    memory: 1024M
+                    memory: 2048M
 
     minio:
         # Note: add hostname as minio to /etc/hosts
@@ -132,7 +131,7 @@ services:
             MINIO_CONSOLE_ADDRESS: ${MINIO_CONSOLE_ADDRESS}
             MINIO_STORAGE_USE_HTTPS: ${MINIO_STORAGE_USE_HTTPS}
 
-            MINIO_SERVER_URL: "http://127.0.0.1:9000"
+#            MINIO_SERVER_URL:
 #            MINIO_BROWSER_REDIRECT_URL: Does not need specified
 
         networks:
@@ -167,10 +166,10 @@ services:
             resources:
                 limits:
                     cpus: "4"
-                    memory: 2048M
+                    memory: 4096M
                 reservations:
                     cpus: "2"
-                    memory: 1024M
+                    memory: 2048M
 
     lakefs:
         build:
@@ -216,6 +215,23 @@ services:
             - |
                 source /generate_config.sh
                 lakefs run
+
+        deploy:
+            mode: global
+
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                window: 120s
+                max_attempts: 3
+
+            resources:
+                limits:
+                    cpus: "4"
+                    memory: 4096M
+                reservations:
+                    cpus: "2"
+                    memory: 2048M
 
 networks:
     MLOps:

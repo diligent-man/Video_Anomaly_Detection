@@ -25,10 +25,10 @@ blockstore:
     s3:
         region: ""
         discover_bucket_region: false
+        disable_pre_signed: true  # not know reason but it enable client-server sync
 
         # Use path-style S3 url in lieu of http(s)://
         force_path_style: true
-        disable_ssl: true
 
         # MinIO endpoint
         credentials:

@@ -13,7 +13,7 @@ from AI.src.tools.Trainer import Trainer
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 from AI.src.optimizer import build_optimizer
-from AI.src.metrics import build_metric
+from AI.src.metrics import MetricManager
 from AI.src.utils import DotDict, ConfigReader, load_ckpt
 
 warnings.filterwarnings("once")
@@ -35,7 +35,7 @@ def main(args: argparse.Namespace) -> None:
     model, optim = load_ckpt(copy.deepcopy(config), model, optim)
 
     # loss_class = build_loss(config["Loss"])
-    metrics = build_metric(copy.deepcopy(config))
+    metrics: MetricManager = MetricManager(copy.deepcopy(config))
 
     trainer = Trainer(config, model, optim, scheduler, metrics, train_dataloader, val_dataloader)
     trainer.fit()

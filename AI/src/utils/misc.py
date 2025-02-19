@@ -90,7 +90,7 @@ def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScale
 
         # currently use default arg for GradScaler
         if use_grad_scaler:
-            scaler: torch.GradScaler = torch.amp.GradScaler("cuda", enabled=use_amp) if TORCH_2_4 else torch.cuda.amp.GradScaler(enabled=use_amp)
+            scaler: torch.GradScaler = torch.amp.GradScaler("cuda", enabled=use_amp)  # if TORCH_2_4 else torch.cuda.amp.GradScaler(enabled=use_amp)
         else:
             warnings.warn("use_grad_scaler should be True if use_amp=True")
     else:
