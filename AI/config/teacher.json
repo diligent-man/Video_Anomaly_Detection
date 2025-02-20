@@ -23,10 +23,10 @@
         {
             "dataset":
             {
-                "name": "VideoFolderDataset",
-                "root": "../../dataset/ucf-test/unlabeled",
-                "ext": "mp4",
-                "loader": "v4",  // api for creating pseudo tensor for dev only
+                "name": "VADVideoLevelDataset",
+                "normal_root": "../../dataset/ucf-test/unlabeled/normal",
+                "anomaly_root": "../../dataset/ucf-test/unlabeled/normal",
+                "loader": "v4",
                 "transforms": null,
                 "target_transforms": null
             },
@@ -52,7 +52,7 @@
                 "name": "VideoFolderDataset",
                 "root": "../../dataset/ucf-test/unlabeled",
                 "ext": "mp4",
-                "loader": "v4",  // api for creating pseudo tensor for dev only
+                "loader": "v4",
                 "transforms": null,
                 "target_transforms": null
             },

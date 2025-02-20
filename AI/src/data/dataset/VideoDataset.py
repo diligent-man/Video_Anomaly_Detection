@@ -66,9 +66,9 @@ class VideoDataset(Dataset):
         return ""
 
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, Any]:
-        video_path = os.path.join(self.__root, os.listdir(self.__root)[index])
+        video_path: str = os.path.join(self.__root, os.listdir(self.__root)[index])
         sample: torch.Tensor = self.__loader(video_path)
-        print(video_path)
+
         if self.__transforms is not None:
             sample: torch.Tensor = self.__transforms(sample)
 
@@ -77,7 +77,7 @@ class VideoDataset(Dataset):
         else:
             target: Any = self.__target
 
-        sample = sample[:200, ...]  # temporary add for loading
+        # sample = sample[:200, ...]  # temporary add for loading
         return sample.to(self.__return_device), target
 
     def __len__(self) -> int:

@@ -36,7 +36,6 @@ class VideoFolderDataset(DatasetFolder):
         :param target_transforms: transform function for label
         :param device: device that used to load video
         :param return_device: device that used to return read video
-        :param is_valid_file:
         """
         assert os.path.isdir(root), NotADirectoryError
         assert loader in video_loader.keys(), NotImplementedError
@@ -81,7 +80,9 @@ class VideoFolderDataset(DatasetFolder):
 
         if self.target_transform is not None:
             target = self.target_transform(target)
-        return sample, target
+
+        # sample = sample[:200, ...]  # temporary add for loading
+        return sample.to(self.__return_device), target
 
     def __len__(self) -> int:
         return len(self.samples)
