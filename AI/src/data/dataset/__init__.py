@@ -1,13 +1,14 @@
 from .VideoDataset import VideoDataset
-
-# Resourcewarning bug
 from .VideoFolderDataset import VideoFolderDataset
+from .VADVideoLevelDataset import VADVideoLevelDataset
+# from .VADFrameLevelDataset import VADFrameLevelDataset
 
 
 DATASETS = {
     "VideoDataset": VideoDataset,
     "VideoFolderDataset": VideoFolderDataset,
+    "VADVideoLevelDataset": VADVideoLevelDataset,
 }
 
 
-__all__ = ["DATASETS", "VideoDataset", "VideoFolderDataset"]
+__all__ = ["DATASETS", "VideoDataset", "VideoFolderDataset", "VADVideoLevelDataset"]
