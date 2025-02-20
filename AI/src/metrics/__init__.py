@@ -1,4 +1,4 @@
-from .MetricManager import MetricManager
+from .MetricWrapper import MetricWrapper
 
 
-__all__ = ["MetricManager"]
+__all__ = ["MetricWrapper"]

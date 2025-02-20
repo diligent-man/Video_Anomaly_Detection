@@ -80,10 +80,10 @@ METRICS: Dict[str, Callable] = {
 }
 
 
-__all__ = ["MetricManager"]
+__all__ = ["MetricWrapper"]
 
 
-class MetricManager(object):
+class MetricWrapper(object):
     __metrics: List[Metric]
     __name: List[str]
 

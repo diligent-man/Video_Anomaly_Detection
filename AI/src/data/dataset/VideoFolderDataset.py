@@ -14,9 +14,9 @@ class VideoFolderDataset(torchvision.datasets.DatasetFolder):
     def __init__(self,
                  root: Union[str, Path],
                  loader: str = "v2",
-                 extensions: Optional[Tuple[str, ...]] = ("mp4", "avi") ,
-                 transform: Optional[Callable] = None,
-                 target_transform: Optional[Callable] = None,
+                 ext: Optional[Tuple[str, ...]] = ("mp4", "avi"),
+                 transforms: Optional[Callable] = None,
+                 target_transforms: Optional[Callable] = None,
                  is_valid_file: Optional[Callable[[str], bool]] = None,
                  allow_empty: bool = False
                  ):
@@ -26,9 +26,9 @@ class VideoFolderDataset(torchvision.datasets.DatasetFolder):
         super().__init__(
             root,
             loader,
-            extensions,
-            transform,
-            target_transform,
+            ext,
+            transforms,
+            target_transforms,
             is_valid_file,
             allow_empty
         )

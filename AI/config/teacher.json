@@ -23,19 +23,18 @@
         {
             "dataset":
             {
-                "name": "VideoDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+                "name": "VideoFolderDataset",
+                "root": "../../dataset/ucf-test/unlabeled",
                 "ext": "mp4",
-                "loader": "v2",
-                "device": "cpu",
+                "loader": "v4",  // api for creating pseudo tensor for dev only
                 "transforms": null,
-                "return_device": null
+                "target_transforms": null
             },
 
             "dataloader":
             {
                 "name": "DefaultDataLoader",
-                "batch_size": 8,
+                "batch_size": 5,
                 "shuffle": true,
                 "num_workers": 4,
                 "drop_last": false,
@@ -50,19 +49,18 @@
         {
             "dataset":
             {
-                "name": "VideoDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+                "name": "VideoFolderDataset",
+                "root": "../../dataset/ucf-test/unlabeled",
                 "ext": "mp4",
-                "loader": "v2",
-                "device": "cpu",
-                "return_device": null,
-                "transforms": null
+                "loader": "v4",  // api for creating pseudo tensor for dev only
+                "transforms": null,
+                "target_transforms": null
             },
 
             "dataloader":
             {
                 "name": "DefaultDataLoader",
-                "batch_size": 8,
+                "batch_size": 5,
                 "shuffle": true,
                 "num_workers": 4,
                 "drop_last": false,
@@ -142,11 +140,11 @@
 
     "loss":
     {
-        "NAME": "BCELoss",
-        "ARGS":
-        {
-            "reduction": "mean"
-        }
+        "name": "MILRankingLoss",
+        "sparsity_constraint": false,
+        "smoothness_constraint": false,
+        "reduction": "mean"
+
     },
 
     "checkpoint":

@@ -15,7 +15,7 @@ from torcheval.metrics import Metric
 from .forward_strategy import FORWARD_STRATEGIES
 
 from ..data.model import BatchOutput
-from ..metrics import MetricManager
+from ..metrics import MetricWrapper
 from ..callbacks import add_callbacks
 
 from ..utils import DotDict, get_amp_cfg, EarlyStopping
@@ -45,7 +45,7 @@ class BatchForwarder(object):
                  forward_strategy: str,
                  model: torch.nn.Module,
                  dataloader: torch.utils.data.DataLoader,
-                 metrics: MetricManager,
+                 metrics: MetricWrapper,
                  amp_cfg: Dict[str, Any],
                  optim: torch.optim.Optimizer = None,
                  scheduler: torch.optim.lr_scheduler.LRScheduler = None,
@@ -60,10 +60,7 @@ class BatchForwarder(object):
         forward_callable: Callable = FORWARD_STRATEGIES[forward_strategy]
         kwargs: Dict[str, Any] = {
             "phase": phase, "epochs": self.__epochs, "cur_epoch": self.__cur_epoch,
-
-            "ctx_manager": torch.set_grad_enabled(phase == "train") \
-                if phase in ("train", "val") else torch.inference_mode(),
-
+            "ctx_manager": torch.set_grad_enabled(phase == "train") if phase in ("train", "val") else torch.inference_mode(),
             "model": model, "dataloader": dataloader, "metrics": metrics, "amp_cfg": amp_cfg,
             "grad_scaler": grad_scaler
         }
@@ -85,7 +82,7 @@ class Trainer(object):
     __config: DotDict
     __model: torch.nn.Module
     __lr_scheduler: torch.optim.lr_scheduler.LRScheduler
-    __metrics: MetricManager
+    __metrics: MetricWrapper
     __train_dataloader: torch.utils.data.DataLoader
     __val_dataloader: torch.utils.data.DataLoader
     __callbacks: Dict[str, List[Callable]] = defaultdict(list, {})
@@ -103,7 +100,7 @@ class Trainer(object):
                  model: torch.nn.Module,
                  optim: torch.optim.Optimizer,
                  scheduler: torch.optim.lr_scheduler.LRScheduler,
-                 metrics: MetricManager,
+                 metrics: MetricWrapper,
                  train_dataloader: torch.utils.data.DataLoader,
                  val_dataloader: torch.utils.data.DataLoader,
                  ) -> None:
@@ -117,7 +114,7 @@ class Trainer(object):
 
 
         # Declare misc attrs used during training
-        self.__start_epoch = 1
+        self.__start_epoch = 0
         self.__best_val_loss = self._get_best_val_loss()
         self.__amp_cfg, self.__grad_scaler = get_amp_cfg(self.__config)
         self.__sleep_time = self.__config.Global.get("sleep", 0)

@@ -352,4 +352,6 @@ AI/dataset/ubifights1/*
 !AI/dataset/ubifights1/.lakefs_ref.yaml
 AI/dataset/ubifights2/*
 !AI/dataset/ubifights2/.lakefs_ref.yaml
+AI/dataset/ucf-test/*
+!AI/dataset/ucf-test/.lakefs_ref.yaml
 # End ignored by lakectl local
