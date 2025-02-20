@@ -17,8 +17,8 @@ class BaseTrainer:
         amp (bool): Flag to enable AMP (Automatic Mixed Precision).
         scaler (amp.GradScaler): Gradient scaler for AMP.
         data (str): Path to data.
-        trainset (torch.utils.data.Dataset): Training dataset.
-        testset (torch.utils.data.Dataset): Testing dataset.
+        trainset (Dataset): Training dataset.
+        testset (Dataset): Testing dataset.
         ema (nn.Module): EMA (Exponential Moving Average) of the model.
         resume (bool): Resume training from a checkpoint.
         lf (nn.Module): Loss function.
@@ -271,7 +271,7 @@ class BaseTrainer:
         self.run_callbacks("on_train_start")
         LOGGER.info(
             f"Image sizes {self.args.imgsz} train, {self.args.imgsz} val\n"
-            f"Using {self.train_loader.num_workers * (world_size or 1)} dataloader workers\n"
+            f"Using {self.train_loader.num_workers * (world_size or 1)} DataLoader workers\n"
             f"Logging results to {colorstr('bold', self.save_dir)}\n"
             f"Starting training for " + (f"{self.args.time} hours..." if self.args.time else f"{self.epochs} epochs...")
         )
@@ -291,7 +291,7 @@ class BaseTrainer:
             if RANK != -1:
                 self.train_loader.sampler.set_epoch(epoch)
             pbar = enumerate(self.train_loader)
-            # Update dataloader attributes (optional)
+            # Update DataLoader attributes (optional)
             if epoch == (self.epochs - self.args.close_mosaic):
                 self._close_dataloader_mosaic()
                 self.train_loader.reset()
@@ -559,7 +559,7 @@ class BaseTrainer:
         raise NotImplementedError("get_validator function not implemented in trainer")
 
     def get_dataloader(self, dataset_path, batch_size=16, rank=0, mode="train"):
-        """Returns dataloader derived from torch.data.Dataloader."""
+        """Returns DataLoader derived from torch.data.DataLoader."""
         raise NotImplementedError("get_dataloader function not implemented in trainer")
 
     def build_dataset(self, img_path, mode="train", batch=None):
@@ -694,7 +694,7 @@ class BaseTrainer:
         if hasattr(self.train_loader.dataset, "mosaic"):
             self.train_loader.dataset.mosaic = False
         if hasattr(self.train_loader.dataset, "close_mosaic"):
-            LOGGER.info("Closing dataloader mosaic")
+            LOGGER.info("Closing DataLoader mosaic")
             self.train_loader.dataset.close_mosaic(hyp=copy(self.args))
 
     def build_optimizer(self, model, name="auto", lr=0.001, momentum=0.9, decay=1e-5, iterations=1e5):

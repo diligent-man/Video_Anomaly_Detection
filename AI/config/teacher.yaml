@@ -21,7 +21,7 @@ data:
     TEST_DATASET_ARGS:
         root: /home/trong/Downloads/Dataset/small_celeb_A/
         annotation: /home/trong/Downloads/Dataset/small_celeb_A/test.csv
-    DATALOADER: DefaultDataLoader
+    DataLoader: DefaultDataLoader
     TRAIN_DATALOADER_ARGS:
         batch_size: 1600
         shuffle: true

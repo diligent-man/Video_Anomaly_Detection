@@ -44,8 +44,8 @@ def train_with_mlflow(run_name: str,
                       loss: torch.nn.Module,
                       metric_lst: List[torcheval.metrics.Metric],
                       optimizer: torch.optim.Optimizer,
-                      train_loader: torch.utils.data.DataLoader,
-                      val_loader: torch.utils.data.DataLoader,
+                      train_loader: DataLoader,
+                      val_loader: DataLoader,
                       signature: ModelSignature
                       ) -> None:
     # Note: Signatures and Input Examples are not set
@@ -79,7 +79,7 @@ def train_with_mlflow(run_name: str,
         mlflow.pytorch.log_model(model, artifact_path="model", signature=signature)
 
 
-def test_with_mlflow(test_loader: torch.utils.data.DataLoader,
+def test_with_mlflow(test_loader: DataLoader,
                      signature: ModelSignature
                      ) -> None:
     """
@@ -127,8 +127,8 @@ def main() -> None:
     batch_size = 1024
 
     train_data, test_data = get_dataset(root="/home/trong/Downloads/Dataset/MNIST/raw")
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, drop_last=False)
-    val_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, drop_last=False)
+    train_loader = DataLoader(train_data, batch_size=batch_size, drop_last=False)
+    val_loader = DataLoader(test_data, batch_size=batch_size, drop_last=False)
     test_loader = copy.deepcopy(val_loader)
 
     # Manually specify. Current caveat: not directly accept tensor datatype

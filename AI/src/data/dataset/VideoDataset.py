@@ -3,16 +3,21 @@ import torch
 import inspect
 import functools
 
-from ...utils import video_loader
 from typing import Callable, Optional, Tuple, List
+
+
+from torch.utils.data import Dataset
+
+
+from ...utils import video_loader
 
 
 __all__ = ["VideoDataset"]
 
 
-class VideoDataset(torch.utils.data.Dataset):
+class VideoDataset(Dataset):
     """
-    Used in conjunction with torch.utils.data.Dataloader for batch loading and further processing steps.
+    Used in conjunction with DataLoader for batch loading and further processing steps.
     """
     _repr_indent = 4
 

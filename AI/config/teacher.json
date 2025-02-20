@@ -141,6 +141,7 @@
     "loss":
     {
         "name": "MILRankingLoss",
+        "margin": 1,
         "sparsity_constraint": false,
         "smoothness_constraint": false,
         "reduction": "mean"

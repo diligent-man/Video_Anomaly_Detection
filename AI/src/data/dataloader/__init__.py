@@ -1,9 +1,9 @@
 from .DefaultDataLoader import DefaultDataLoader
 
 
-dataloaders = {
+DATALOADERS = {
     "DefaultDataLoader": DefaultDataLoader
 }
 
 
-__all = ["dataloaders"]
+__all = ["DATALOADERS"]

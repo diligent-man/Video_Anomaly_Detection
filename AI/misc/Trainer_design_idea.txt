@@ -1,5 +1,5 @@
 for each epoch
-    for each phase, dataloader
+    for each phase, DataLoader
         # Train loop
             # Stuff to do:
                 + forward_pass

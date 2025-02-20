@@ -4,9 +4,10 @@ from .VideoDataset import VideoDataset
 from .VideoFolderDataset import VideoFolderDataset
 
 
-datasets = {
+DATASETS = {
     "VideoDataset": VideoDataset,
     "VideoFolderDataset": VideoFolderDataset,
 }
 
-__all__ = ["datasets", "VideoDataset", "VideoFolderDataset"]
+
+__all__ = ["DATASETS", "VideoDataset", "VideoFolderDataset"]

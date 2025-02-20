@@ -7,6 +7,7 @@ __all__ = ["MILRankingLoss"]
 class MILRankingLoss(torch.nn.MarginRankingLoss):
     """
     Ref: Real-world Anomaly Detection in Surveillance Videos
+    https://github.com/seominseok0429/Real-world-Anomaly-Detection-in-Surveillance-Videos-pytorch/blob/main/loss.py
     """
     def __init__(self,
                  margin=0.0,

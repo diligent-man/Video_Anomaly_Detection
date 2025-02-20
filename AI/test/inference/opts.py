@@ -110,7 +110,7 @@ def parse_opts():
         '--n_workers',
         default=4,
         type=int,
-        help='Number of workers for dataloader')
+        help='Number of workers for DataLoader')
 
     # optimizer parameters
     parser.add_argument(

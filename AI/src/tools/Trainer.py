@@ -7,17 +7,16 @@ from typing import List, Dict, Callable, Any
 
 
 import torch
+from torch.utils.data import DataLoader
 
 from tqdm import tqdm
 from torcheval.metrics import Metric
 
-
-from .forward_strategy import FORWARD_STRATEGIES
-
-from ..data.model import BatchOutput
+from ..losses import LossWrapper
 from ..metrics import MetricWrapper
+from ..data.model import BatchOutput
 from ..callbacks import add_callbacks
-
+from .forward_strategy import FORWARD_STRATEGIES
 from ..utils import DotDict, get_amp_cfg, EarlyStopping
 
 
@@ -35,21 +34,22 @@ class BatchForwarder(object):
     __epochs: int
     __cur_epoch: int
 
-    def __init__(self, epochs: int, cur_epoch: int) -> None:
+    def __init__(self, epochs: int, cur_epoch: int, device: str) -> None:
         self.__epochs: int = epochs
         self.__cur_epoch: int = cur_epoch
-
+        self.__device: str = device
 
     def __call__(self,
                  phase: str,
                  forward_strategy: str,
                  model: torch.nn.Module,
-                 dataloader: torch.utils.data.DataLoader,
+                 dataloader: DataLoader,
+                 loss: LossWrapper,
                  metrics: MetricWrapper,
                  amp_cfg: Dict[str, Any],
                  optim: torch.optim.Optimizer = None,
                  scheduler: torch.optim.lr_scheduler.LRScheduler = None,
-                 grad_scaler: torch.GradScaler = None
+                 grad_scaler: torch.GradScaler = None,
                  ) -> BatchOutput:
         """
         Perform 1 epoch runnning with specific phase and selected forward strategy
@@ -61,8 +61,8 @@ class BatchForwarder(object):
         kwargs: Dict[str, Any] = {
             "phase": phase, "epochs": self.__epochs, "cur_epoch": self.__cur_epoch,
             "ctx_manager": torch.set_grad_enabled(phase == "train") if phase in ("train", "val") else torch.inference_mode(),
-            "model": model, "dataloader": dataloader, "metrics": metrics, "amp_cfg": amp_cfg,
-            "grad_scaler": grad_scaler
+            "model": model, "dataloader": dataloader, "loss": loss, "metrics": metrics,
+            "amp_cfg": amp_cfg, "grad_scaler": grad_scaler, "device": self.__device
         }
 
         if phase == "train":
@@ -82,42 +82,48 @@ class Trainer(object):
     __config: DotDict
     __model: torch.nn.Module
     __lr_scheduler: torch.optim.lr_scheduler.LRScheduler
+    __loss: LossWrapper
     __metrics: MetricWrapper
-    __train_dataloader: torch.utils.data.DataLoader
-    __val_dataloader: torch.utils.data.DataLoader
+    __train_dataloader: DataLoader
+    __val_dataloader: DataLoader
     __callbacks: Dict[str, List[Callable]] = defaultdict(list, {})
 
     __start_epoch: int
-    __train_batch_forwarder: BatchForwarder
-    __test_batch_forwarder: BatchForwarder
     __best_val_loss: float
     __amp_cfg: Dict[str, Any]
     __grad_scaler: torch.GradScaler
+    __sleep_time: float
+    __device: str
+
     __early_stopping: None | EarlyStopping
+    __train_batch_forwarder: BatchForwarder
+    __test_batch_forwarder: BatchForwarder
 
     def __init__(self,
                  config: DotDict,
                  model: torch.nn.Module,
                  optim: torch.optim.Optimizer,
                  scheduler: torch.optim.lr_scheduler.LRScheduler,
+                 loss: LossWrapper,
                  metrics: MetricWrapper,
-                 train_dataloader: torch.utils.data.DataLoader,
-                 val_dataloader: torch.utils.data.DataLoader,
+                 train_dataloader: DataLoader,
+                 val_dataloader: DataLoader,
                  ) -> None:
         self.__config = config
         self.__model = model
         self.__optimizer = optim
         self.__scheduler = scheduler
+        self.__loss = loss
         self.__metrics = metrics
         self.__train_dataloader = train_dataloader
         self.__val_dataloader = val_dataloader
-
 
         # Declare misc attrs used during training
         self.__start_epoch = 0
         self.__best_val_loss = self._get_best_val_loss()
         self.__amp_cfg, self.__grad_scaler = get_amp_cfg(self.__config)
         self.__sleep_time = self.__config.Global.get("sleep", 0)
+        self.__device: str = self.__config.Global.get("device", "cpu")
 
         add_callbacks(self)
         self._setup_train()
@@ -171,7 +177,7 @@ class Trainer(object):
 
     # def _fit(self,
     #          epoch: int,
-    #          dataloader: torch.utils.data.DataLoader,
+    #          DataLoader: DataLoader,
     #          metrics: List[Metric] = None,
     #          phase="train"
     #          ) -> Dict[str, Any]:
@@ -187,7 +193,7 @@ class Trainer(object):
             c/ saving & logging training results and the relevant
             d/ check early stopping cond
 
-        Note: # iters = epochs * len(dataloader)
+        Note: # iters = epochs * len(DataLoader)
         """
         print("Start training model ...")
         for epoch in range(self.__start_epoch, self.__start_epoch + self.__config.Global.epochs):
@@ -196,21 +202,23 @@ class Trainer(object):
             for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
                 batch_output: BatchOutput = BatchForwarder(
                     self.__config.Global.epochs,
-                    epoch
+                    epoch,
+                    self.__device
                 )(
                     phase,
                     self.__config.Data[phase].forward_strategy,
                     self.__model,
                     dataloader,
+                    self.__loss,
                     self.__metrics,
                     self.__amp_cfg,
                     self.__optimizer,
                     self.__scheduler,
-                    self.__grad_scaler,
+                    self.__grad_scaler
                 )
 
                 # run_epoch_result: Dict[str, Any] = {**{"Lr": self.__lr_scheduler.get_last_lr().pop()},
-                #                                     **self.__run_epoch(phase, epoch, dataloader, metrics)
+                #                                     **self.__run_epoch(phase, epoch, DataLoader, metrics)
                 #                                     }
 
                 # Add to tensorboad writer

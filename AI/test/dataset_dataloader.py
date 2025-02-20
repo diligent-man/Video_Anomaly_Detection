@@ -1,8 +1,8 @@
 """
-Test dataset and dataloader.
+Test dataset and DataLoader.
 """
 from AI.src.data.dataset import datasets
-from AI.src.data.dataloader import dataloaders
+from AI.src.data.DataLoader import dataloaders
 
 
 
@@ -18,7 +18,7 @@ def main() -> None:
             "mp4"
     )
 
-    dataloader = dataloaders[dataloader_name](
+    DataLoader = dataloaders[dataloader_name](
         dataset,
         batch_size=32,
         num_workers=6,
@@ -30,9 +30,9 @@ def main() -> None:
     )
 
     print(dataset)
-    print(f"Dataloader len: {len(dataloader)}")
+    print(f"DataLoader len: {len(DataLoader)}")
 
-    for i, (videos, labels) in enumerate(dataloader):
+    for i, (videos, labels) in enumerate(DataLoader):
         print(videos)
         print(labels)
         print()

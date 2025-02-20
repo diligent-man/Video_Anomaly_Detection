@@ -40,16 +40,16 @@ def train(epochs: int,
           loss: torch.nn.Module,
           metric_lst: List[torcheval.metrics.Metric],
           optimizer: torch.optim.Optimizer,
-          dataloader: torch.utils.data.dataloader.DataLoader,
+          DataLoader: DataLoader,
           device: str
           ):
     """
     Simple training loop
     """
     model.train()
-    curr_step = 0 + curr_epoch * len(dataloader)
+    curr_step = 0 + curr_epoch * len(DataLoader)
 
-    for i, (X, y) in tqdm(enumerate(dataloader), initial=curr_step, total=len(dataloader) * epochs, desc="Training"):
+    for i, (X, y) in tqdm(enumerate(DataLoader), initial=curr_step, total=len(DataLoader) * epochs, desc="Training"):
         X, y = X.to(device), y.to(device)
 
         pred = model(X)
@@ -77,18 +77,18 @@ def val(model: torch.nn.Module,
         loss: torch.nn.Module,
         metric_lst: List[torcheval.metrics.Metric],
         epoch: int,
-        dataloader: torch.utils.data.dataloader.DataLoader,
+        DataLoader: DataLoader,
         device: str
         ):
     """
     Validate model per epoch.
     """
     model.eval()
-    num_batches = len(dataloader)
+    num_batches = len(DataLoader)
     eval_loss, eval_accuracy = 0., 0.
 
     with torch.no_grad():
-        for X, y in tqdm(dataloader, total=num_batches, desc="Validating"):
+        for X, y in tqdm(DataLoader, total=num_batches, desc="Validating"):
             X, y = X.to(device), y.to(device)
 
             pred = model(X)

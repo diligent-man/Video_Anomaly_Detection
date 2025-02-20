@@ -1,16 +1,18 @@
-import torch
-import torchvision
-
 from pathlib import Path
 from typing import Union, Callable, Any, Optional, Tuple
 
-from...utils import video_loader
+
+import torch
+from torchvision.datasets import DatasetFolder
+
+
+from ...utils import video_loader
 
 
 __all__ = ["VideoFolderDataset"]
 
 
-class VideoFolderDataset(torchvision.datasets.DatasetFolder):
+class VideoFolderDataset(DatasetFolder):
     def __init__(self,
                  root: Union[str, Path],
                  loader: str = "v2",
