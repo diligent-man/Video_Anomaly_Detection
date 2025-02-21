@@ -1,9 +1,11 @@
 from .DefaultDataLoader import DefaultDataLoader
+from .VADVideoLevelDataLoader import VADVideoLevelDataLoader
 
 
-dataloaders = {
-    "DefaultDataLoader": DefaultDataLoader
+DATALOADERS = {
+    "DefaultDataLoader": DefaultDataLoader,
+    "VADVideoLevelDataset": VADVideoLevelDataLoader
 }
 
 
-__all = ["dataloaders"]
+__all = ["DATALOADERS", "DefaultDataLoader", "VADVideoLevelDataset"]

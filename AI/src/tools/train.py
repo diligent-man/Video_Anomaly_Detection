@@ -9,14 +9,19 @@ sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
 
 import torch
 
-from AI.src.tools.Trainer import Trainer
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 from AI.src.optimizer import build_optimizer
-from AI.src.metrics import build_metric
+
+from AI.src.losses import LossWrapper
+from AI.src.metrics import MetricWrapper
+
+from AI.src.tools.Trainer import Trainer
 from AI.src.utils import DotDict, ConfigReader, load_ckpt
 
+
 warnings.filterwarnings("once")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 def main(args: argparse.Namespace) -> None:
@@ -33,10 +38,10 @@ def main(args: argparse.Namespace) -> None:
     optim, scheduler = build_optimizer(copy.deepcopy(config), model)
     model, optim = load_ckpt(copy.deepcopy(config), model, optim)
 
-    # loss_class = build_loss(config["Loss"])
-    metrics = build_metric(copy.deepcopy(config))
+    loss: LossWrapper = LossWrapper(copy.deepcopy(config))
+    metrics: MetricWrapper = MetricWrapper(copy.deepcopy(config))
 
-    trainer = Trainer(config, model, optim, scheduler, metrics, train_dataloader, val_dataloader)
+    trainer = Trainer(config, model, optim, scheduler, loss, metrics, train_dataloader, val_dataloader)
     trainer.fit()
     return None
 

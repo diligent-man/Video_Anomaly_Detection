@@ -1,16 +1,17 @@
+from typing import Type
+
 import requests
 import requests as rq
+from requests import Timeout
 
-from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
-from typing import Tuple
+from requests.adapters import HTTPAdapter
 
 
 __all__ = ["ping_server"]
 
 
-def ping_server(uri: str, **kwargs) -> int:
-    print(kwargs)
+def ping_server(uri: str, **kwargs) -> int | Type[Timeout]:
     try:
         with requests.Session() as s:
             retries = Retry(
@@ -23,4 +24,4 @@ def ping_server(uri: str, **kwargs) -> int:
         return response.status_code
     except rq.exceptions.Timeout:
         # Catching both ConnectTimeout and ReadTimeout errors
-        return 404
+        return rq.exceptions.Timeout

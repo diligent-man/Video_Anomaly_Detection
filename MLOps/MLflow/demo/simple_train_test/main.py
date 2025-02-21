@@ -28,8 +28,11 @@ from MLOps.MLflow.demo.simple_train_test.ImageClassifier import ImageClassifier
 os.environ["MLFLOW_TRACKING_USERNAME"] = "root"
 os.environ["MLFLOW_TRACKING_PASSWORD"] = "Root123!"
 
-mlflow.set_tracking_uri(uri="http://localhost:5000")
+
+mlflow.set_tracking_uri(uri=f"file:{os.path.join(os.getcwd(), 'mlruns')}")
 mlflow.set_experiment("pytorch_demo")
+print(f"View at: mlflow server --backend-store-uri {os.path.join(os.getcwd(), 'mlruns')}")
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
@@ -41,8 +44,8 @@ def train_with_mlflow(run_name: str,
                       loss: torch.nn.Module,
                       metric_lst: List[torcheval.metrics.Metric],
                       optimizer: torch.optim.Optimizer,
-                      train_loader: torch.utils.data.DataLoader,
-                      val_loader: torch.utils.data.DataLoader,
+                      train_loader: DataLoader,
+                      val_loader: DataLoader,
                       signature: ModelSignature
                       ) -> None:
     # Note: Signatures and Input Examples are not set
@@ -76,7 +79,7 @@ def train_with_mlflow(run_name: str,
         mlflow.pytorch.log_model(model, artifact_path="model", signature=signature)
 
 
-def test_with_mlflow(test_loader: torch.utils.data.DataLoader,
+def test_with_mlflow(test_loader: DataLoader,
                      signature: ModelSignature
                      ) -> None:
     """
@@ -119,13 +122,13 @@ def test_with_mlflow(test_loader: torch.utils.data.DataLoader,
 
 
 def main() -> None:
-    epochs = 1
+    epochs = 10
     lr = 1e-3
     batch_size = 1024
 
     train_data, test_data = get_dataset(root="/home/trong/Downloads/Dataset/MNIST/raw")
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, drop_last=False)
-    val_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, drop_last=False)
+    train_loader = DataLoader(train_data, batch_size=batch_size, drop_last=False)
+    val_loader = DataLoader(test_data, batch_size=batch_size, drop_last=False)
     test_loader = copy.deepcopy(val_loader)
 
     # Manually specify. Current caveat: not directly accept tensor datatype
@@ -133,7 +136,7 @@ def main() -> None:
     output_schema = Schema([TensorSpec(np.dtype(np.float32), (-1, 10), "output")])
     signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
-    for i in range(4):
+    for i in range(1):
         run_name = f"run {i}"
         model = ImageClassifier().to(device)
         loss = torch.nn.CrossEntropyLoss()

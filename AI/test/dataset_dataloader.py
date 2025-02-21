@@ -1,40 +1,42 @@
 """
-Test dataset and dataloader.
+Test dataset and DataLoader.
 """
 from AI.src.data.dataset import datasets
-from AI.src.data.dataloader import dataloaders
+from AI.src.data.DataLoader import dataloaders
+
 
 
 def main() -> None:
-    dataset_name = "VideoDataset"
+    dataset_name = "VideoFolderDataset"
     dataloader_name = "DefaultDataLoader"
     assert dataset_name in datasets.keys(), ValueError("Module is not supported")
     assert dataloader_name in dataloaders.keys(), ValueError("Module is not supported")
 
     dataset = datasets[dataset_name](
-            "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
-            "mp4",
-            device="cpu",
-            loader="v2"
+            "../dataset/ucf-test/unlabed",
+            "v3",
+            "mp4"
     )
 
-    dataloader = dataloaders[dataloader_name](
+    DataLoader = dataloaders[dataloader_name](
         dataset,
-        batch_size=8,
+        batch_size=32,
         num_workers=6,
-        shuffle=False,
+        shuffle=True,
         drop_last=False,
         prefetch_factor=1,
         multiprocessing_context="fork",
+        collate_fn=collate_fn
     )
 
     print(dataset)
-    print(f"Dataloader len: {len(dataloader)}")
+    print(f"DataLoader len: {len(DataLoader)}")
 
-    for i, batch in enumerate(dataloader):
-        video_paths, videos = batch
-        print(video_paths, videos.shape)
-        break
+    for i, (videos, labels) in enumerate(DataLoader):
+        print(videos)
+        print(labels)
+        print()
+        print()
     return None
 
 

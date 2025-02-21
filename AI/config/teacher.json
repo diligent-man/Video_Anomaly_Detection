@@ -6,13 +6,15 @@
 //        "experiment_name": "run",
 //        "technique": "single",
 //        "mode": "train",
-        "seed": 12345,
-        "device": "cuda",
-        "epochs": 100,
-        "print_batch_step": 1,
-        "save_epoch_step": 1,
+
+        "epochs": 2,
+        "print_step": 1,
+        "save_step": 1,
+
         "use_amp": true,
-        "use_grad_scaler": true
+        "use_grad_scaler": true,
+        "seed": 12345,
+        "device": "cuda"
     },
 
     "data":
@@ -21,58 +23,52 @@
         {
             "dataset":
             {
-                "name": "VideoDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
-                "ext": "mp4",
-                "loader": "v2",
-                "device": "cpu",
-                "transform": {},
-                "return_device": null
+                "name": "VADVideoLevelDataset",
+                "normal_root": "../../dataset/ucf-test/unlabeled/normal",
+                "anomaly_root": "../../dataset/ucf-test/unlabeled/normal",
+                "loader": "v4",
+                "transforms": null,
+                "target_transforms": null
             },
 
             "dataloader":
             {
                 "name": "DefaultDataLoader",
-                "batch_size": 8,
+                "batch_size": 5,
                 "shuffle": true,
                 "num_workers": 4,
                 "drop_last": false,
-                "pin_memory": false,
-                "timeout": 10,
                 "multiprocessing_context": "fork",
                 "prefetch_factor": 2,
-                "persistent_workers": false,
-                "pin_memory_device": "cuda"
-            }
-
+                "persistent_workers": false
+            },
+            "forward_strategy": "v2"
         },
         /////////////////////////////////////////////////////////
         "val":
         {
             "dataset":
             {
-                "name": "VideoDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+                "name": "VideoFolderDataset",
+                "root": "../../dataset/ucf-test/unlabeled",
                 "ext": "mp4",
-                "loader": "v2",
-                "device": "cpu",
-                "return_device": null,
-                "transform": {}
+                "loader": "v4",
+                "transforms": null,
+                "target_transforms": null
             },
 
             "dataloader":
             {
                 "name": "DefaultDataLoader",
-                "batch_size": 8,
+                "batch_size": 5,
                 "shuffle": true,
                 "num_workers": 4,
                 "drop_last": false,
-                "pin_memory": false,
-                "timeout": 10,
                 "multiprocessing_context": "fork",
                 "prefetch_factor": 2,
-                "persistent_workers": false,
-                "pin_memory_device": "cuda"}
+                "persistent_workers": false
+            },
+            "forward_strategy": "v2"
         },
         /////////////////////////////////////////////////////////
         "test": {
@@ -144,11 +140,12 @@
 
     "loss":
     {
-        "NAME": "BCELoss",
-        "ARGS":
-        {
-            "reduction": "mean"
-        }
+        "name": "MILRankingLoss",
+        "margin": 1,
+        "sparsity_constraint": false,
+        "smoothness_constraint": false,
+        "reduction": "mean"
+
     },
 
     "checkpoint":
@@ -163,6 +160,14 @@
 
     },
 
+    "early_stopping":
+    {
+        "apply": false,
+        "patience": 10,
+        "min_delta": 0
+
+    },
+
     "services": [
         {
             "name": "tensorboard",
@@ -174,8 +179,7 @@
         {
             "name": "mlflow",
             "apply": true,
-//            "tracking_uri": "http://58.187.115.100:5000",
-            "tracking_uri": "http://58.187.115.100:5000",
+            "tracking_uri": "http://183.80.97.114:5000"
 //            "username": "root" ,
 //            "password":  "Root123!"
         }

@@ -1,37 +1,68 @@
-import torch
-import torchvision
+import os
+import inspect
 
 from pathlib import Path
-from typing import Union, Callable, Any, Optional, Tuple
+from functools import partial
+from typing import Union, Callable, Any, Optional, Tuple, Dict
 
-from...utils import video_loader
+
+import torch
+from torchvision.datasets import DatasetFolder
+
+
+from ...utils import video_loader
 
 
 __all__ = ["VideoFolderDataset"]
 
 
-class VideoFolderDataset(torchvision.datasets.DatasetFolder):
+class VideoFolderDataset(DatasetFolder):
     def __init__(self,
                  root: Union[str, Path],
                  loader: str = "v2",
-                 extensions: Optional[Tuple[str, ...]] = ("mp4", "avi") ,
-                 transform: Optional[Callable] = None,
-                 target_transform: Optional[Callable] = None,
-                 is_valid_file: Optional[Callable[[str], bool]] = None,
-                 allow_empty: bool = False
+                 loader_args: Optional[Dict[str, Any]] = None,
+                 extensions: Optional[Tuple[str, ...]] = ("mp4", "avi"),
+                 transforms: Optional[Callable] = None,
+                 target_transforms: Optional[Callable] = None,
+                 device: str = "cpu",
+                 return_device: str = "cpu"
                  ):
-        assert loader in video_loader.keys(), ValueError(f"Unsupported video loader. Currently {video_loader.keys()}")
-        loader: Callable[[str], torch.Tensor] = video_loader[loader]
+        """
+        :param root: dir of videos
+        :param loader: video loader api. Defaults to "v2"
+        :param loader_args: arguments for video loader
+        :param extensions: video extension
+        :param transforms: transform function for input video
+        :param target_transforms: transform function for label
+        :param device: device that used to load video
+        :param return_device: device that used to return read video
+        """
+        assert os.path.isdir(root), NotADirectoryError
+        assert loader in video_loader.keys(), NotImplementedError
+        assert set(extensions) <= {"mp4", "avi"}, "Currently only supports mp4 video"
+        assert device in ("cpu", "cuda"), "Currently only supports cpu/ cuda device"
+
+        loader: Callable = video_loader[loader]
+
+        if loader_args is None:
+            loader_args = {}
+
+        if "device" in inspect.signature(loader).parameters:
+            loader_args = {"device": device, **loader_args}
 
         super().__init__(
             root,
-            loader,
+            partial(loader, **loader_args),
             extensions,
-            transform,
-            target_transform,
-            is_valid_file,
-            allow_empty
+            transforms,
+            target_transforms,
+            None,
+            True
         )
+
+        self.__transforms: Optional[Callable] = transforms
+        self.__target_transforms: Optional[Callable] = target_transforms
+        self.__return_device: str = return_device
 
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, Any]:
         """
@@ -49,7 +80,9 @@ class VideoFolderDataset(torchvision.datasets.DatasetFolder):
 
         if self.target_transform is not None:
             target = self.target_transform(target)
-        return sample, target
+
+        # sample = sample[:200, ...]  # temporary add for loading
+        return sample.to(self.__return_device), target
 
     def __len__(self) -> int:
         return len(self.samples)

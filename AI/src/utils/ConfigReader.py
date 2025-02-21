@@ -5,7 +5,7 @@ import pathlib
 from typing import Union, List, Dict, Any, Set, Tuple
 
 from . import DotDict, ANSIColor
-from .misc import get_services
+from .misc import get_services, make_border
 from .file_ops import load_config, create_increment_path
 
 __all__ = ["ConfigReader"]
@@ -13,7 +13,7 @@ __all__ = ["ConfigReader"]
 
 class ConfigReader(object):
     __defaults: Dict[str, Any] = {
-        "save_dir": os.path.join(os.path.dirname(os.getcwd()), "results"),
+        "save_dir": os.path.join(os.path.dirname(os.getcwd()), "..", "results"),
         "project_name": "nameless_project",
         "experiment_name": "run",
         "technique": "single",
@@ -24,7 +24,7 @@ class ConfigReader(object):
         "mode": ["train", "test"],
         "dataset": ["train", "val", "test"],
         "technique": ["single", "distillation"],
-        "fields": ["global", "data", "architecture", "checkpoint", "optim", "metric", "loss", "services"]
+        "fields": ["global", "data", "architecture", "optim", "metric", "loss", "checkpoint", "early_stopping", "services"]
     }
 
     __supported_services: Tuple[str, ...] = ("tensorboard", "mlflow")
@@ -32,13 +32,15 @@ class ConfigReader(object):
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
         self.__config: DotDict = DotDict(load_config(self.__config_path), key_error_handling="warn")
+        self.__config.Global["config_path"] = config_path
 
         # Post-init setup
-        print(f"{ANSIColor().CYAN}--------------------------------  Config post-init running  --------------------------------{ANSIColor().RESET}")
+        top, bottom = make_border("Config post-init running")
+        print(top)
         self._structure_check()
         self._create_save_dir()
         self._flatten_service_config()
-        print(f"{ANSIColor().CYAN}------------------------------------------------------------------------------------------------{ANSIColor().RESET}")
+        print(bottom)
 
     def _structure_check(self):
         print("Config structure sanity check")
@@ -124,6 +126,7 @@ class ConfigReader(object):
                                self.__config.Global.mode,
                                self.__config.Global.experiment_name
                                ]
+
         save_dir: str = f"{os.sep}".join(save_dir)
         save_dir: pathlib.Path = create_increment_path(save_dir, False, "", True)
 

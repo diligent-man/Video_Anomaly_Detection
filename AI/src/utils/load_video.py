@@ -2,6 +2,8 @@ import torch
 
 from typing import Tuple, Dict, Callable
 
+import torchaudio
+
 
 def v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
     """
@@ -109,10 +111,19 @@ def v3(path: str):
     return stream_info
 
 
+def v4(path: str) -> torch.Tensor:
+    """
+    Create pseudo-tensor for dev stage
+    """
+    pseudo_tensor: torch.Tensor = torch.rand(32, 3, 30, 224, 224)
+    return pseudo_tensor
+
+
 video_loader: Dict[str, Callable] = {
     "v1": v1,
     "v2": v2,
-    "v3": v3
+    "v3": v3,
+    "v4": v4
 }
 
 __all__ = [video_loader]

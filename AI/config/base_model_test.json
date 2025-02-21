@@ -29,7 +29,7 @@
                 "return_device": null
             },
 
-            "dataloader":
+            "DataLoader":
             {
                 "name": "DefaultDataLoader",
                 "batch_size": 8,
@@ -59,7 +59,7 @@
                 "transform": {}
             },
 
-            "dataloader":
+            "DataLoader":
             {
                 "name": "DefaultDataLoader",
                 "batch_size": 8,
@@ -76,7 +76,7 @@
         /////////////////////////////////////////////////////////
         "test": {
             "dataset":{},
-            "dataloader":{}
+            "DataLoader":{}
         }
     },
 

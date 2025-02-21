@@ -25,6 +25,7 @@ blockstore:
     s3:
         region: ""
         discover_bucket_region: false
+        disable_pre_signed: true  # not know reason but it enable client-server sync
 
         # Use path-style S3 url in lieu of http(s)://
         force_path_style: true
@@ -33,6 +34,7 @@ blockstore:
         credentials:
             access_key_id: ${MINIO_ROOT_USER}
             secret_access_key: ${MINIO_ROOT_PASSWORD}
+
         # endpoint is specified in docker compose instead in this
 
 

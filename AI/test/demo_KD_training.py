@@ -156,7 +156,7 @@ def train_knowledge_distillation(teacher, student, train_loader,
 
 
 def test(model: torch.nn.Module,
-         test_loader: torch.utils.data.DataLoader,
+         test_loader: DataLoader,
          device: str
          ) -> float:
     model.to(device)
@@ -196,11 +196,11 @@ def main() -> None:
     train_dataset = torchvision.datasets.CIFAR10(root="/home/trong/Downloads/Dataset/cifar10/cifar-10-python", train=True, download=True, transform=transforms_cifar)
     test_dataset = torchvision.datasets.CIFAR10(root="/home/trong/Downloads/Dataset/cifar10/cifar-10-python", train=False, download=True, transform=transforms_cifar)
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=4096, shuffle=True, num_workers=4,
+    train_loader = DataLoader(train_dataset, batch_size=4096, shuffle=True, num_workers=4,
                                                persistent_workers=True, prefetch_factor=4)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=4096, shuffle=False, num_workers=4,
+    test_loader = DataLoader(test_dataset, batch_size=4096, shuffle=False, num_workers=4,
                                               persistent_workers=True, prefetch_factor=4)
-    print(f"Train dataloader: {len(train_loader)}, Test dataloader: {len(test_loader)}\n")
+    print(f"Train DataLoader: {len(train_loader)}, Test DataLoader: {len(test_loader)}\n")
 
     f = open("KD_offline_training_result.txt", "w")
     for mode in ["offline", "online"]:
