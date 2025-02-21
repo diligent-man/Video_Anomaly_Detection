@@ -23,7 +23,6 @@ from ..utils import DotDict, get_amp_cfg, EarlyStopping
 __all__ = ["Trainer"]
 
 
-
 import inspect
 
 
@@ -216,6 +215,9 @@ class Trainer(object):
                     self.__scheduler,
                     self.__grad_scaler
                 )
+
+                if phase == "val":
+                    continue
 
                 # run_epoch_result: Dict[str, Any] = {**{"Lr": self.__lr_scheduler.get_last_lr().pop()},
                 #                                     **self.__run_epoch(phase, epoch, DataLoader, metrics)

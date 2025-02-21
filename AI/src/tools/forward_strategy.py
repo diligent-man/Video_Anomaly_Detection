@@ -81,12 +81,12 @@ def v2(phase: str,
     for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Foward v2, Phase: {phase}, Epoch: {cur_epoch+1}"):
         with ctx_manager:
             inps: Tensor = inps.to(device)
-
-            outs = model(inps)
+            print(inps.shape)
+            # outs = model(inps)
             # print(outs)
             # model_output = model(imgs, labels, model, optimizer, metrics, loss, phase, device)
             # total_loss += batch_loss.item()  # Accumulate minibatch into total loss
-        break
+        # break
 
 # def _forward(imgs: Tensor, labels: Tensor, num_classes: int,
 #              model: Module, optimizer: Optimizer,

@@ -7,7 +7,7 @@
 //        "technique": "single",
 //        "mode": "train",
 
-        "epochs": 2,
+        "epochs": 1,
         "print_step": 1,
         "save_step": 1,
 
@@ -25,7 +25,7 @@
             {
                 "name": "VADVideoLevelDataset",
                 "normal_root": "../../dataset/ucf-test/unlabeled/normal",
-                "anomaly_root": "../../dataset/ucf-test/unlabeled/normal",
+                "anomaly_root": "../../dataset/ucf-test/unlabeled/anomaly",
                 "loader": "v4",
                 "transforms": null,
                 "target_transforms": null
@@ -33,13 +33,12 @@
 
             "dataloader":
             {
-                "name": "DefaultDataLoader",
+                "name": "VADVideoLevelDataLoader",
                 "batch_size": 5,
                 "shuffle": true,
-                "num_workers": 4,
-                "drop_last": false,
-                "multiprocessing_context": "fork",
-                "prefetch_factor": 2,
+                "method": 1,
+//                "num_workers": 4,
+//                "prefetch_factor": 2,
                 "persistent_workers": false
             },
             "forward_strategy": "v2"
@@ -49,9 +48,9 @@
         {
             "dataset":
             {
-                "name": "VideoFolderDataset",
-                "root": "../../dataset/ucf-test/unlabeled",
-                "ext": "mp4",
+                "name": "VADVideoLevelDataset",
+                "normal_root": "../../dataset/ucf-test/unlabeled/",
+                "anomaly_root": "../../dataset/ucf-test/unlabeled/",
                 "loader": "v4",
                 "transforms": null,
                 "target_transforms": null
@@ -59,12 +58,11 @@
 
             "dataloader":
             {
-                "name": "DefaultDataLoader",
+                "name": "VADVideoLevelDataLoader",
                 "batch_size": 5,
                 "shuffle": true,
+                "method": 1,
                 "num_workers": 4,
-                "drop_last": false,
-                "multiprocessing_context": "fork",
                 "prefetch_factor": 2,
                 "persistent_workers": false
             },

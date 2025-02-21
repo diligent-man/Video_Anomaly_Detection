@@ -4,8 +4,8 @@ from .VADVideoLevelDataLoader import VADVideoLevelDataLoader
 
 DATALOADERS = {
     "DefaultDataLoader": DefaultDataLoader,
-    "VADVideoLevelDataset": VADVideoLevelDataLoader
+    "VADVideoLevelDataLoader": VADVideoLevelDataLoader
 }
 
 
-__all = ["DATALOADERS", "DefaultDataLoader", "VADVideoLevelDataset"]
+__all = ["DATALOADERS", "DefaultDataLoader", "VADVideoLevelDataLoader"]

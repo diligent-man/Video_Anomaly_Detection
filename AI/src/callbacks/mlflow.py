@@ -35,27 +35,29 @@ def on_pretrain_routine_start(instance: Trainer) -> None:
     """
     top, bottom = make_border("Init mlflow service")
     print(top)
-    uri: str = instance.config.Mlflow.get("tracking_uri", "")
+    uri: str = instance.config.Global.mlflow_path
 
-    username = instance.config.Mlflow.get("username", None)
-    password = instance.config.Mlflow.get("password", None)
-    auth = (username, password) if username and password else None
+    # username = instance.config.Mlflow.get("username", None)
+    # password = instance.config.Mlflow.get("password", None)
+    # auth = (username, password) if username and password else None
 
-    mlflow_path: str = instance.config.Global.mlflow_path
-    experiment_name: str = mlflow_path.split(os.sep)[-5]  # project_name
-    run_name: str = "_".join(mlflow_path.split(os.sep)[-4: -1])  # technique_mode_experiment_name
+    experiment_name: str = uri.split(os.sep)[-5]  # project_name
+    run_name: str = "_".join(uri.split(os.sep)[-4: -1])  # technique_mode_experiment_name
 
-    try:
-        ping_server(uri, auth=auth, timeout=(.5, .5), total=3)
-        mlflow.set_tracking_uri(uri)
-        mlflow.set_experiment(experiment_name)
-        print(f"View at {uri}\n")
-    except (rq.exceptions.Timeout, mlflow.exceptions.MlflowException) as e:
-        uri = instance.config.Global.mlflow_path
-        mlflow.set_tracking_uri(uri)
-        mlflow.set_experiment(experiment_name)
-        print(f"{e}.\nTracking uri is set to {ANSIColor().CYAN}mlflow_path{ANSIColor().RESET}\n")
-        print(f"View at http://localhost:5000 with 'mlflow server --backend-store-uri {uri}'\n")
+    mlflow.set_tracking_uri(uri)
+    mlflow.set_experiment(experiment_name)
+
+    # try:
+    #     ping_server(uri, auth=auth, timeout=(.5, .5), total=3)
+    #     mlflow.set_tracking_uri(uri)
+    #     mlflow.set_experiment(experiment_name)
+    #     print(f"View at {uri}\n")
+    # except (rq.exckkkeptions.Timeout, mlflow.exceptions.MlflowException) as e:
+    #     uri = instance.config.Global.mlflow_path
+    #     mlflow.set_tracking_uri(uri)
+    #     mlflow.set_experiment(experiment_name)
+    #     print(f"{e}.\nTracking uri is set to {ANSIColor().CYAN}mlflow_path{ANSIColor().RESET}\n")
+    #     print(f"View at http://localhost:5000 with 'mlflow server --backend-store-uri {uri}'\n")
 
     active_run = mlflow.active_run() or mlflow.start_run(
         run_name=run_name,

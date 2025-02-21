@@ -43,6 +43,10 @@ class VADSampler(Sampler):
         self.__shuffle: bool = shuffle
         self.__data_source: VADVideoLevelDataset = data_source
 
+    def __len__(self) -> int:
+        data_len: int = min(self.__data_source.__len__()) if self.__method == 1 else max(self.__data_source.__len__())
+        return data_len
+
     def __iter__(self) -> Tuple[Iterator[int], Iterator[int]]:
         min_source_len: int = min(self.__data_source.__len__())
         max_source_len: int = max(self.__data_source.__len__())

@@ -119,11 +119,24 @@ def v4(path: str) -> torch.Tensor:
     return pseudo_tensor
 
 
+def v5(path: str) -> torch.Tensor:
+    """
+    Create pseudo-tensor for dev stage
+    """
+    stream_reader: torchaudio.io.StreamReader = torchaudio.io.StreamReader(path)
+    print(stream_reader)
+
+    T = torch.randint(low=10, high=50, size=(1,)).item()
+    pseudo_tensor: torch.Tensor = torch.rand(1, 3, T, 224, 224)
+    return pseudo_tensor
+
+
 video_loader: Dict[str, Callable] = {
     "v1": v1,
     "v2": v2,
     "v3": v3,
-    "v4": v4
+    "v4": v4,
+    "v5": v5
 }
 
 __all__ = [video_loader]
