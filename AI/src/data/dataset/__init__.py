@@ -10,5 +10,7 @@ DATASETS = {
     "VADVideoLevelDataset": VADVideoLevelDataset,
 }
 
+__all__ = ["datasets", "VideoDataset", "VideoFolderDataset"]
+
 
 __all__ = ["DATASETS", "VideoDataset", "VideoFolderDataset", "VADVideoLevelDataset"]

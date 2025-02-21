@@ -6,6 +6,7 @@ from .ModelArchInspector import ModelArchInspector
 
 from .load_video import video_loader
 from .create_feature_extractor import create_feature_extractor
+from .visualize_dataset import prompt_dataset_statistics, plot_dataset_statistics
 
 from .visualize_dataset import (
     prompt_dataset_statistics,
@@ -31,7 +32,6 @@ from .misc import (
     make_border
 )
 
-
 __all__ = [
     "DotDict",
     "ANSIColor",
@@ -40,7 +40,6 @@ __all__ = [
     "ModelArchInspector",
 
     "video_loader",
-
     "prompt_dataset_statistics",
     "plot_dataset_statistics",
 
