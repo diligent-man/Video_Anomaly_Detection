@@ -34,7 +34,7 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 5,
+                "batch_size": 3,
                 "shuffle": true,
                 "method": 1,
 //                "num_workers": 4,
@@ -140,8 +140,8 @@
     {
         "name": "MILRankingLoss",
         "margin": 1,
-        "sparsity_constraint": false,
-        "smoothness_constraint": false,
+        "sparsity_constraint": true,
+        "smoothness_constraint": true,
         "reduction": "mean"
 
     },

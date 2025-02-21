@@ -59,11 +59,10 @@ class BatchForwarder(object):
         forward_callable: Callable = FORWARD_STRATEGIES[forward_strategy]
         kwargs: Dict[str, Any] = {
             "phase": phase, "epochs": self.__epochs, "cur_epoch": self.__cur_epoch,
-            "ctx_manager": torch.set_grad_enabled(phase == "train") if phase in ("train", "val") else torch.inference_mode(),
+            "grad_ctx_manager": torch.set_grad_enabled(phase == "train") if phase in ("train", "val") else torch.inference_mode(),
             "model": model, "dataloader": dataloader, "loss": loss, "metrics": metrics,
             "amp_cfg": amp_cfg, "grad_scaler": grad_scaler, "device": self.__device
         }
-
         if phase == "train":
             model.train()
             kwargs["optim"] = optim

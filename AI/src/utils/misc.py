@@ -96,7 +96,7 @@ def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScale
     else:
         amp_dtype: torch.dtype = torch.float32
 
-    autocast_config: Dict[str, Any] = {"device": device, "dtype": amp_dtype}
+    autocast_config: Dict[str, Any] = {"device_type": device, "dtype": amp_dtype}
     return autocast_config, scaler
 
 

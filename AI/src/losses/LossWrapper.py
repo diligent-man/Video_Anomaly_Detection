@@ -65,13 +65,17 @@ Has aux logits: {self.__has_aux}""")
 
     def compute_batch_loss(self,
                            inputs: Union[torch.Tensor, List[torch.Tensor]],
-                           targets: torch.Tensor,
+                           targets: torch.Tensor = None,
                            aux_logits_weight: float=0.3
                            ) -> torch.Tensor:
+        if isinstance(inputs, torch.Tensor):
+            inputs = [inputs]
+
         # aux logits (GoogleLeNet, InceptionV3)
         if self.__has_aux:
+            # Test later
             batch_loss = [self.__loss(inputs[i], targets) for i in range(len(inputs))]
             batch_loss = batch_loss[0] + sum(batch_loss) * aux_logits_weight
         else:
-            batch_loss = self.__loss(inputs, targets)
+            batch_loss = self.__loss(*inputs, targets) if targets is not None else self.__loss(*inputs)
         return batch_loss

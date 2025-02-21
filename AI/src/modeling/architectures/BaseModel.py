@@ -67,10 +67,12 @@ class BaseModel(torch.nn.Module):
         if x.dim() == 5:
             x = x.unsqueeze(0)
 
+        device = x.device
         extracted_feats: None | List = None
         projected_feats: None | torch.Tensor = None
+
         for i in range(len(self._backbones)):
-            backbone: torch.nn.Module = self._backbones[i].to(x.device)
+            backbone: torch.nn.Module = self._backbones[i].to(device)
             name: str = self._names[i]
             reduce: functools.partial = self._reduce[i]
 
@@ -78,13 +80,13 @@ class BaseModel(torch.nn.Module):
             extracted_feats = [feats] if extracted_feats is None else extracted_feats.append(feats)
 
             if self._out_proj is not None:
-                feats: torch.Tensor = self._out_proj[i].to(feats.device)(feats)
+                feats: torch.Tensor = self._out_proj[i].to(device)(feats)
 
             feats = feats.unsqueeze(0)
             projected_feats = feats if projected_feats is None else torch.cat((projected_feats, feats), 0)
 
-        neck_outs: torch.Tensor = self._neck.to(projected_feats.device)(projected_feats)
-        preds: torch.Tensor = self._head.to(neck_outs.device)(neck_outs)
+        neck_outs: torch.Tensor = self._neck.to(device)(projected_feats)
+        preds: torch.Tensor = self._head.to(device)(neck_outs).squeeze(-1)  # (B, S, 1) -> (B, S)
 
         if self._postprocessing is not None:
             preds = self._postprocessing(preds)

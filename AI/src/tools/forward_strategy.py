@@ -1,6 +1,6 @@
 from typing import Dict, Any, Callable
 
-
+import torch
 from tqdm import tqdm
 from torch import GradScaler, Tensor
 
@@ -48,7 +48,7 @@ def v1(phase: str,
 def v2(phase: str,
        epochs: int,
        cur_epoch: int,
-       ctx_manager,
+       grad_ctx_manager,
        model: Module,
        dataloader: DataLoader,
        loss: LossWrapper,
@@ -78,15 +78,20 @@ def v2(phase: str,
     """
     cur_step: int = 0 + cur_epoch * len(dataloader)
 
-    for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Foward v2, Phase: {phase}, Epoch: {cur_epoch+1}"):
-        with ctx_manager:
-            inps: Tensor = inps.to(device)
-            print(inps.shape)
-            # outs = model(inps)
-            # print(outs)
+    for i, (inps, _) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Foward v2, Phase: {phase}, Epoch: {cur_epoch+1}"):
+        inps: Tensor
+
+        with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
+            anomaly, normal = torch.chunk(inps, 2, 1)
+
+            # (B, S)
+            anomaly_preds: Tensor = model(anomaly.to(device)).preds
+            normal_preds: Tensor = model(normal.to(device)).preds
+
+            loss = loss.compute_batch_loss([anomaly_preds, normal_preds], )
             # model_output = model(imgs, labels, model, optimizer, metrics, loss, phase, device)
             # total_loss += batch_loss.item()  # Accumulate minibatch into total loss
-        # break
+        break
 
 # def _forward(imgs: Tensor, labels: Tensor, num_classes: int,
 #              model: Module, optimizer: Optimizer,

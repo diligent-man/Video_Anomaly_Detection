@@ -46,14 +46,14 @@ class VADVideoLevelDataset(Dataset):
             Inputs shape: (B, 2, T, H, W, C) with v2 video loader
             Targets shape: (B, 2)
         """
-        if len(self.normal_ds) <= len(self.anomaly_ds):
-            normal_idx, anomaly_idx = indices
+        if len(self.anomaly_ds) <= len(self.normal_ds):
+            anomaly_idx, normal_idx = indices
         else:
-            normal_idx, anomaly_idx = reversed(indices)
+            anomaly_idx, normal_idx = reversed(indices)
 
-        normal, _ = self.normal_ds.__getitem__(normal_idx)
         anomaly, _ = self.anomaly_ds.__getitem__(anomaly_idx)
-        return torch.vstack((normal, anomaly)), torch.tensor([0, 1])
+        normal, _ = self.normal_ds.__getitem__(normal_idx)
+        return torch.vstack((anomaly, normal)), torch.tensor(1, )
 
     def __repr__(self) -> str:
         head = "Dataset " + self.__class__.__name__ + " includes:"
