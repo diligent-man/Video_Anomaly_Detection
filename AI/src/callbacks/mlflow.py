@@ -3,35 +3,28 @@ import os
 import pathlib
 import warnings
 import requests as rq
+from typing import Dict, Any
 
 import mlflow
 
+
 from ..tools import Trainer
-from ..utils import ANSIColor, make_border
+from ..data.model import BatchOutput
 from ..utils.service import ping_server
+from ..utils import ANSIColor, make_border, ModelArchInspector
 
-
-def sanitize_dict(x):
-    """Sanitize dictionary keys by removing parentheses and converting values to floats."""
-    return {k.replace("(", "").replace(")", ""): float(v) for k, v in x.items()}
-########################################################################################################################
+__all__ = ["mlflow_callbacks"]
 
 
 def on_pretrain_routine_start(instance: Trainer) -> None:
     """
-    Log training parameters to MLflow at the end of the pretraining routine.
+    Log training info to local mlflow folder at the beginning of the training routine.
+    At this stage, mlflow logs
+        + Model arch (if have)
+        + Dataloader info
+        + Config file
 
-    This function sets up MLflow logging based on environment variables and trainer arguments.
-    It sets the tracking URI, experiment name, and run name, then starts the MLflow run if not already active.
-    It finally logs the parameters from the trainer.
-
-    :param: trainer (src.tools.Trainer): The training object with arguments and parameters to log.
-
-    Environment Variables:
-        MLFLOW_TRACKING_URI: The URI for MLflow tracking. If not set, defaults to 'runs/mlflow'.
-        MLFLOW_EXPERIMENT_NAME: The name of the MLflow experiment. If not set, defaults to trainer.args.project.
-        MLFLOW_RUN: The name of the MLflow run. If not set, defaults to trainer.args.name.
-        MLFLOW_KEEP_RUN_ACTIVE: Boolean indicating whether to keep the MLflow run active after the end of training.
+    :param instance: (Trainer) The training object with arguments and parameters to log.
     """
     top, bottom = make_border("Init mlflow service")
     print(top)
@@ -63,37 +56,52 @@ def on_pretrain_routine_start(instance: Trainer) -> None:
         run_name=run_name,
         tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
         description=instance.config.Mlflow.get("description", None),
-        # log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
+        log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
     )
 
+    model_arch: None | ModelArchInspector = instance.config.pop("Model_arch", None)
+    if model_arch is not None:
+        mlflow.log_text(str(model_arch()), "model_arch.txt", active_run.info.run_id)
+
     mlflow.log_dict(instance.config.get_dict(), f"config{pathlib.Path(instance.config.Global.config_path).suffixes[0]}")
+    mlflow.log_text(f"""Train dataloader info:
+    {instance.train_dataloader.__repr__()}\n
+Val dataloader info:
+    {instance.val_dataloader.__repr__()}""","dataloader_info.txt", active_run.info.run_id)
+
     print(f"""Experiment name: {experiment_name}
 Experiment id: {active_run.info.experiment_id}
 Run name: {run_name}
 Run id: {active_run.info.run_id}
 Uri: {uri}
+Command: 'mlflow server --backend-store-uri {uri}'
 ** Disabling by setting services.mlflow.apply=false
 """)
     print(bottom)
     return None
 
 
-def on_train_epoch_end(trainer: Trainer):
-    """Log training metrics at the end of each train epoch to MLflow."""
-    if mlflow:
-        mlflow.log_metrics(
-            metrics={
-                **sanitize_dict(trainer.lr),
-                **sanitize_dict(trainer.label_loss_items(trainer.tloss, prefix="train")),
-            },
-            step=trainer.epoch,
-        )
+def on_train_batch_end(instance: Trainer) -> None:
+    batch_output: Dict[str, Any] = instance.batch_output.as_metrics()
+    mlflow.log_metrics(batch_output, step=instance.batch_output.step)
 
 
-def on_fit_epoch_end(trainer: Trainer):
-    """Log training metrics at the end of each fit epoch to MLflow."""
-    if mlflow:
-        mlflow.log_metrics(metrics=sanitize_dict(trainer.metrics), step=trainer.epoch)
+# def on_train_epoch_end(trainer: Trainer):
+#     """Log training metrics at the end of each train epoch to MLflow."""
+#     if mlflow:
+#         mlflow.log_metrics(
+#             metrics={
+#                 **sanitize_dict(trainer.lr),
+#                 **sanitize_dict(trainer.label_loss_items(trainer.tloss, prefix="train")),
+#             },
+#             step=trainer.epoch,
+#         )
+
+#
+# def on_fit_epoch_end(trainer: Trainer):
+#     """Log training metrics at the end of each fit epoch to MLflow."""
+#     if mlflow:
+#         mlflow.log_metrics(metrics=sanitize_dict(trainer.metrics), step=trainer.epoch)
 
 
 def on_train_end(trainer):
@@ -116,9 +124,10 @@ def on_train_end(trainer):
     )
 
 
-callbacks = {
+mlflow_callbacks = {
     "on_pretrain_routine_start": on_pretrain_routine_start,
-    "on_train_epoch_end": on_train_epoch_end,
-    "on_fit_epoch_end": on_fit_epoch_end,
-    "on_train_end": on_train_end,
+    "on_train_batch_end": on_train_batch_end,
+    # "on_train_epoch_end": on_train_epoch_end,
+    # "on_fit_epoch_end": on_fit_epoch_end,
+    # "on_train_end": on_train_end,
 }

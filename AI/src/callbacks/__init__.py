@@ -33,7 +33,7 @@ def add_callbacks(instance: Union[Trainer]) -> None:
             assert service in SUPPORTED_CALLBACKS, ValueError(f"'{service}' is not supported in training phase")
 
             if service == "mlflow":
-                from .mlflow import callbacks as mlflow_callbacks
+                from .mlflow import mlflow_callbacks
                 callbacks_lst.append(mlflow_callbacks)
 
             # from .dvc import callbacks as dvc_cb

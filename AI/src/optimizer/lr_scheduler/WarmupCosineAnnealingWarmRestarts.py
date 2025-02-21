@@ -10,15 +10,15 @@ __all__ = ["WarmupCosineAnnealingWarmRestarts"]
 class WarmupCosineAnnealingWarmRestarts(torch.optim.lr_scheduler.CosineAnnealingWarmRestarts):
     def __init__(self,
                  optimizer: torch.optim.Optimizer,
-                 T_0: int,
-                 T_mult: int = 1,
+                 t_0: int,
+                 t_mult: int = 1,
                  num_warmup_steps: int = 1,
                  eta_min: float = 0.0,
                  last_epoch: int = -1,
                  verbose: str = "deprecated",
                  ) -> None:
         self.num_warmup_steps: int = num_warmup_steps
-        super(WarmupCosineAnnealingWarmRestarts, self).__init__(optimizer, T_0, T_mult, eta_min, last_epoch, verbose)
+        super(WarmupCosineAnnealingWarmRestarts, self).__init__(optimizer, t_0, t_mult, eta_min, last_epoch, verbose)
 
     @overrides.override
     def get_lr(self):

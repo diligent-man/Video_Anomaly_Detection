@@ -1,6 +1,8 @@
 from typing import Tuple
 
 import torch
+from torch.optim.optimizer import Optimizer
+from torch.optim.lr_scheduler import LRScheduler
 
 from .optimizer import OPTIMIZERS
 from .lr_scheduler import SCHEDULERS
@@ -14,7 +16,7 @@ __all__ = ["build_optimizer", "OPTIMIZERS", "SCHEDULERS"]
 
 def build_optimizer(config: DotDict,
                     model: torch.nn.Module
-                    ) -> Tuple[torch.optim.Optimizer, None | torch.optim.lr_scheduler.LRScheduler]:
+                    ) -> Tuple[Optimizer, None | LRScheduler]:
     top, bottom = make_border("Build optim")
     print(top)
     # step 1: build scheduler
@@ -22,7 +24,7 @@ def build_optimizer(config: DotDict,
     name: None | str = lr_config.pop("name", None)
     assert name in OPTIMIZERS.keys(), ValueError(f"Invalid optimizer. Get '{name}'")
 
-    optim: torch.optim.Optimizer = OPTIMIZERS[name](model.parameters(), **lr_config.get_dict())
+    optim: Optimizer = OPTIMIZERS[name](model.parameters(), **lr_config.get_dict())
 
     # step 2: build regularization
     reg: None = None
@@ -35,11 +37,11 @@ def build_optimizer(config: DotDict,
     # step 3: build scheduler
     scheduler: None = None
     scheduler_config: DotDict = config.Optim.pop("scheduler", DotDict({}))
-    name: None | str = lr_config.pop("name", None)
+    name: None | str = scheduler_config.pop("name", None)
 
     if name is not None:
         assert name in SCHEDULERS.keys(), ValueError(f"Invalid scheduler. Get '{name}'")
-        scheduler: torch.optim.lr_scheduler.LRScheduler = SCHEDULERS[name](optim, **scheduler_config.get_dict())
+        scheduler: LRScheduler = SCHEDULERS[name](optim, **scheduler_config.get_dict())
 
     print(f"""Optimizer: {optim.__class__.__name__}
 Scheduler: {scheduler if scheduler is None else scheduler.__class__.__name__}

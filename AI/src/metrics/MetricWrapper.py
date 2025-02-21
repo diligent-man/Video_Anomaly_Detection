@@ -86,9 +86,10 @@ __all__ = ["MetricWrapper"]
 class MetricWrapper(object):
     __metrics: List[Metric]
     __name: List[str]
+    __in_train: bool
 
     def __init__(self, config: DotDict) -> None:
-        self.__metrics, self.__names = self._build_metric(config)
+        self.__metrics, self.__names, self.__in_train = self._build_metric(config)
 
     @property
     def metrics(self) -> List[Metric]:
@@ -97,6 +98,10 @@ class MetricWrapper(object):
     @property
     def name(self) -> List[str]:
         return self.__names
+
+    @property
+    def in_train(self) -> bool:
+        return self.__in_train
 
     def update(self, inputs: torch.Tensor, targets: torch.Tensor) -> None:
         # Check type except
@@ -119,7 +124,7 @@ class MetricWrapper(object):
         return [_get_metric_result(metric) for metric in self.__metrics]
 
     @staticmethod
-    def _build_metric(config: DotDict) -> Tuple[List[Metric], List[str]]:
+    def _build_metric(config: DotDict) -> Tuple[List[Metric], List[str], bool]:
         top, bottom = make_border("Build metric")
         print(top)
         in_train: bool = config.Metric.pop("in_train", False)
@@ -140,7 +145,7 @@ class MetricWrapper(object):
             print(f"Metric {i}: {metric.__class__.__name__}")
         print(f"Use metric during training: {in_train}")
         print(bottom)
-        return built_metrics, names
+        return built_metrics, names, in_train
 
 
 @dispatch(torch.Tensor)

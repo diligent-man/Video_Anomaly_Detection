@@ -37,7 +37,8 @@ class MILRankingLoss(torch.nn.Module):
         top_k_normal_preds: torch.Tensor = normal_preds.max(dim=1).values
         top_k_anomaly_preds: torch.Tensor = anomaly_preds.max(dim=1).values
 
-        loss: torch.Tensor = torch.nn.ReLU()(self.__margin - 1 * (top_k_anomaly_preds - top_k_normal_preds))
+        loss: torch.Tensor = self.__margin - 1 * (top_k_anomaly_preds - top_k_normal_preds)
+        loss = torch.where(loss < 0, 0, loss)
 
         if self.__sparsity_constraint:
             loss += torch.sum(anomaly_preds, dim=1) * self.__sparsity_weight

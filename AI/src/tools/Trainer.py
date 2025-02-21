@@ -1,85 +1,32 @@
 import os
 import time
-import copy
 
 from collections import defaultdict
-from typing import List, Dict, Callable, Any
+from typing import List, Dict, Callable, Any, Tuple
 
 
 import torch
 from torch.utils.data import DataLoader
+from torch.optim.optimizer import Optimizer
+from torch.optim.lr_scheduler import LRScheduler
 
-from tqdm import tqdm
-from torcheval.metrics import Metric
 
 from ..losses import LossWrapper
 from ..metrics import MetricWrapper
 from ..data.model import BatchOutput
 from ..callbacks import add_callbacks
-from .forward_strategy import FORWARD_STRATEGIES
-from ..utils import DotDict, get_amp_cfg, EarlyStopping
+from .BatchForwarder import BatchForwarder
+from ..utils import DotDict, get_amp_cfg, EarlyStopping, ModelArchInspector
 
 
 __all__ = ["Trainer"]
 
 
-import inspect
-
-
-class BatchForwarder(object):
-    """
-    Forward model on mini-batch manner. This class can be used in train/ val/ test phases
-    """
-    __epochs: int
-    __cur_epoch: int
-
-    def __init__(self, epochs: int, cur_epoch: int, device: str) -> None:
-        self.__epochs: int = epochs
-        self.__cur_epoch: int = cur_epoch
-        self.__device: str = device
-
-    def __call__(self,
-                 phase: str,
-                 forward_strategy: str,
-                 model: torch.nn.Module,
-                 dataloader: DataLoader,
-                 loss: LossWrapper,
-                 metrics: MetricWrapper,
-                 amp_cfg: Dict[str, Any],
-                 optim: torch.optim.Optimizer = None,
-                 scheduler: torch.optim.lr_scheduler.LRScheduler = None,
-                 grad_scaler: torch.GradScaler = None,
-                 ) -> BatchOutput:
-        """
-        Perform 1 epoch runnning with specific phase and selected forward strategy
-        """
-        assert phase in ("train", "val", "test"), ValueError("Selected phase is invalid")
-        assert forward_strategy in FORWARD_STRATEGIES.keys(), ValueError(f"Selected strategy '{forward_strategy}' is not supported")
-
-        forward_callable: Callable = FORWARD_STRATEGIES[forward_strategy]
-        kwargs: Dict[str, Any] = {
-            "phase": phase, "epochs": self.__epochs, "cur_epoch": self.__cur_epoch,
-            "grad_ctx_manager": torch.set_grad_enabled(phase == "train") if phase in ("train", "val") else torch.inference_mode(),
-            "model": model, "dataloader": dataloader, "loss": loss, "metrics": metrics,
-            "amp_cfg": amp_cfg, "grad_scaler": grad_scaler, "device": self.__device
-        }
-        if phase == "train":
-            model.train()
-            kwargs["optim"] = optim
-
-            if "scheduler" in inspect.signature(forward_callable).parameters.keys():
-                kwargs["scheduler"] = scheduler
-        else:
-            model.eval()
-
-        batch_output: BatchOutput = forward_callable(**kwargs)
-        return batch_output
-
-
 class Trainer(object):
     __config: DotDict
     __model: torch.nn.Module
-    __lr_scheduler: torch.optim.lr_scheduler.LRScheduler
+    __optimizer: Optimizer
+    __scheduler: LRScheduler
     __loss: LossWrapper
     __metrics: MetricWrapper
     __train_dataloader: DataLoader
@@ -97,11 +44,13 @@ class Trainer(object):
     __train_batch_forwarder: BatchForwarder
     __test_batch_forwarder: BatchForwarder
 
+    __batch_output: BatchOutput = None
+
     def __init__(self,
                  config: DotDict,
                  model: torch.nn.Module,
-                 optim: torch.optim.Optimizer,
-                 scheduler: torch.optim.lr_scheduler.LRScheduler,
+                 optim: Optimizer,
+                 scheduler: LRScheduler,
                  loss: LossWrapper,
                  metrics: MetricWrapper,
                  train_dataloader: DataLoader,
@@ -134,10 +83,35 @@ class Trainer(object):
     def config(self) -> DotDict:
         return self.__config
 
-    def run_callbacks(self, event: str):
+    @property
+    def train_dataloader(self) -> DataLoader:
+        return self.__train_dataloader
+
+    @property
+    def val_dataloader(self) -> DataLoader:
+        return self.__val_dataloader
+
+    @property
+    def optimizer(self) -> Optimizer:
+        return self.__optimizer
+
+    @property
+    def scheduler(self) -> LRScheduler:
+        return self.__scheduler
+
+    @property
+    def batch_output(self):
+        return self.__batch_output
+
+    @batch_output.setter
+    def batch_output(self, batch_output: BatchOutput):
+        self.__batch_output = batch_output
+
+    def run_callbacks(self, event: str, *args, **kwargs) -> None:
         """Run all existing callbacks associated with a particular event."""
+        print(event)
         for callback in self.__callbacks.get(event, []):
-            callback(self)
+            callback(self, *args, **kwargs)
 
     def _get_best_val_loss(self) -> float:
         ckpt_path: str = self.__config.Global.ckpt_path
@@ -149,16 +123,15 @@ class Trainer(object):
             return float("inf")
 
     def _setup_train(self):
-        self.run_callbacks("on_pretrain_routine_start")
-        # Load trained checkpoint for continue
+        # Load trained checkpoint for continuous training
         if self.__config.Checkpoint.load:
-            ckpth_path: str = self.__config.Global.ckpt_path
+            ckpt_path: str = self.__config.Global.ckpt_path
             resume_name: str = self.__config.Checkpoint.get("resume_name", "")
 
-            ckpt_path = os.path.join(ckpth_path, resume_name)
+            ckpt_path = os.path.join(ckpt_path, resume_name)
             assert os.path.isfile(ckpt_path), FileNotFoundError
 
-            ckpt = torch.load(f=ckpth_path, map_location="cpu")
+            ckpt = torch.load(f=ckpt_path, map_location="cpu")
             self.__start_epoch = ckpt["epoch"] + 1
             self.__model.load_state_dict(ckpt["model_state_dict"])
             self.__optimizer.load_state_dict(ckpt["optimizer_state_dict"])
@@ -173,36 +146,50 @@ class Trainer(object):
         else:
             self.__early_stopping = None
 
-    # def _fit(self,
-    #          epoch: int,
-    #          DataLoader: DataLoader,
-    #          metrics: List[Metric] = None,
-    #          phase="train"
-    #          ) -> Dict[str, Any]:
-    #
-    #     return run_epoch_result
+        # Inspect model architecture
+        inspect_model_arch: bool = self.__config.Global.get("inspect_model_arch", False)
+        dummy_shape: None | Tuple[int, ...] = self.__config.Global.get("dummy_input_shape", None)
+        if inspect_model_arch and dummy_shape is not None:
+            try:
+                with torch.amp.autocast(**self.__amp_cfg):
+                    model_arch = ModelArchInspector(
+                        self.__model,
+                        self.__config.Global.dummy_input_shape,
+                        depth=self.__config.Global.get("inspect_depth", 3),
+                        mode="train",
+                        verbose=0
+                    )
+                self.__config["Model_arch"] = model_arch
+            except Exception as e:
+                self.__config["Model_arch"] = f"Fail to inspect model architecture due to {e}"
 
     def fit(self):
         """
-        As the rule of thumb, model is trained on the mini-batch manner (iteration), which means that after each
+        As a rule of thumb, model is trained on the mini-batch manner (iteration), which means that after each
         iteration-based forward pass, we do the following:
             a/ compute loss by backprop,
             b/ compute metric
-            c/ saving & logging training results and the relevant
+            c/ saving and logging training results and the relevant
             d/ check early stopping cond
 
         Note: # iters = epochs * len(DataLoader)
         """
         print("Start training model ...")
+        self.run_callbacks("on_pretrain_routine_start")
+
         for epoch in range(self.__start_epoch, self.__start_epoch + self.__config.Global.epochs):
             self.run_callbacks("on_train_epoch_start")
 
             for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
-                batch_output: BatchOutput = BatchForwarder(
+                if phase == "val":
+                    continue
+
+                BatchForwarder(
                     self.__config.Global.epochs,
                     epoch,
                     self.__device
                 )(
+                    self,
                     phase,
                     self.__config.Data[phase].forward_strategy,
                     self.__model,
@@ -215,35 +202,10 @@ class Trainer(object):
                     self.__grad_scaler
                 )
 
-                if phase == "val":
-                    continue
-
-                # run_epoch_result: Dict[str, Any] = {**{"Lr": self.__lr_scheduler.get_last_lr().pop()},
-                #                                     **self.__run_epoch(phase, epoch, DataLoader, metrics)
-                #                                     }
-
-                # Add to tensorboad writer
-                # if self.__tensorboard:
-                #     self.__tensorboard.add_scalar("Learning rate", run_epoch_result["Lr"], epoch)
-                #     self.__tensorboard.add_scalars("Loss", {phase: run_epoch_result["loss"]}, epoch)
-                #
-                #     if self.__config.METRIC_IN_TRAIN:
-                #         tag_scalar_dict: Dict[str, Any] = {f"{phase.capitalize()}_{metric}": run_epoch_result[metric] for metric
-                #                                            in self.__config.TENSORBOARD_TRACKING_METRIC}
-                #         self.__tensorboard.add_scalars("Metric", tag_scalar_dict, epoch)
-
-
                 # Logging
-                # Do sthg here ...
 
             # Stop program in the meantime
             print("Sleeping...")
             time.sleep(self.__sleep_time)
         print("Training finished")
         return None
-
-
-
-
-
-

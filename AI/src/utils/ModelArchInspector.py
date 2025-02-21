@@ -55,7 +55,7 @@ class ModelArchInspector(object):
         self.__kwargs = kwargs
 
     def __call__(self):
-        torchinfo.summary(
+        return torchinfo.summary(
             self.__model,
             self.__input_size,
             self.__input_data,

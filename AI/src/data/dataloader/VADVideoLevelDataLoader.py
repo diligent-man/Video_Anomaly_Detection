@@ -15,8 +15,12 @@ class VADVideoLevelDataLoader(DataLoader):
                  method: int,
                  **kwargs
                  ) -> None:
+        self.__dataset = dataset
         super(VADVideoLevelDataLoader, self).__init__(
             dataset,
             batch_sampler=VADBatchSampler(VADSampler(dataset, method, shuffle), batch_size),
             **kwargs
         )
+
+    def __repr__(self):
+        return self.__dataset

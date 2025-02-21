@@ -14,7 +14,12 @@
         "use_amp": true,
         "use_grad_scaler": true,
         "seed": 12345,
-        "device": "cuda"
+        "device": "cuda",
+
+        "inspect_model_arch": true,
+        "inspect_depth": 5,
+        "dummy_input_shape": [1, 32, 3, 13, 224, 224],
+
     },
 
     "data":
@@ -41,7 +46,7 @@
 //                "prefetch_factor": 2,
                 "persistent_workers": false
             },
-            "forward_strategy": "v2"
+            "forward_strategy": "v1"
         },
         /////////////////////////////////////////////////////////
         "val":
@@ -66,7 +71,7 @@
                 "prefetch_factor": 2,
                 "persistent_workers": false
             },
-            "forward_strategy": "v2"
+            "forward_strategy": "v1"
         },
         /////////////////////////////////////////////////////////
         "test": {
@@ -122,14 +127,14 @@
 
     "optim":
     {
-        "lr": {"name": "SGD", "lr": 1e-6},
-        "scheduler": {},
+        "lr": {"name": "Adam", "lr": 1e-6, "amsgrad": true},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  7, "num_warmup_steps":  14},
         "regularizer": {}
     },
 
     "metric":
     {
-        "in_train": true,
+        "in_train": false,
         "metrics": [
             {"name": "BinaryAUPRC"},
             {"name": "BinaryAUROC"}
