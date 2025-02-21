@@ -1,7 +1,6 @@
 import os.path
 from typing import Dict, Any
 from collections import defaultdict
-
 import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
@@ -71,14 +70,22 @@ def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
     sorted_class_names, sorted_class_counts = zip(*sorted_classes)
 
     # 1. Vẽ biểu đồ số video theo lớp
-    draw_bar_chart(list(sorted_class_names),
-                   list(sorted_class_counts),
-                   "Number of Videos per Class",
-                   "Class", "Number of Videos",
-                   {"rotation": 45, "ha": "right"}, None,
-                   None, {"bottom": 0, "top": max(list(sorted_class_counts)) * 1.2},
-                   **kwargs
-                   )
+    # Lọc bỏ các lớp có chứa "Normal"
+    filtered_classes = [(name, count) for name, count in zip(sorted_class_names, sorted_class_counts) if "Normal" not in name]
+
+    # Tách danh sách sau khi lọc
+    filtered_class_names, filtered_class_counts = zip(*filtered_classes) if filtered_classes else ([], [])
+
+    # Vẽ biểu đồ với dữ liệu đã lọc
+    draw_bar_chart(list(filtered_class_names),
+               list(filtered_class_counts),
+               "Number of Videos per Class",
+               "Class", "Number of Videos",
+               {"rotation": 45, "ha": "right"}, None,
+               None, {"bottom": 0, "top": max(filtered_class_counts) * 1.2} if filtered_class_counts else {"bottom": 0, "top": 1},
+               **kwargs
+               )
+
 
     # 2. So sánh số lượng video bất thường và bình thường
     anomaly_count = sum(count for cls, count in class_counts.items() if cls != "Normal")
