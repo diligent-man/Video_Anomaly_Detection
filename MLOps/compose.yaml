@@ -131,6 +131,7 @@ services:
             MINIO_CONSOLE_ADDRESS: ${MINIO_CONSOLE_ADDRESS}
             MINIO_STORAGE_USE_HTTPS: ${MINIO_STORAGE_USE_HTTPS}
 
+            MINIO_VOLUMES: ${MINIO_VOLUMES}
 #            MINIO_SERVER_URL:
 #            MINIO_BROWSER_REDIRECT_URL: Does not need specified
 
@@ -142,7 +143,9 @@ services:
             - "${MINIO_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}"
 
         volumes:
-            - ~/MLOps_data/minio/data:/data
+            - ~/MLOps_data/minio/shard1:/shard1
+            - /mnt/MINIO1/shard2:/shard2
+            - /mnt/MINIO2/shard3:/shard3
 
         restart: on-failure
 

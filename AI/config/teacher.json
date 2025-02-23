@@ -7,7 +7,7 @@
 //        "technique": "single",
 //        "mode": "train",
 
-        "epochs": 1,
+        "epochs": 3,
         "print_step": 1,
         "save_step": 1,
 
@@ -148,7 +148,6 @@
         "sparsity_constraint": true,
         "smoothness_constraint": true,
         "reduction": "mean"
-
     },
 
     "checkpoint":
@@ -159,8 +158,7 @@
         "save": false,
         "save_step": true,
         "save_weight_only": true,
-        "include_config": true,
-
+        "include_config": true
     },
 
     "early_stopping":

@@ -43,7 +43,7 @@ class VADVideoLevelDataset(Dataset):
             - 2nd idx:
             idx from iterator with larger length dataset in both sampling methods of VADSampler
         :return: Tuple of inputs and targets.
-            Inputs shape: (B, 2, T, H, W, C) with v2 video loader
+            Inputs shape: (B, 64, C, T, H, W) with v4 video loader
             Targets shape: (B, 2)
         """
         if len(self.anomaly_ds) <= len(self.normal_ds):
