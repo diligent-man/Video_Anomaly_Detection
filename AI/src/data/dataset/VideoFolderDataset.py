@@ -82,7 +82,7 @@ class VideoFolderDataset(DatasetFolder):
             target = self.target_transform(target)
 
         # sample = sample[:200, ...]  # temporary add for loading
-        return sample.to(self.__return_device), target
+        return sample, target
 
     def __len__(self) -> int:
         return len(self.samples)

@@ -9,8 +9,11 @@ DATASETS = {
     "VideoFolderDataset": VideoFolderDataset,
     "VADVideoLevelDataset": VADVideoLevelDataset,
 }
-
-__all__ = ["datasets", "VideoDataset", "VideoFolderDataset"]
+# datasets = {
+#     "VideoDataset": VideoDataset,
+#     "VideoFolderDataset": VideoFolderDataset,
+# }
+# __all__ = ["datasets", "VideoDataset", "VideoFolderDataset"]
 
 
 __all__ = ["DATASETS", "VideoDataset", "VideoFolderDataset", "VADVideoLevelDataset"]

@@ -9,11 +9,19 @@ from matplotlib.ticker import MaxNLocator
 from .ANSIColor import ANSIColor
 from ..data.dataset import VideoFolderDataset
 
-
+# Define the public functions available for import
 __all__ = ["prompt_dataset_statistics", "plot_dataset_statistics"]
 
-
 def prompt_dataset_statistics(stats: Dict[str, Any]) -> str:
+    """
+    Generates a formatted string displaying dataset statistics.
+
+    Args:
+        stats (Dict[str, Any]): A dictionary containing dataset statistics.
+
+    Returns:
+        str: A formatted string with dataset statistics.
+    """
     prompt = f"""{'-' * 40}  {ANSIColor().CYAN}DATASET STATISTICS{ANSIColor().RESET}  {'-' * 40}
 DATASET STATISTICS
 Total number of videos: {stats['total_samples']}
@@ -23,6 +31,7 @@ Number of videos per class:
     for class_name, count in stats['class_count'].items():
         prompt += f"  - {class_name}: {count} videos\n"
     
+    # Calculate average FPS, resolution, and duration
     avg_fps = np.mean(list(stats['fps_count'].keys())) if stats['fps_count'] else 0
     avg_resolution = (
         int(np.mean([res[0] for res in stats['resolution'].keys()])),
@@ -41,53 +50,57 @@ Average duration: {avg_duration:.2f} seconds
 """
     return prompt
 
-
 def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
-    """Vẽ các biểu đồ thống kê từ dataset."""
-    class_counts = defaultdict(int)  # Số lượng video theo từng lớp
-    fps_list = []  # Danh sách FPS của video
-    durations = []  # Danh sách thời gian video
-    resolutions = []  # Danh sách độ phân giải video
+    """
+    Plots various dataset statistics, including class distribution, anomaly comparison, and duration distribution.
 
-    # Duyệt qua dataset và thu thập thông tin
+    Args:
+        dataset (VideoFolderDataset): The dataset containing video samples.
+        **kwargs: Additional parameters for customization.
+    """
+    class_counts = defaultdict(int)  # Store the number of videos per class
+    fps_list = []  # Store the FPS values
+    durations = []  # Store video durations
+    resolutions = []  # Store video resolutions
+
+    # Iterate through the dataset to collect statistics
     for stream_info, video_class in dataset:
-        class_name = dataset.classes[video_class]  # Lấy tên lớp video
+        class_name = dataset.classes[video_class]  # Get the class name
         class_counts[class_name] += 1
 
-        # Lấy thông tin về FPS, số frame, độ phân giải
+        # Extract video properties
         fps = getattr(stream_info, "frame_rate", 0)
         num_frames = getattr(stream_info, "num_frames", 0)
         resolution = (getattr(stream_info, "width", 0), getattr(stream_info, "height", 0))
 
-        # Tính thời gian video (tránh chia cho 0)
+        # Compute video duration (avoid division by zero)
         duration = num_frames / fps if fps > 0 else 0
         fps_list.append(fps)
         resolutions.append(resolution)
         durations.append(duration)
 
-    # Sắp xếp số lượng video theo lớp
+    # Sort class counts in ascending order
     sorted_classes = sorted(class_counts.items(), key=lambda item: item[1])
     sorted_class_names, sorted_class_counts = zip(*sorted_classes)
 
-    # 1. Vẽ biểu đồ số video theo lớp
-    # Lọc bỏ các lớp có chứa "Normal"
+    # 1. Plot the number of videos per class
+    # Filter out classes containing "Normal"
     filtered_classes = [(name, count) for name, count in zip(sorted_class_names, sorted_class_counts) if "Normal" not in name]
 
-    # Tách danh sách sau khi lọc
+    # Extract filtered class names and counts
     filtered_class_names, filtered_class_counts = zip(*filtered_classes) if filtered_classes else ([], [])
 
-    # Vẽ biểu đồ với dữ liệu đã lọc
+    # Plot the filtered data
     draw_bar_chart(list(filtered_class_names),
                list(filtered_class_counts),
-               "Number of Videos per Class",
-               "Class", "Number of Videos",
+               "Videos per Class",
+               "", "Number of Videos",
                {"rotation": 45, "ha": "right"}, None,
                None, {"bottom": 0, "top": max(filtered_class_counts) * 1.2} if filtered_class_counts else {"bottom": 0, "top": 1},
                **kwargs
                )
 
-
-    # 2. So sánh số lượng video bất thường và bình thường
+    # 2. Compare the number of anomaly and normal videos
     anomaly_count = sum(count for cls, count in class_counts.items() if cls != "Normal")
     normal_count = class_counts.get("Normal", 0)
 
@@ -100,20 +113,20 @@ def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
                    **kwargs
                    )
 
-    # 3. Phân phối độ dài video
-    bins = np.arange(0, 700, 100)  # Chia bins mỗi 100 giây
+    # 3. Plot video duration distribution
+    bins = np.concatenate([np.arange(0, 110, 20), np.arange(200, 800, 100)])
     bin_counts, _ = np.histogram(durations, bins=bins)
     bin_labels = [f"[{bins[i]}, {bins[i + 1]})" for i in range(len(bins) - 1)]
 
     draw_bar_chart(bin_labels, bin_counts.tolist(),
-                   "Duration Distribution",
+                   "Time Distribution",
                    "Seconds", "Number of Videos",
                    {"rotation": 45, "ha": "right"}, None,
                    None, {"bottom": 0, "top": max(bin_counts.tolist()) * 1.2},
                    **kwargs
                    )
-########################################################################################################################
 
+########################################################################################################################
 
 def draw_bar_chart(x: Any, y: Any, title: str,
                    xlabel: str = None, ylabel: str = None,
@@ -122,6 +135,22 @@ def draw_bar_chart(x: Any, y: Any, title: str,
                    force_y_int: bool = False,
                    fpath: str = None
                    ) -> None:
+    """
+    Draws a bar chart using Seaborn and Matplotlib.
+
+    Args:
+        x (Any): X-axis labels.
+        y (Any): Y-axis values.
+        title (str): Title of the chart.
+        xlabel (str, optional): Label for the X-axis. Defaults to None.
+        ylabel (str, optional): Label for the Y-axis. Defaults to None.
+        xticks (dict, optional): X-axis tick properties. Defaults to None.
+        yticks (dict, optional): Y-axis tick properties. Defaults to None.
+        xlim (dict, optional): X-axis limits. Defaults to None.
+        ylim (dict, optional): Y-axis limits. Defaults to None.
+        force_y_int (bool, optional): If True, forces integer values on the Y-axis. Defaults to False.
+        fpath (str, optional): File path to save the plot. Defaults to None.
+    """
     if xticks is None:
         xticks = {}
 
@@ -135,25 +164,32 @@ def draw_bar_chart(x: Any, y: Any, title: str,
         ylim = {}
 
     plt.figure(figsize=(8, 6))
-    ax = sns.barplot(x=x, y=y, hue=y, palette="viridis", legend=False)
+
+    # Giảm độ sáng màu đen bằng cách dùng màu xám nhạt hơn
+    if title == "Anomaly vs Normal videos":
+        colors = ["red", "blue"]  # Đỏ cho bất thường, xanh cho bình thường
+    else:
+        colors = ["#c2c2c2"] * len(y)  # Xám thay vì đen (#808080 là màu xám trung bình)
+
+
+    ax = sns.barplot(x=x, y=y, palette=colors, legend=False)
 
     if force_y_int:
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
-    # Hiển thị số trên thanh, căn chỉnh để tránh đụng vào mép trên
+    # Display values on top of each bar
     for i, value in enumerate(y):
-        ax.text(i, value + max(y) * 0.02, str(value), ha="center", va="bottom", fontsize=8)
+        ax.text(i, value + max(y) * 0.02, str(value), ha="center", va="bottom", fontsize=10, fontweight="bold")
 
     plt.title(title)
-
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
     plt.xticks(**xticks)
-    plt.yticks(**yticks)
+    plt.yticks([])  # Remove Y-axis labels as required
 
     plt.xlim(**xlim)
-    plt.ylim(**ylim)  # Mở rộng trục Y để số liệu không bị che
+    plt.ylim(**ylim)  # Expand Y-axis limits to avoid label overlap
     plt.subplots_adjust(bottom=0.3)
 
     if fpath is not None and os.path.isdir(fpath):
