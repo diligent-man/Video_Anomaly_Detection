@@ -9,10 +9,10 @@ from torch.optim.optimizer import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
 
-from ..tools import Trainer
-from ..losses import LossWrapper
-from ..metrics import MetricWrapper
-from ..data.model import BatchOutput
+from AI.src.tools import Trainer
+from AI.src.losses import LossWrapper
+from AI.src.metrics import MetricWrapper
+from AI.src.data.model import BatchOutput
 
 
 __all__ = ["FORWARD_STRATEGIES"]

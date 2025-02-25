@@ -6,10 +6,10 @@ import torch
 from torch.utils.data import DataLoader
 
 
-from . import Trainer
-from ..losses import LossWrapper
-from ..metrics import MetricWrapper
-from .forward_strategy import FORWARD_STRATEGIES
+from AI.src.tools import Trainer
+from AI.src.losses import LossWrapper
+from AI.src.metrics import MetricWrapper
+from AI.src.utils.forward_strategy import FORWARD_STRATEGIES
 
 
 __all__ = ["BatchForwarder"]

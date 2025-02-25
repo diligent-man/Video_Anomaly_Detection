@@ -19,7 +19,7 @@ class VideoPreprocessor(object):
     ]
 
     __filters: Dict[str, Dict[str, Any]] = {
-        "fps": {"fps": 15, "round": "up"},
+        "fps": {"fps": 25, "round": "up"},
         "scale": {"w": 256, "h": 256, "sws_flags": "lanczos"},
         "crop": {"out_w": 224, "out_h": 224, "exact": 1, "keep_aspect": 1},
     }
@@ -31,6 +31,7 @@ class VideoPreprocessor(object):
                  device: str,
                  num_segments: int = 32,
                  num_frames: int = 30,
+                 filters: Dict[str, Dict[str, Any]] = None,
                  ) -> None:
         super(VideoPreprocessor, self).__init__()
         self.__fpath: str = fpath
@@ -38,6 +39,7 @@ class VideoPreprocessor(object):
         self.__device: str = device
         self.__num_segments: int = num_segments
         self.__num_frames: int = num_frames
+        self.__filters = filters or self.__filters
         os.makedirs((pathlib.Path(self.__spath)).parent, exist_ok=True)
 
     @property
@@ -86,12 +88,18 @@ class VideoPreprocessor(object):
         stream = stream.overwrite_output()
         stream.run()
 
-    def _sampling_and_convert_tensor(self):
-        try:
-            video: torch.Tensor = v2(self.__spath, fps=15, device=self.__device)  # [T,H,W,C]
-        except torch.cuda.OutOfMemoryError:
-            video: torch.Tensor = v2(self.__spath, fps=15, device="cpu")  # [T,H,W,C]
+        if self.__device == "cuda":
+            gc.collect()
+            torch.cuda.empty_cache()
 
+    def _sampling_and_convert_tensor(self):
+        """
+        Split video into segments and perform sampling by interpolation
+        """
+        try:
+            video: torch.Tensor = v2(self.__spath, device=self.__device)  # [T,H,W,C]
+        except torch.cuda.OutOfMemoryError:
+            video: torch.Tensor = v2(self.__spath, device="cpu")  # [T,H,W,C]
 
         total_frames: int = video.shape[0]
         seg_start_idx: torch.Tensor = torch.linspace(0, total_frames, self.__num_segments).clamp(0, total_frames).int()
@@ -102,20 +110,24 @@ class VideoPreprocessor(object):
             indices: torch.Tensor = torch.arange(start, end, device=video.device)
 
             frames: torch.Tensor = torch.index_select(video, 0, indices)
-            frames = frames.permute(-1, 0, 1, 2)
-            frames = frames.unsqueeze(0)
-            frames = torch.nn.functional.interpolate(frames, self.__num_frames)
+            frames = frames.permute(-1, 0, 1, 2).unsqueeze(0)
+
+            inter_mode = "nearest-exact" if indices.shape[0] > self.__num_frames else "trilinear"
+            frames = torch.nn.functional.interpolate(
+                frames.type(torch.float32) if inter_mode == "trilinear" else frames,
+                self.__num_frames,
+                mode=inter_mode
+                )
 
             segments = frames if segments is None else torch.vstack((segments, frames))
+
+            if self.__device == "cuda":
+                gc.collect()
+                torch.cuda.empty_cache()
 
         extension: str = pathlib.Path(self.spath).name.split(".")[-1]
         torch.save(segments, self.spath.replace(extension, "pt"))
         os.remove(self.__spath)
-
-        if self.__device == "cuda":
-            del segments
-            gc.collect()
-            torch.cuda.empty_cache()
         return None
 
     def __call__(self) -> None:

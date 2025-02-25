@@ -15,7 +15,7 @@ from ..losses import LossWrapper
 from ..metrics import MetricWrapper
 from ..data.model import BatchOutput
 from ..callbacks import add_callbacks
-from .BatchForwarder import BatchForwarder
+from AI.src.utils.BatchForwarder import BatchForwarder
 from ..utils import DotDict, get_amp_cfg, EarlyStopping, ModelArchInspector
 
 

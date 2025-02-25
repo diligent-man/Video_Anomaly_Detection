@@ -8,6 +8,8 @@ from argparse import ArgumentParser, Namespace
 
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
 
+from tqdm import tqdm
+
 from AI.src.preprocessing import VideoPreprocessor
 from AI.src.data.dataset import VideoFolderDataset
 from AI.src.data.dataloader import DefaultDataLoader
@@ -20,20 +22,20 @@ def custom_collate_fn(batch) -> List[str]:
 
 def main(args: Namespace) -> None:
     ds_name: str = pathlib.Path(args.root).name
+    pool: Pool = Pool(processes=args.processes)
     ds = VideoFolderDataset(args.root, "v6")
     dl = DefaultDataLoader(ds, args.batch_size, None, collate_fn=custom_collate_fn, drop_last=False)
 
-    for fpaths in dl:
-        pool: Pool = Pool(processes=args.processes)
-
+    for fpaths in tqdm(dl, total=int(len(ds) / args.processes), desc=f"Dataset: {ds_name}", colour="red"):
         if args.device == "both":
-            devices: List[str] = list(map(lambda i: "cpu" if i < len(fpaths) // 5 else "cuda", range(len(fpaths))))
+            devices: List[str] = list(map(lambda i: "cpu" if i < len(fpaths) // 2 else "cuda", range(len(fpaths))))
         else:
             devices: List[str] = [args.device] * len(fpaths)
 
         preprocessors: List[VideoPreprocessor] = list(map(
             lambda fpath, device: VideoPreprocessor(fpath, args.save_root, ds_name, device), *(fpaths, devices))
         )
+
         pool.map(VideoPreprocessor.__call__, preprocessors)
     return None
 
@@ -67,7 +69,7 @@ if __name__ == "__main__":
     argument_parser.add_argument("--processes",
                                  default=os.cpu_count(),
                                  type=int,
-                                 help="Num processes for multiprocessingr"                                 )
+                                 help="Num processes for multiprocessing")
 
     parsed_args = argument_parser.parse_args()
     main(parsed_args)
