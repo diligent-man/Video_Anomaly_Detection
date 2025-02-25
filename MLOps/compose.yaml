@@ -132,7 +132,7 @@ services:
             MINIO_STORAGE_USE_HTTPS: ${MINIO_STORAGE_USE_HTTPS}
 
             MINIO_VOLUMES: ${MINIO_VOLUMES}
-#            MINIO_SERVER_URL:
+#            MINIO_SERVER_URL: Does not need specified
 #            MINIO_BROWSER_REDIRECT_URL: Does not need specified
 
         networks:
@@ -144,12 +144,12 @@ services:
 
         volumes:
             - ~/MLOps_data/minio/shard1:/shard1
-            - /mnt/MINIO1/shard2:/shard2
-            - /mnt/MINIO2/shard3:/shard3
+#            - /mnt/MINIO1/shard2:/shard2
+#            - /mnt/MINIO2/shard3:/shard3
 
         restart: on-failure
 
-        entrypoint: ["minio", "server", "/data", "--address", "${MINIO_ADDRESS}", "--console-address", "${MINIO_CONSOLE_ADDRESS}"]
+        entrypoint: ["minio", "server", "${MINIO_VOLUMES}", "--address", "${MINIO_ADDRESS}", "--console-address", "${MINIO_CONSOLE_ADDRESS}"]
 
         healthcheck:
             test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]

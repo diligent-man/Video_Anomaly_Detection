@@ -73,7 +73,10 @@ class VideoFolderDataset(DatasetFolder):
             tuple: (sample, target) where target is class_index of the target class.
         """
         path, target = self.samples[index]
-        sample: torch.Tensor = self.loader(path)
+        sample: torch.Tensor | Any = self.loader(path)
+
+        if isinstance(sample, torch.Tensor):
+            sample: torch.Tensor = sample.to(self.__return_device)
 
         if self.transform is not None:
             sample = self.transform(sample)
@@ -82,7 +85,7 @@ class VideoFolderDataset(DatasetFolder):
             target = self.target_transform(target)
 
         # sample = sample[:200, ...]  # temporary add for loading
-        return sample.to(self.__return_device), target
+        return sample, target
 
     def __len__(self) -> int:
         return len(self.samples)

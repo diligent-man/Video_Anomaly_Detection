@@ -26,8 +26,8 @@ def v2(path: str,
        threads: int = 32,
        thread_type: str = "slice",
        device: str = "cuda",
-       output_shape: Tuple[int, int] = (224, 224),
-                  ) -> torch.Tensor:
+       output_shape: Tuple[int, int] = (224, 224)
+       ) -> torch.Tensor:
     import torchaudio
     """
     :param path: path to video
@@ -105,6 +105,10 @@ def v2(path: str,
 
 
 def v3(path: str):
+    """
+    :param path: path to video
+    :return: InputStream object
+    """
     import torchaudio
     stream_reader: torchaudio.io.StreamReader = torchaudio.io.StreamReader(path)
     stream_info = stream_reader.get_src_stream_info(0)
@@ -131,12 +135,21 @@ def v5(path: str) -> torch.Tensor:
     return pseudo_tensor
 
 
+def v6(path: str) -> str:
+    """
+    :param path: path to video
+    :return path to video
+    """
+    return path
+
+
 video_loader: Dict[str, Callable] = {
     "v1": v1,
     "v2": v2,
     "v3": v3,
     "v4": v4,
-    "v5": v5
+    "v5": v5,
+    "v6": v6
 }
 
 __all__ = [video_loader]
