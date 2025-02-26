@@ -36,14 +36,12 @@ def _is_labeled(fpath: str, ds_name: str) -> bool:
 def stage_one(args: Namespace, dl: DataLoader, ds_name: str) -> None:
     pool: Pool = Pool(processes=args.processes)
 
-    for fpaths in tqdm(dl, total=len(dl), desc=f"Dataset: {ds_name}", colour="red"):
+    for fpaths in tqdm(dl, total=len(dl), desc=f"Dataset: {ds_name}", colour="cyan"):
         if args.device == "both":
             cpu_ratio: int = int(args .cpu_ratio * len(fpaths))
             devices: List[str] = list(map(lambda i: "cpu" if i < cpu_ratio else "cuda", range(len(fpaths))))
         else:
             devices: List[str] = [args.device] * len(fpaths)
-
-        is_labeleds: List[bool] = list(map(_is_labeled, *(fpaths, [ds_name] * len(fpaths))))
 
         preprocessors: List[VideoPreprocessor] = list(map(
             lambda fpath, device: VideoPreprocessor(
@@ -56,8 +54,8 @@ def stage_one(args: Namespace, dl: DataLoader, ds_name: str) -> None:
             ), *(fpaths, devices))
         )
 
-        iterables = [(preprocessor, label_status, args.run_async) for preprocessor, label_status in zip(preprocessors, is_labeleds)]
-        pool.starmap(VideoPreprocessor.stage_one, iterables)
+        iterables = [(preprocessor, args.del_prev_result) for preprocessor in preprocessors]
+        pool.starmap(VideoPreprocessor.stage_two, iterables)
 
         if args.run_async:
             time.sleep(5)
@@ -68,7 +66,6 @@ def stage_two(args: Namespace, dl: DataLoader, ds_name: str) -> None:
     pool: Pool = Pool(processes=args.processes)
 
     for fpaths in tqdm(dl, total=len(dl), desc=f"Dataset: {ds_name}", colour="red"):
-        print(fpaths, args.del_prev_result)
         if args.device == "both":
             cpu_ratio: int = int(args .cpu_ratio * len(fpaths))
             devices: List[str] = list(map(lambda i: "cpu" if i < cpu_ratio else "cuda", range(len(fpaths))))
@@ -151,7 +148,7 @@ if __name__ == "__main__":
     # Take effect from stage 2
     argument_parser.add_argument("--del_prev_result",
                                  default=False,
-                                 type=bool,
+                                 type=lambda x: (str(x).lower() == "true"),
                                  help="Delete previous stage result")
     parsed_args = argument_parser.parse_args()
     main(parsed_args)

@@ -42,7 +42,6 @@ class VideoPreprocessor(object):
         self.__filters = filters or self.__filters
         os.makedirs((pathlib.Path(self.__spath)).parent, exist_ok=True)
 
-
     @property
     def fpath(self) -> str:
         return self.__fpath
@@ -97,36 +96,43 @@ class VideoPreprocessor(object):
 
     def stage_two(self, del_prev_result: bool = False) -> None:
         """
-        Split video into segments and perform sampling by interpolation
+        Stage two includes:
+            a/ Split video into segments
+            b/ Temporal sampling by interpolation (up/ down scaling)
+            c/ Save video stream as .pt file
+         and
         """
-        try:
-            video: torch.Tensor = v2(self.__spath, device=self.__device)  # [T,H,W,C]
-        except torch.cuda.OutOfMemoryError:
-            video: torch.Tensor = v2(self.__spath, device="cpu")  # [T,H,W,C]
+        segments: None | torch.Tensor = None
+        video: torch.Tensor = v2(self.__spath, device=self.__device)  # [T,H,W,C] in cpu device
 
         total_frames: int = video.shape[0]
         seg_start_idx: torch.Tensor = torch.linspace(0, total_frames, self.__num_segments).clamp(0, total_frames).int()
 
-        segments: None | torch.Tensor = None
         for i in range(0, len(seg_start_idx)-1):
             start, end = seg_start_idx[i].item(), seg_start_idx[i + 1].item()
+
             indices: torch.Tensor = torch.arange(start, end, device=video.device)
+            inter_mode = "nearest-exact" if indices.shape[0] > self.__num_frames else "trilinear"
 
             frames: torch.Tensor = torch.index_select(video, 0, indices)
-            frames = frames.permute(-1, 0, 1, 2).unsqueeze(0)
 
-            inter_mode = "nearest-exact" if indices.shape[0] > self.__num_frames else "trilinear"
+            try:
+                frames = frames.to(self.__device).permute(-1, 0, 1, 2).unsqueeze(0)
+            except torch.cuda.OutOfMemoryError:
+                frames = frames.permute(-1, 0, 1, 2).unsqueeze(0)
+
             frames = torch.nn.functional.interpolate(
                 frames.type(torch.float32) if inter_mode == "trilinear" else frames,
                 (self.__num_frames, *frames.shape[-2:]),
                 mode=inter_mode
                 )
-            frames = frames.type(torch.uint8)
+            frames = frames.to("cpu").type(torch.uint8)
 
             segments = frames if segments is None else torch.vstack((segments, frames))
 
         extension: str = pathlib.Path(self.spath).name.split(".")[-1]
         torch.save(segments, self.spath.replace(extension, "pt"))
+        torch.serialization.add_safe_globals([segments])
 
         if del_prev_result:
             os.remove(self.__spath)
