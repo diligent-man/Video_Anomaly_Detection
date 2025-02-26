@@ -23,4 +23,4 @@ class VADVideoLevelDataLoader(DataLoader):
         )
 
     def __repr__(self):
-        return self.__dataset
+        return self.__dataset.__repr__()

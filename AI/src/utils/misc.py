@@ -188,7 +188,7 @@ def make_border(headline: str) -> Tuple[str, str]:
                    f"{'-' * (MAX_LINE_LEN - len(headline))}"
 
     top: str = f"{ANSIColor().CYAN}{headline}{ANSIColor().RESET}"
-    bottom: str = f"{ANSIColor().CYAN}{'-' * len(headline)}{ANSIColor().RESET}\n\n\n"
+    bottom: str = f"{ANSIColor().CYAN}{'-' * len(headline)}{ANSIColor().RESET}\n\n"
     return top, bottom
 ########################################################################################################################
 

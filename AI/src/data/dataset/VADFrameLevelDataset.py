@@ -15,6 +15,8 @@ __all__ = ["VADFrameLevelDataset"]
 
 
 class VADFrameLevelDataset(Dataset):
+    _repr_indent = 4
+
     def __init__(self,
                  root: str,
                  annotation: str,
@@ -40,12 +42,17 @@ class VADFrameLevelDataset(Dataset):
 
         self.__root: str = root
         self.__loader: Callable = functools.partial(loader, **loader_args)
+        self.__annotation_fname: str = annotation
         self.__annotation: pd.DataFrame = pd.read_csv(os.path.join(root, annotation))
         self.__transforms: Optional[Callable] = transforms
         self.__target_transforms: Optional[Callable] = target_transforms
         self.__return_device: str = return_device
 
-    def __len__(self):
+    @staticmethod
+    def extra_repr() -> str:
+        return ""
+
+    def __len__(self) -> int:
         return len(self.__annotation)
 
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -69,3 +76,18 @@ class VADFrameLevelDataset(Dataset):
         if self.__target_transforms is not None:
             labels = self.__target_transforms(labels)
         return frames, labels
+
+    def __repr__(self):
+        num_anomaly: int = len(self.__annotation.loc[self.__annotation.path.str.startswith('anomaly')])
+        num_normal: int = len(self.__annotation.loc[self.__annotation.path.str.startswith('normal')])
+
+        head = "Dataset " + self.__class__.__name__ + " includes:"
+
+        body = [f"Number of datapoints: {self.__len__()} ({num_anomaly} anomaly, {num_normal} normal)"]
+        body += [f"Root localtion: {self.__root}"]
+        body += [f"Annotation: {self.__annotation_fname}"]
+
+        body += self.extra_repr().splitlines()
+
+        lines = [head] + [" " * self._repr_indent + line for line in body]
+        return "\n".join(lines)

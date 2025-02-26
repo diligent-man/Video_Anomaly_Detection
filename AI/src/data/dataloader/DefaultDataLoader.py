@@ -4,4 +4,5 @@ __all__ = ["DefaultDataLoader"]
 
 
 class DefaultDataLoader(DataLoader):
-    pass
+    def __repr__(self) -> str:
+        return self.dataset.__repr__()

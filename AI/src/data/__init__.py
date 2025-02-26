@@ -3,6 +3,7 @@ from torch.utils.data import Dataset, DataLoader
 from ..utils import DotDict
 from .dataset import DATASETS
 from .dataloader import DATALOADERS
+from ..utils.misc import make_border
 
 
 def _post_init_check(dl: DataLoader) -> None:
@@ -19,9 +20,13 @@ def build_dataloader(config: DotDict,
     assert dataset_name in DATASETS, ValueError("Current support dataset {}".format(list(DATASETS.keys())))
     assert dataloader_name in DATALOADERS, ValueError("Current support DataLoader {}".format(list(DATALOADERS.keys())))
 
+    top, bottom = make_border(f"Build {mode} dataloader")
+    print(top)
     ds: Dataset = DATASETS[dataset_name](**config.Data[mode].get_dict("dataset"))
     dl: DataLoader = DATALOADERS[dataloader_name](ds, **config.Data[mode].get_dict("dataloader"))
 
     _post_init_check(dl)
-    print(f"{mode.capitalize()} DataLoader: {len(dl)}")
+    print(f"{mode.capitalize()} dataLoader len: {len(dl)}")
+    print(dl)
+    print(bottom)
     return dl
