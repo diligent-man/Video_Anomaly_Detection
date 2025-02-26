@@ -1,13 +1,16 @@
 """Script for preprocessing train video."""
 import os
 import sys
-import pathlib
+import glob
 import time
+import shutil
+import pathlib
+import inspect
 
 from functools import partial
 from multiprocessing import Pool
-from typing import List, Dict, Callable
 from argparse import ArgumentParser, Namespace
+from typing import List, Dict, Callable, Set, Any
 
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
 
@@ -17,6 +20,7 @@ from torch.utils.data import Dataset, DataLoader
 from AI.src.preprocessing import VideoPreprocessor
 from AI.src.data.dataset import VideoFolderDataset
 from AI.src.data.dataloader import DefaultDataLoader
+
 
 
 def _custom_collate_fn(batch) -> List[str]:
@@ -82,19 +86,46 @@ def stage_two(args: Namespace, dl: DataLoader, ds_name: str) -> None:
     return None
 
 
-def stage_three():
+def stage_three(args: Namespace, dl: DataLoader, ds_name: str) -> None:
+    """
+    Move all other file from original to save_root
+    """
+    ds_name_idx = args.root.split(os.sep).index(ds_name)
+
+    save_root: List[str] = args.root.split(os.sep)
+    save_root.insert(ds_name_idx, args.save_root)
+    save_root: str = f"{os.sep}".join(save_root)
+
+    objs_in_save_root: Set[str] = set([path.replace(save_root, "") for path in \
+                                       glob.glob(f"{save_root}/**", recursive=True, include_hidden=True)])
+
+    objs_in_original_root: Set[str] = set([
+        path.replace(args.root, "").replace(args.vid_ext, "pt") for path in \
+        glob.glob(f"{args.root}/**", recursive=True, include_hidden=True)
+    ])
+
+    for f in objs_in_original_root.difference(objs_in_save_root):
+        original_path = f"{args.root}{f}"
+        save_path = f"{save_root}{f}"
+        shutil.copy(original_path, save_path)
+    return None
 
 
 def main(args: Namespace) -> None:
     STAGES: Dict[str, Callable] = {
         "stage_one": stage_one,
-        "stage_two": stage_two
+        "stage_two": stage_two,
+        "stage_three": stage_three
     }
+    callable_paras = set(inspect.signature(STAGES["stage_one"]).parameters.keys())
 
     ds_name: str = pathlib.Path(args.root).name
     ds: Dataset = VideoFolderDataset(args.root, "v6")
     dl: DataLoader = DefaultDataLoader(ds, args.batch_size, None, collate_fn=_custom_collate_fn, drop_last=False)
-    STAGES[args.fn_name](args, dl, ds_name)
+
+    kwargs: Dict[str, Any] = {"args": args, "dl": dl, "ds_name": ds_name}
+    kwargs = {k: v for k, v in kwargs.items() if k in callable_paras}
+    STAGES[args.fn_name](**kwargs)
     return None
 
 
@@ -105,30 +136,36 @@ if __name__ == "__main__":
                                  type=str,
                                  help="Device for preprocessing video with ffmpeg"
                                  )
+
     argument_parser.add_argument("--cpu_ratio",
                                  default=.5,
                                  type=float,
                                  help="Ratio b/t the utilization of cpu and gpu if device is both"
                                  )
+
     argument_parser.add_argument("--root",
                                  type=str,
                                  help="Root of dataset, which is read by VideoFolderDataset class"
                                  )
+
     argument_parser.add_argument("--save_root",
                                  default="out",
                                  type=str,
                                  help="Output root of preprocessed videos"
                                  )
+
     argument_parser.add_argument("--loader",
                                  default="v6",
                                  type=str,
                                  help="Video loader api"
                                  )
+
     argument_parser.add_argument("--batch_size",
                                  default=48,
                                  type=int,
                                  help="Batch size for dataloader"
                                  )
+
     argument_parser.add_argument("--processes",
                                  default=os.cpu_count(),
                                  type=int,
@@ -149,5 +186,12 @@ if __name__ == "__main__":
                                  default=False,
                                  type=lambda x: (str(x).lower() == "true"),
                                  help="Delete previous stage result")
+
+    # Take effect from stage 3
+    argument_parser.add_argument("--vid_ext",
+                                 type=str,
+                                 help="Video extension")
+
+
     parsed_args = argument_parser.parse_args()
     main(parsed_args)
