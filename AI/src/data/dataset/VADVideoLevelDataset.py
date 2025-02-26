@@ -1,3 +1,4 @@
+import os
 from typing import Tuple
 
 import torch
@@ -18,13 +19,12 @@ class VADVideoLevelDataset(Dataset):
     _repr_indent: int = 4
 
     def __init__(self,
-                 normal_root: str,
-                 anomaly_root: str,
+                 root: str,
                  loader: str,
                  **kwargs
                  ) -> None:
-        self.normal_ds: VideoDataset = VideoDataset(normal_root, loader, target=0, **kwargs)
-        self.anomaly_ds: VideoFolderDataset = VideoFolderDataset(anomaly_root, loader, **kwargs)
+        self.normal_ds: VideoDataset = VideoDataset(os.path.join(root, "normal"), loader, target=0, **kwargs)
+        self.anomaly_ds: VideoFolderDataset = VideoFolderDataset(os.path.join(root, "anomaly"), loader, **kwargs)
 
     @staticmethod
     def extra_repr() -> str:

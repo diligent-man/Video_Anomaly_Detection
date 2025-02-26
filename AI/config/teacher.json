@@ -29,8 +29,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "normal_root": "../../dataset/ucf-test/unlabeled/normal",
-                "anomaly_root": "../../dataset/ucf-test/unlabeled/anomaly",
+                "root": "../../dataset/iitb/unlabeled/",
                 "loader": "v4",
                 "transforms": null,
                 "target_transforms": null
@@ -40,7 +39,7 @@
             {
                 "name": "VADVideoLevelDataLoader",
                 "batch_size": 3,
-                "shuffle": true,
+                "shuffle": false,
                 "method": 1,
 //                "num_workers": 4,
 //                "prefetch_factor": 2,
@@ -53,9 +52,8 @@
         {
             "dataset":
             {
-                "name": "VADVideoLevelDataset",
-                "normal_root": "../../dataset/ucf-test/unlabeled/",
-                "anomaly_root": "../../dataset/ucf-test/unlabeled/",
+                "name": "VADFrameLevelDataset",
+                "annotation": "../../dataset/ucf-test/unlabeled/label.csv",
                 "loader": "v4",
                 "transforms": null,
                 "target_transforms": null

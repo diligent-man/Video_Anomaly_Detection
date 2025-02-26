@@ -21,7 +21,7 @@ class VideoFolderDataset(DatasetFolder):
                  root: Union[str, Path],
                  loader: str = "v2",
                  loader_args: Optional[Dict[str, Any]] = None,
-                 extensions: Optional[Tuple[str, ...]] = ("mp4", "avi"),
+                 extensions: Optional[Tuple[str, ...]] = ("mp4", "avi", "pt"),
                  transforms: Optional[Callable] = None,
                  target_transforms: Optional[Callable] = None,
                  device: str = "cpu",
@@ -39,7 +39,7 @@ class VideoFolderDataset(DatasetFolder):
         """
         assert os.path.isdir(root), NotADirectoryError
         assert loader in video_loader.keys(), NotImplementedError
-        assert set(extensions) <= {"mp4", "avi"}, "Currently only supports mp4 video"
+        assert set(extensions) <= {"mp4", "avi", "pt"}, "Currently only supports mp4 video"
         assert device in ("cpu", "cuda"), "Currently only supports cpu/ cuda device"
 
         loader: Callable = video_loader[loader]

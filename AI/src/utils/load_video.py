@@ -1,7 +1,8 @@
-import torch
-
+import os
+import pathlib
 from typing import Tuple, Dict, Callable
 
+import torch
 import torchaudio
 
 
@@ -99,7 +100,14 @@ def v2(path: str,
     video: torch.Tensor | None = None
     for chunk in stream_reader.stream():
         frames = chunk[0]
-        frames = _yuv_to_rgb(frames)  # read frames is in YUV444P format
+
+        # read frames is in YUV444P format
+        try:
+            frames = _yuv_to_rgb(frames)
+        except torch.cuda.OutOfMemoryError:
+            frames = _yuv_to_rgb(frames.to("cpu"))
+
+        frames = frames.to("cpu")
         video = frames if video is None else torch.vstack([video, frames])
     return video
 
@@ -117,10 +125,12 @@ def v3(path: str):
 
 def v4(path: str) -> torch.Tensor:
     """
-    Create pseudo-tensor for dev stage
+    Load video in .pt format
     """
-    pseudo_tensor: torch.Tensor = torch.rand(32, 3, 30, 224, 224)
-    return pseudo_tensor
+    path = pathlib.Path(path)
+    assert os.path.isfile(path), ValueError(f"Invalid path, Get {path}")
+    assert path.suffix == ".pt", ValueError(f"Invalid file extension, Get {path}")
+    return torch.load(path)
 
 
 def v5(path: str) -> torch.Tensor:

@@ -20,7 +20,7 @@ class VideoPreprocessor(object):
 
     __filters: Dict[str, Dict[str, Any]] = {
         "fps": {"fps": 25, "round": "up"},
-        "scale": {"w": 256, "h": 256, "sws_flags": "lanczos"},
+        "scale": {"w": 320, "h": 320, "sws_flags": "neighbor"},
         "crop": {"out_w": 224, "out_h": 224, "exact": 1, "keep_aspect": 1},
     }
 
@@ -41,6 +41,7 @@ class VideoPreprocessor(object):
         self.__num_frames: int = num_frames
         self.__filters = filters or self.__filters
         os.makedirs((pathlib.Path(self.__spath)).parent, exist_ok=True)
+
 
     @property
     def fpath(self) -> str:
@@ -66,33 +67,35 @@ class VideoPreprocessor(object):
         spath: str = f"{os.sep}".join(path_components)
         return spath
 
-    def _preprocess(self) -> None:
+    def stage_one(self,
+                  is_labeled: bool,
+                  run_async: bool = False
+                  ) -> None:
         """
-        Preprocess includes:
+        Stage one includes:
             a/ Resampling video with specified fps
             b/ Rescale frame
             c/ Central crop frame
             d/ Save video stream as output
         """
-        probe_info: Dict[str, Any] = ffmpeg.probe(self.fpath)
+        if is_labeled:
+            self.__filters.pop("fps", None)
 
-        if self.__device == "cuda":
-            stream = ffmpeg.input(self.__fpath, hwaccel="cuda")[(self._find_video_stream(probe_info["streams"]))]
-        else:
-            stream = ffmpeg.input(self.__fpath)[(self._find_video_stream(probe_info["streams"]))]
+        probe_info: Dict[str, Any] = ffmpeg.probe(self.fpath)
+        stream = self._find_video_stream(probe_info["streams"])
+
+        stream = ffmpeg.input(self.__fpath, hwaccel="cuda")[stream] if self.__device == "cuda" else \
+            ffmpeg.input(self.__fpath)[stream]
 
         for filter_name, kwargs in self.__filters.items():
             stream = stream.filter(filter_name, **kwargs)
 
-        stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="quiet")
+        stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="error")
         stream = stream.overwrite_output()
-        stream.run()
 
-        if self.__device == "cuda":
-            gc.collect()
-            torch.cuda.empty_cache()
+        stream.run_async() if run_async else stream.run()
 
-    def _sampling_and_convert_tensor(self):
+    def stage_two(self, del_prev_result: bool = False) -> None:
         """
         Split video into segments and perform sampling by interpolation
         """
@@ -115,21 +118,21 @@ class VideoPreprocessor(object):
             inter_mode = "nearest-exact" if indices.shape[0] > self.__num_frames else "trilinear"
             frames = torch.nn.functional.interpolate(
                 frames.type(torch.float32) if inter_mode == "trilinear" else frames,
-                self.__num_frames,
+                (self.__num_frames, *frames.shape[-2:]),
                 mode=inter_mode
                 )
+            frames = frames.type(torch.uint8)
 
             segments = frames if segments is None else torch.vstack((segments, frames))
 
-            if self.__device == "cuda":
-                gc.collect()
-                torch.cuda.empty_cache()
-
         extension: str = pathlib.Path(self.spath).name.split(".")[-1]
         torch.save(segments, self.spath.replace(extension, "pt"))
-        os.remove(self.__spath)
-        return None
 
-    def __call__(self) -> None:
-        self._preprocess()
-        self._sampling_and_convert_tensor()
+        if del_prev_result:
+            os.remove(self.__spath)
+
+        if self.__device == "cuda":
+            del video
+            gc.collect()
+            torch.cuda.empty_cache()
+        return None

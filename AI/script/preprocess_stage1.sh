@@ -1,10 +1,14 @@
 #!/bin/sh
-python3 ../src/tools/preprocess_video.py \
+# Run in alienware
+python3 ../src/tools/preprocess.py\
   --device both \
-  --processes 16 \
-  --batch_size 16 \
-  --root ../dataset/ubi-fight \
-  --save_root ../dataset/out
+  --processes 32 \
+  --batch_size 32 \
+  --root /home/trong/Downloads/Dataset/VAD/iitb \
+  --cpu_ratio 0.6 \
+  --save_root out \
+  --run_async true \
+  --fn_name stage_one
 
 
 # Run in Vostro
@@ -13,4 +17,3 @@ python3 ../src/tools/preprocess_video.py \
 #   --batch_size 16 \
 #   --root /media/trong/Backup/Dataset/VAD/iitb \
 #   --save_root /media/trong/Backup/Dataset/VAD/out
-
