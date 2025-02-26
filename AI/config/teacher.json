@@ -29,7 +29,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "../../dataset/iitb/unlabeled/",
+                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/unlabeled",
                 "loader": "v4",
                 "transforms": null,
                 "target_transforms": null
@@ -53,7 +53,8 @@
             "dataset":
             {
                 "name": "VADFrameLevelDataset",
-                "annotation": "../../dataset/ucf-test/unlabeled/label.csv",
+                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/labeled",
+                "annotation": "label.csv",
                 "loader": "v4",
                 "transforms": null,
                 "target_transforms": null
@@ -61,16 +62,13 @@
 
             "dataloader":
             {
-                "name": "VADVideoLevelDataLoader",
-                "batch_size": 5,
-                "shuffle": true,
-                "method": 1,
-                "num_workers": 4,
-                "prefetch_factor": 2,
-                "persistent_workers": false
+                "name": "DefaultDataLoader",
+                "batch_size": 1,
+                "shuffle": false,
             },
             "forward_strategy": "v1"
         },
+
         /////////////////////////////////////////////////////////
         "test": {
             "dataset":{},

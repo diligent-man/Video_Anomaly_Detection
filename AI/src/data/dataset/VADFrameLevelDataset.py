@@ -1,15 +1,14 @@
 import os
 import inspect
 import functools
-from typing import Optional, Callable, Any, Tuple, Dict
-
+from typing import Optional, Callable, Any, Tuple, Dict, List
 
 import torch
+import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
 
-
-from AI.src.utils import video_loader
+from ...utils import video_loader
 
 
 __all__ = ["VADFrameLevelDataset"]
@@ -49,32 +48,24 @@ class VADFrameLevelDataset(Dataset):
     def __len__(self):
         return len(self.__annotation)
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         fpath: str = self.__annotation["path"][idx]
         fpath: str = os.path.join(self.__root, fpath)
 
-        inp: torch.Tensor = self.__loader(fpath)
-        print(inp.shape)
+        frames: torch.Tensor = self.__loader(fpath)  # [T, H, W, C]
+        frames = frames.permute(0, -1, 1, 2)
 
-from AI.src.data.dataloader import DefaultDataLoader
+        labels: torch.Tensor = torch.zeros(frames.shape[0], dtype=torch.uint8, device=frames.device)
+        labeled_indices: List[np.int64] = self.__annotation.iloc[idx, self.__annotation.columns != "path"].to_list()
+        for i in range(0, len(labeled_indices), 2):
+            start, end = labeled_indices[i: i+2]
 
+            if (start, end) != (-1, -1):
+                labels[start: end+1] = 1
 
-def main() -> None:
-    ds = VADFrameLevelDataset(
-        "/home/trong/Downloads/Dataset/VAD/iitb_tensor/labeled",
-        "label.csv",
-        "v4"
-    )
+        if self.__transforms is not None:
+            frames = self.__transforms(frames)
 
-    next(iter(ds))
-
-    # dl = DefaultDataLoader(ds, 1, False)
-    # print(ds)
-    # inps, labels = next(iter(dl))
-    # print(inps.shape, labels.shape)
-    # next(dl.__iter__())
-    return None
-
-
-if __name__ == '__main__':
-    main()
+        if self.__target_transforms is not None:
+            labels = self.__target_transforms(labels)
+        return frames, labels
