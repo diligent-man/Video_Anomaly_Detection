@@ -130,7 +130,7 @@ def v4(path: str) -> torch.Tensor:
     path = pathlib.Path(path)
     assert os.path.isfile(path), ValueError(f"Invalid path, Get {path}")
     assert path.suffix == ".pt", ValueError(f"Invalid file extension, Get {path}")
-    return torch.load(path)
+    return torch.load(path, weights_only=True)
 
 
 def v5(path: str) -> torch.Tensor:

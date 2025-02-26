@@ -2,8 +2,8 @@
 # Run in alienware
 python3 ../src/tools/preprocess.py\
   --device cuda \
-  --processes 18 \
-  --batch_size 18 \
+  --processes 8 \
+  --batch_size 8 \
   --root /home/trong/Downloads/Dataset/VAD/iitb \
   --cpu_ratio 0.25 \
   --save_root out \

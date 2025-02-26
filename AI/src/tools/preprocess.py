@@ -72,8 +72,17 @@ def stage_two(args: Namespace, dl: DataLoader, ds_name: str) -> None:
                 30
             ), *(fpaths, devices))
         )
-        pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), preprocessors)
+
+        # Due to insufficient RAM
+        is_labeled_processors: List[VideoPreprocessor] = [preprocessor for preprocessor in preprocessors if preprocessor.is_label]
+        not_is_labeled_processors: List[VideoPreprocessor] = [preprocessor for preprocessor in preprocessors if not preprocessor.is_label]
+
+        pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), is_labeled_processors)
+        pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), not_is_labeled_processors)
     return None
+
+
+def stage_three():
 
 
 def main(args: Namespace) -> None:

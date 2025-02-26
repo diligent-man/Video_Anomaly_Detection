@@ -54,15 +54,14 @@ class VADFrameLevelDataset(Dataset):
         fpath: str = os.path.join(self.__root, fpath)
 
         inp: torch.Tensor = self.__loader(fpath)
-
-
+        print(inp.shape)
 
 from AI.src.data.dataloader import DefaultDataLoader
 
 
 def main() -> None:
     ds = VADFrameLevelDataset(
-        "../../../dataset/iitb_out/labeled",
+        "/home/trong/Downloads/Dataset/VAD/iitb_tensor/labeled",
         "label.csv",
         "v4"
     )

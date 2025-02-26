@@ -1,9 +1,8 @@
-
 def main() -> None:
-    
-    
-    return None
+    # Your code
 
+
+    return None
 
 if __name__ == '__main__':
     main()
