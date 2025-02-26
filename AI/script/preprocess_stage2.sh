@@ -2,11 +2,12 @@
 # Run in alienware
 python3 ../src/tools/preprocess.py\
   --device cuda \
-  --processes 16 \
-  --batch_size 16 \
+  --processes 18 \
+  --batch_size 18 \
   --root /home/trong/Downloads/Dataset/VAD/iitb \
+  --cpu_ratio 0.25 \
   --save_root out \
-  --del_prev_result false \
+  --del_prev_result true \
   --fn_name stage_two
 
 

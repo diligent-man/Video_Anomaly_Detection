@@ -40,6 +40,7 @@ class VideoPreprocessor(object):
         self.__num_segments: int = num_segments
         self.__num_frames: int = num_frames
         self.__filters = filters or self.__filters
+        self.__is_labeled: bool = self._is_labeled(dataset_name)
         os.makedirs((pathlib.Path(self.__spath)).parent, exist_ok=True)
 
     @property
@@ -49,6 +50,14 @@ class VideoPreprocessor(object):
     @property
     def spath(self) -> str:
         return self.__spath
+
+    def _is_labeled(self, ds_name: str) -> bool:
+        flag: bool = False
+        path_components: List[str] = self.__fpath.split(os.sep)
+
+        if path_components[path_components.index(ds_name) + 1] == "labeled":
+            flag = not flag
+        return flag
 
     def _find_video_stream(self, streams: Dict[str, Any]) -> str:
         stream: Dict[str, Any]
@@ -66,10 +75,7 @@ class VideoPreprocessor(object):
         spath: str = f"{os.sep}".join(path_components)
         return spath
 
-    def stage_one(self,
-                  is_labeled: bool,
-                  run_async: bool = False
-                  ) -> None:
+    def stage_one(self, run_async: bool = False) -> None:
         """
         Stage one includes:
             a/ Resampling video with specified fps
@@ -77,7 +83,7 @@ class VideoPreprocessor(object):
             c/ Central crop frame
             d/ Save video stream as output
         """
-        if is_labeled:
+        if self.__is_labeled:
             self.__filters.pop("fps", None)
 
         probe_info: Dict[str, Any] = ffmpeg.probe(self.fpath)
@@ -94,7 +100,9 @@ class VideoPreprocessor(object):
 
         stream.run_async() if run_async else stream.run()
 
-    def stage_two(self, del_prev_result: bool = False) -> None:
+    def stage_two(self,
+                  del_prev_result: bool = False
+                  ) -> None:
         """
         Stage two includes:
             a/ Split video into segments
@@ -102,37 +110,40 @@ class VideoPreprocessor(object):
             c/ Save video stream as .pt file
          and
         """
-        segments: None | torch.Tensor = None
         video: torch.Tensor = v2(self.__spath, device=self.__device)  # [T,H,W,C] in cpu device
 
         total_frames: int = video.shape[0]
         seg_start_idx: torch.Tensor = torch.linspace(0, total_frames, self.__num_segments).clamp(0, total_frames).int()
 
-        for i in range(0, len(seg_start_idx)-1):
-            start, end = seg_start_idx[i].item(), seg_start_idx[i + 1].item()
+        save_tensor: None | torch.Tensor = None
+        if not self.__is_labeled:
+            for i in range(0, len(seg_start_idx)-1):
+                start, end = seg_start_idx[i].item(), seg_start_idx[i + 1].item()
 
-            indices: torch.Tensor = torch.arange(start, end, device=video.device)
-            inter_mode = "nearest-exact" if indices.shape[0] > self.__num_frames else "trilinear"
+                indices: torch.Tensor = torch.arange(start, end, device=video.device)
+                inter_mode = "nearest-exact" if indices.shape[0] > self.__num_frames else "trilinear"
 
-            frames: torch.Tensor = torch.index_select(video, 0, indices)
+                frames: torch.Tensor = torch.index_select(video, 0, indices)
 
-            try:
-                frames = frames.to(self.__device).permute(-1, 0, 1, 2).unsqueeze(0)
-            except torch.cuda.OutOfMemoryError:
-                frames = frames.permute(-1, 0, 1, 2).unsqueeze(0)
+                try:
+                    frames = frames.to(self.__device).permute(-1, 0, 1, 2).unsqueeze(0)
+                except torch.cuda.OutOfMemoryError:
+                    frames = frames.permute(-1, 0, 1, 2).unsqueeze(0)
 
-            frames = torch.nn.functional.interpolate(
-                frames.type(torch.float32) if inter_mode == "trilinear" else frames,
-                (self.__num_frames, *frames.shape[-2:]),
-                mode=inter_mode
-                )
-            frames = frames.to("cpu").type(torch.uint8)
+                frames = torch.nn.functional.interpolate(
+                    frames.type(torch.float32) if inter_mode == "trilinear" else frames,
+                    (self.__num_frames, *frames.shape[-2:]),
+                    mode=inter_mode
+                    )
+                frames = frames.to("cpu").type(torch.uint8)
 
-            segments = frames if segments is None else torch.vstack((segments, frames))
+                save_tensor = frames if save_tensor is None else torch.vstack((save_tensor, frames))
+        else:
+            save_tensor = video
 
         extension: str = pathlib.Path(self.spath).name.split(".")[-1]
-        torch.save(segments, self.spath.replace(extension, "pt"))
-        torch.serialization.add_safe_globals([segments])
+        torch.save(save_tensor, self.spath.replace(extension, "pt"))
+        torch.serialization.add_safe_globals([save_tensor])
 
         if del_prev_result:
             os.remove(self.__spath)

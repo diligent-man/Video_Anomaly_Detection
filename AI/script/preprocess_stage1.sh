@@ -2,10 +2,10 @@
 # Run in alienware
 python3 ../src/tools/preprocess.py\
   --device both \
-  --processes 32 \
-  --batch_size 32 \
+  --processes 18 \
+  --batch_size 18 \
   --root /home/trong/Downloads/Dataset/VAD/iitb \
-  --cpu_ratio 0.6 \
+  --cpu_ratio 0.5 \
   --save_root out \
   --run_async true \
   --fn_name stage_one

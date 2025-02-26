@@ -24,15 +24,6 @@ def _custom_collate_fn(batch) -> List[str]:
     return paths
 
 
-def _is_labeled(fpath: str, ds_name: str) -> bool:
-    flag: bool = False
-    path_components: List[str] = fpath.split(os.sep)
-
-    if path_components[path_components.index(ds_name) + 1] == "labeled":
-        flag = not flag
-    return flag
-
-
 def stage_one(args: Namespace, dl: DataLoader, ds_name: str) -> None:
     pool: Pool = Pool(processes=args.processes)
 
@@ -54,8 +45,7 @@ def stage_one(args: Namespace, dl: DataLoader, ds_name: str) -> None:
             ), *(fpaths, devices))
         )
 
-        iterables = [(preprocessor, args.del_prev_result) for preprocessor in preprocessors]
-        pool.starmap(VideoPreprocessor.stage_two, iterables)
+        pool.map(partial(VideoPreprocessor.stage_one, run_async=args.run_async), preprocessors)
 
         if args.run_async:
             time.sleep(5)
@@ -82,8 +72,8 @@ def stage_two(args: Namespace, dl: DataLoader, ds_name: str) -> None:
                 30
             ), *(fpaths, devices))
         )
-
         pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), preprocessors)
+    return None
 
 
 def main(args: Namespace) -> None:
