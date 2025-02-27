@@ -27,12 +27,12 @@ class DotDict(dict):
         if not isinstance(in_dict, dict):
             raise ValueError(f"Incorrect input type: {type(in_dict)}")
 
-        self._key_error_handling: str = kwargs.get("key_error_handling", "raise")
         self._depth: int = depth
+        self._key_error_handling: str = kwargs.get("key_error_handling", "raise")
         super(DotDict, self).__init__()
 
         for k, v in in_dict.items():
-            k: str = self._preprocess_key(k, depth, kwargs.get("capitalize_first_level_key", True))
+            k: str = self._preprocess_key(k, depth, kwargs.get("capitalize_first_level_key", True if depth == 0 else False))
 
             if isinstance(v, (list, tuple, set)):
                 v = self._remove_duplicated_dicts(v)
@@ -47,7 +47,8 @@ class DotDict(dict):
             #     if not (k.startswith("_") or k.startswith("__")):
             #         return_dict[k] = v
             # return return_dict
-            return self[k]
+            # print(self._preprocess_key(k, self._depth), self._depth)
+            return self[self._preprocess_key(k, self._depth-1)]
         except KeyError as e:
             if self._key_error_handling == "raise":
                 raise e
@@ -72,10 +73,10 @@ class DotDict(dict):
         return DotDict(copy.deepcopy(dict(self), memo=memo))
 
     @staticmethod
-    def _preprocess_key(k: str, depth: int, capitalize_first_level_key: bool) -> str:
+    def _preprocess_key(k: str, depth: int, capitalize_first_level_key: bool = False) -> str:
         k = k.replace("-", "_")
         k = k.replace(" ", "_")
-        k = k.lower() if depth > 0 and capitalize_first_level_key else k.capitalize()
+        k = k.capitalize() if capitalize_first_level_key or depth == 0 else k
         return k
 
     @staticmethod

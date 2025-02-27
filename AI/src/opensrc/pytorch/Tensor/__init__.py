@@ -1,3 +1,3 @@
-from .dtype import available_dtype
+from .dtype import DTYPES
 
-__all__ = ["available_dtype"]
+__all__ = ["DTYPES"]

@@ -1,5 +1,5 @@
 import inspect
-from typing import Dict, Callable, Any, Union
+from typing import Dict, Callable, Any, Union, KeysView
 
 
 import torch
@@ -19,13 +19,13 @@ class BatchForwarder(object):
     """
     Forward model on a mini-batch manner. This class can be used in train/ val/ test phases
     """
-    __epochs: int
-    __cur_epoch: int
+    __epochs: None | int
+    __cur_epoch: None | int
 
     def __init__(self,
-                 epochs: int,
-                 cur_epoch: int,
-                 device: str
+                 epochs: int = None,
+                 cur_epoch: int = None,
+                 device: str = "cpu"
                  ) -> None:
         self.__epochs: int = epochs
         self.__cur_epoch: int = cur_epoch
@@ -51,19 +51,22 @@ class BatchForwarder(object):
         assert forward_strategy in FORWARD_STRATEGIES.keys(), ValueError(f"Selected strategy '{forward_strategy}' is not supported")
 
         forward_callable: Callable = FORWARD_STRATEGIES[forward_strategy]
+        callable_params: KeysView = inspect.signature(forward_callable).parameters.keys()
+
         kwargs: Dict[str, Any] = {
             "instance": instance, "phase": phase, "epochs": self.__epochs, "cur_epoch": self.__cur_epoch,
             "grad_ctx_manager": torch.set_grad_enabled(phase == "train") if phase in ("train", "val") else torch.inference_mode(),
             "model": model, "dataloader": dataloader, "loss": loss, "metrics": metrics,
             "amp_cfg": amp_cfg, "grad_scaler": grad_scaler, "device": self.__device
         }
+
         if phase == "train":
             model.train()
             kwargs["optim"] = optim
 
-            if "scheduler" in inspect.signature(forward_callable).parameters.keys():
+            if "scheduler" in callable_params:
                 kwargs["scheduler"] = scheduler
         else:
             model.eval()
 
-        forward_callable(**kwargs)
+        forward_callable(**{k: kwargs[k] for k in callable_params})

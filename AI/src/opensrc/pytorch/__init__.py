@@ -8,9 +8,7 @@ from .optim import (
     available_lr_scheduler
 )
 
-from .Tensor import (
-    available_dtype
-)
+from .Tensor import DTYPES
 
 __all__ = [
     "available_loss",

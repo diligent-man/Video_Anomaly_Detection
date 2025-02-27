@@ -1,3 +1,4 @@
+from typing import Dict, Any
 from torch import (
     complex64,
     complex128,
@@ -14,7 +15,7 @@ from torch import (
     int64,
 )
 
-available_dtype = {
+DTYPES: Dict[str, Any] = {
     "complex64": complex64,
     "complex128": complex128,
 
@@ -29,3 +30,5 @@ available_dtype = {
     "int32": int32,
     "int64": int64
 }
+
+__all__ = ["DTYPES"]

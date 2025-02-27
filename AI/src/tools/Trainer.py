@@ -109,7 +109,6 @@ class Trainer(object):
 
     def run_callbacks(self, event: str, *args, **kwargs) -> None:
         """Run all existing callbacks associated with a particular event."""
-        print(event)
         for callback in self.__callbacks.get(event, []):
             callback(self, *args, **kwargs)
 

@@ -57,6 +57,38 @@ def v1(instance: Union[Trainer],
     for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Foward v2, Phase: {phase}, Epoch: {cur_epoch+1}"):
         inps: Tensor
 
+        print(inps.shape)
+        from torchvision.transforms import v2, Compose, InterpolationMode
+        compose = Compose([
+            v2.ToDtype(torch.float32, scale=True),
+            v2.RandomHorizontalFlip(),
+            v2.RandomResizedCrop((224, 224), (.5, 1),  interpolation=InterpolationMode.NEAREST, antialias=True),
+            v2.RandomResizedCrop((224, 224), (1., 1.5),  interpolation=InterpolationMode.BICUBIC, antialias=True),
+            v2.RandomRotation((-90, 90), InterpolationMode.NEAREST, False),
+
+            Permute((0, 1, 3, 2, 4, 5)),
+            # v2.ColorJitter(.5, .5, .5, .25),
+
+            v2.RandomGrayscale(.5),
+            v2.GaussianBlur((3, 3), (.1, 2)),
+            Permute((0, 1, 3, 2, 4, 5))
+        ])
+
+        inps = compose(inps)
+        print(inps.shape)
+
+
+
+
+
+
+
+
+
+
+
+
+
         if phase == "train":
             optim.zero_grad()
 

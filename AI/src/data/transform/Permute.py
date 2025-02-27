@@ -1,0 +1,28 @@
+from typing import Tuple
+
+import torch
+
+__all__ = ["Permute"]
+
+
+class Permute(torch.nn.Module):
+    """
+    Permutes the dimensions of a video.
+    """
+    def __init__(self, dims: Tuple[int]):
+        """
+        :param dims (Tuple[int]): The desired ordering of dimensions.
+        """
+        assert (
+            (d in dims) for d in range(len(dims))
+        ), "dims must contain every dimension (0, 1, 2, ...)"
+
+        super().__init__()
+        self._dims = dims
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            x (torch.Tensor): video tensor whose dimensions are to be permuted.
+        """
+        return x.permute(*self._dims)

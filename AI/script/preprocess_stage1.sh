@@ -4,10 +4,10 @@ python3 ../src/tools/preprocess.py\
   --device both \
   --processes 18 \
   --batch_size 18 \
-  --root /home/trong/Downloads/Dataset/VAD/iitb \
+  --root /home/trong/Downloads/Dataset/VAD/ubi-fight \
   --cpu_ratio 0.5 \
   --save_root out \
-  --run_async true \
+  --run_async false \
   --fn_name stage_one
 
 
