@@ -64,7 +64,7 @@ class DotDict(dict):
             raise AttributeError(f"{self.__class__.__name__} object has no attribute '{k}'")
 
     def __deepcopy__(self, memo=None) -> object:
-        new_obj: DotDict = type(self)(self)  # Other syntax: self.__class__.__new__(self.__class__)
+        new_obj: DotDict = type(self)({})  # Other syntax: self.__class__.__new__(self.__class__)
         memo[id(self)] = new_obj
 
         for k, v in self.items():

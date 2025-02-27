@@ -32,7 +32,7 @@ def main(args: argparse.Namespace) -> None:
     config: DotDict = ConfigReader(args.config).config
 
     from pprint import pprint as pp
-    pp(copy.deepcopy(config))
+    pp(copy.deepcopy(config).Data)
     # train_dataloader = build_dataloader(copy.deepcopy(config), "train")
     # val_dataloader = build_dataloader(copy.deepcopy(config), "val")
     #
