@@ -150,7 +150,6 @@ def build_transforms(transforms: Dict[str, Dict] = None) -> Compose:
     if transforms is not None:
         # Verify transformation
         for transform in transforms.keys():
-            print(transform)
             assert transform in TRANSFORMS.keys(), "Your selected transform method is unavailable"
 
             # Verify interpolation mode & replace str name to its corresponding func

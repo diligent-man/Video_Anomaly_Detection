@@ -16,7 +16,7 @@ def build_dataloader(config: DotDict,
                      mode: str
                      ) -> DataLoader:
     from pprint import pprint as pp
-    pp(config.Data.Train)
+    pp(config.Data["train"])
     dataset_name: str = config.Data[mode].dataset.pop("name")
     dataloader_name: str = config.Data[mode].dataloader.pop("name")
 

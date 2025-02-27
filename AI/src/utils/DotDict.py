@@ -19,7 +19,7 @@ class DotDict(dict):
                  in_dict: Dict[str, Any],
                  depth: int = 0,
                  **kwargs
-                 ):
+                 ) -> None:
         """
         :param in_dict: input dictionary
         :param key_error_handling: ["raise" | "warn"]
@@ -42,12 +42,6 @@ class DotDict(dict):
 
     def __getattr__(self, k: str) -> Any:
         try:
-            # return_dict = {}
-            # for k, v in self[k].items():
-            #     if not (k.startswith("_") or k.startswith("__")):
-            #         return_dict[k] = v
-            # return return_dict
-            # print(self._preprocess_key(k, self._depth), self._depth)
             return self[self._preprocess_key(k, self._depth-1)]
         except KeyError as e:
             if self._key_error_handling == "raise":
@@ -69,8 +63,13 @@ class DotDict(dict):
         except KeyError:
             raise AttributeError(f"{self.__class__.__name__} object has no attribute '{k}'")
 
-    def __deepcopy__(self, memo=None):
-        return DotDict(copy.deepcopy(dict(self), memo=memo))
+    def __deepcopy__(self, memo=None) -> object:
+        new_obj: DotDict = type(self)(self)  # Other syntax: self.__class__.__new__(self.__class__)
+        memo[id(self)] = new_obj
+
+        for k, v in self.items():
+            setattr(new_obj, k, copy.deepcopy(v, memo))
+        return new_obj
 
     @staticmethod
     def _preprocess_key(k: str, depth: int, capitalize_first_level_key: bool = False) -> str:
@@ -96,7 +95,7 @@ class DotDict(dict):
         else:
             return False
 
-    # Note: being duplicated with get_dict. Fix later on
+    # TODO: being duplicated with get_dict. Fix later on
     def _parse_dict(self, in_dict: Dict[str, Any]) -> Dict[str, Any]:
         parsed_dict: Dict[str, Any] = {}
 
