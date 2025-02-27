@@ -1,7 +1,4 @@
-from typing import Any, Dict
-
-from torchvision.transforms import Compose
-from torchvision.transforms import InterpolationMode
+from typing import Dict, List, Callable
 from torchvision.transforms.v2 import (
     # Color
     ColorJitter,
@@ -58,15 +55,19 @@ from torchvision.transforms.v2 import (
     ToImage,
     ToPILImage,
     ToPureTensor,
-    ToTensor
+    ToTensor,
+
+    # Misc
+    Compose,
+    Transform,
+    InterpolationMode
 )
 
 from .Permute import Permute
-
 from ...opensrc.pytorch.Tensor import DTYPES
 
 
-TRANSFORMS: Dict[str, Any] = {
+TRANSFORMS: Dict[str, Callable] = {
     # Color
     "ColorJitter": ColorJitter,
     "Grayscale": Grayscale,
@@ -129,10 +130,10 @@ TRANSFORMS: Dict[str, Any] = {
 }
 
 
-__all__ = ["build_transforms"]
+__all__ = ["build_transform"]
 
 
-INTERPOLATIONS: Dict[str, Any] = {
+INTERPOLATIONS: Dict[str, InterpolationMode] = {
     "NEAREST": InterpolationMode.NEAREST,
     "NEAREST_EXACT": InterpolationMode.NEAREST_EXACT,
     "BILINEAR": InterpolationMode.BILINEAR,
@@ -145,26 +146,40 @@ INTERPOLATIONS: Dict[str, Any] = {
 }
 
 
-def build_transforms(transforms: Dict[str, Dict] = None) -> Compose:
-    compose: Compose = Compose([])
-    if transforms is not None:
-        # Verify transformation
-        for transform in transforms.keys():
-            assert transform in TRANSFORMS.keys(), "Your selected transform method is unavailable"
+def _preprocess_duplicate(transform: str) -> str:
+    """
+    :param transform: name of transform with/ without suffix for repetition
+    :return: preprocessed transform
+    """
+    if "_" in transform:
+        transform = transform.split("_")[0]
+    return transform
 
-            # Verify interpolation mode & replace str name to its corresponding func
-            if transform in ("Resize", "RandomRotation"):
-                assert transforms[transform]["interpolation"] in INTERPOLATIONS.keys(), "Your selected interpolation mode in unavailable"
-                transforms[transform]["interpolation"] = INTERPOLATIONS[transforms[transform]["interpolation"]]
 
-            # Verify dtype & replace str name to its corresponding func
-            if transform in ("ToDtype"):
-                assert transforms[transform]["dtype"] in DTYPES.keys(), "Your selected dtype in unavailable"
-                transforms[transform]["dtype"] = DTYPES[transforms[transform]["dtype"]]
+def build_transform(transform_cfg: None | Dict[str, Dict] = None) -> None | Compose:
+    if len(transform_cfg.keys()) == 0 or transform_cfg is None:
+        return None
 
-            # if transform in ("Lambda"):
-            #     assert transforms[transform]["lambd"] in available_callable.keys(), "Your selected callable in unavailable"
-            #     transforms[transform]["lambd"] = available_callable[transforms[transform]["lambd"]]
+    # Verify & init transformation
+    compose: List[Transform] = []
+    for transform, args in transform_cfg.items():
+        transform: str = _preprocess_duplicate(transform)
+        assert transform in TRANSFORMS.keys(), "Your selected transform method is unavailable"
 
-        compose = Compose([TRANSFORMS[transform](**args) for transform, args in transforms.items()])
+        # Verify interpolation mode & replace str name to its corresponding func
+        if transform in ("Resize", "RandomRotation"):
+            assert transform_cfg[transform]["interpolation"] in INTERPOLATIONS.keys(), "Your selected interpolation mode in unavailable"
+            transform_cfg[transform]["interpolation"] = INTERPOLATIONS[transform_cfg[transform]["interpolation"]]
+
+        # Verify dtype & replace str name to its corresponding func
+        if transform in "ToDtype":
+            assert transform_cfg[transform]["dtype"] in DTYPES.keys(), "Your selected dtype in unavailable"
+            transform_cfg[transform]["dtype"] = DTYPES[transform_cfg[transform]["dtype"]]
+
+        # TODO: Add transform for lambda fn
+        # if transform in ("Lambda"):
+        #     assert transforms[transform]["lambd"] in available_callable.keys(), "Your selected callable in unavailable"
+        #     transforms[transform]["lambd"] = available_callable[transforms[transform]["lambd"]]
+        compose.append(TRANSFORMS[transform](**args))
+    compose: Compose = Compose(compose)
     return compose

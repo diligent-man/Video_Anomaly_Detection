@@ -24,8 +24,8 @@ class VideoDataset(Dataset):
                  loader: str = "v2",
                  loader_args: Optional[Dict[str, Any]] = None,
                  extensions: Optional[Tuple[str, ...]] = ("mp4", "avi"),
-                 transforms: Optional[Callable] = None,
-                 target_transforms: Optional[Callable] = None,
+                 transform: Optional[Callable] = None,
+                 target_transform: Optional[Callable] = None,
                  device: str = "cpu",
                  return_device: str = "cpu",
                  target: Optional[Any] = None
@@ -56,8 +56,8 @@ class VideoDataset(Dataset):
 
         self.__root: str = root
         self.__loader: Callable = functools.partial(loader, **loader_args)
-        self.__transforms: Optional[Callable] = transforms
-        self.__target_transforms: Optional[Callable] = target_transforms
+        self.__transform: Optional[Callable] = transform
+        self.__target_transform: Optional[Callable] = target_transform
         self.__return_device: str = return_device
         self.__target: Optional[Any] = target
 
@@ -69,11 +69,11 @@ class VideoDataset(Dataset):
         video_path: str = os.path.join(self.__root, os.listdir(self.__root)[index])
         sample: torch.Tensor = self.__loader(video_path)
 
-        if self.__transforms is not None:
-            sample: torch.Tensor = self.__transforms(sample)
+        if self.__transform is not None:
+            sample: torch.Tensor = self.__transform(sample)
 
-        if self.__target_transforms is not None:
-            target: torch.Tensor = self.__target_transforms(self.__target)
+        if self.__target_transform is not None:
+            target: torch.Tensor = self.__target_transform(self.__target)
         else:
             target: Any = self.__target
 
@@ -92,8 +92,8 @@ class VideoDataset(Dataset):
 
         body += self._extra_repr().splitlines()
 
-        if hasattr(self, "transforms") and self.__transforms is not None:
-            body += [repr(self.transforms)]
+        if hasattr(self, "transform") and self.__transform is not None:
+            body += [repr(self.transform)]
 
         lines = [head] + [" " * self._repr_indent + line for line in body]
         return "\n".join(lines)

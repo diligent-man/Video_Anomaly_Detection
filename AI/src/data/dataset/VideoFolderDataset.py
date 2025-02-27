@@ -22,8 +22,8 @@ class VideoFolderDataset(DatasetFolder):
                  loader: str = "v2",
                  loader_args: Optional[Dict[str, Any]] = None,
                  extensions: Optional[Tuple[str, ...]] = ("mp4", "avi", "pt"),
-                 transforms: Optional[Callable] = None,
-                 target_transforms: Optional[Callable] = None,
+                 transform: Optional[Callable] = None,
+                 target_transform: Optional[Callable] = None,
                  device: str = "cpu",
                  return_device: str = "cpu"
                  ):
@@ -32,8 +32,8 @@ class VideoFolderDataset(DatasetFolder):
         :param loader: video loader api. Defaults to "v2"
         :param loader_args: arguments for video loader
         :param extensions: video extension
-        :param transforms: transform function for input video
-        :param target_transforms: transform function for label
+        :param transform: transform function for input video
+        :param target_transform: transform function for label
         :param device: device that used to load video
         :param return_device: device that used to return read video
         """
@@ -54,14 +54,14 @@ class VideoFolderDataset(DatasetFolder):
             root,
             partial(loader, **loader_args),
             extensions,
-            transforms,
-            target_transforms,
+            transform,
+            target_transform,
             None,
             True
         )
 
-        self.__transforms: Optional[Callable] = transforms
-        self.__target_transforms: Optional[Callable] = target_transforms
+        self.__transform: Optional[Callable] = transform
+        self.__target_transform: Optional[Callable] = target_transform
         self.__return_device: str = return_device
 
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, Any]:
@@ -98,7 +98,7 @@ class VideoFolderDataset(DatasetFolder):
             body.append(f"Root location: {self.root}")
         body += self.extra_repr().splitlines()
 
-        if hasattr(self, "transforms") and self.transforms is not None:
+        if hasattr(self, "transform") and self.transform is not None:
             body += [repr(self.transforms)]
         lines = [head] + [" " * self._repr_indent + line for line in body]
         return "\n".join(lines)

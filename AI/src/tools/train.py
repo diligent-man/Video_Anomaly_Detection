@@ -31,10 +31,8 @@ def main(args: argparse.Namespace) -> None:
     #
     config: DotDict = ConfigReader(args.config).config
 
-    from pprint import pprint as pp
-    pp(copy.deepcopy(config).Data)
-    # train_dataloader = build_dataloader(copy.deepcopy(config), "train")
-    # val_dataloader = build_dataloader(copy.deepcopy(config), "val")
+    train_dataloader = build_dataloader(copy.deepcopy(config), "train")
+    val_dataloader = build_dataloader(copy.deepcopy(config), "val")
     #
     # model: torch.nn.Module = build_model(copy.deepcopy(config))
     # optim, scheduler = build_optimizer(copy.deepcopy(config), model)

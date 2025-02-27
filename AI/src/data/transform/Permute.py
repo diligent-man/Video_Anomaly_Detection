@@ -1,11 +1,13 @@
 from typing import Tuple
 
 import torch
+from torchvision.transforms.v2 import Transform
+
 
 __all__ = ["Permute"]
 
 
-class Permute(torch.nn.Module):
+class Permute(Transform):
     """
     Permutes the dimensions of a video.
     """

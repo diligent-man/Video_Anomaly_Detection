@@ -1,20 +1,23 @@
 import os
 import inspect
 import functools
+
 from typing import Optional, Callable, Any, Tuple, Dict, List
+
 
 import torch
 import numpy as np
 import pandas as pd
-from torch.utils.data import Dataset
+
+# from torch.utils.data import Dataset
 
 from ...utils import video_loader
-
+from torchvision.datasets import VisionDataset
 
 __all__ = ["VADFrameLevelDataset"]
 
 
-class VADFrameLevelDataset(Dataset):
+class VADFrameLevelDataset(VisionDataset):
     _repr_indent = 4
 
     def __init__(self,
@@ -23,8 +26,8 @@ class VADFrameLevelDataset(Dataset):
                  loader: str = "v2",
                  loader_args: Optional[Dict[str, Any]] = None,
                  extensions: Optional[Tuple[str, ...]] = ("mp4", "avi", "pt"),
-                 transforms: Optional[Callable] = None,
-                 target_transforms: Optional[Callable] = None,
+                 transform: Optional[Callable] = None,
+                 target_transform: Optional[Callable] = None,
                  device: str = "cpu",
                  return_device: str = "cpu",
                  ) -> None:
@@ -32,6 +35,7 @@ class VADFrameLevelDataset(Dataset):
         assert loader in video_loader.keys(), NotImplementedError
         assert set(extensions) <= {"mp4", "avi", "pt"}, "Currently only supports mp4 video"
 
+        super(VADFrameLevelDataset, self).__init__(root, None, transform, target_transform)
         loader: Callable = video_loader[loader]
 
         if loader_args is None:
@@ -44,8 +48,6 @@ class VADFrameLevelDataset(Dataset):
         self.__loader: Callable = functools.partial(loader, **loader_args)
         self.__annotation_fname: str = annotation
         self.__annotation: pd.DataFrame = pd.read_csv(os.path.join(root, annotation))
-        self.__transforms: Optional[Callable] = transforms
-        self.__target_transforms: Optional[Callable] = target_transforms
         self.__return_device: str = return_device
 
     @staticmethod
@@ -70,11 +72,11 @@ class VADFrameLevelDataset(Dataset):
             if (start, end) != (-1, -1):
                 labels[start: end+1] = 1
 
-        if self.__transforms is not None:
-            frames = self.__transforms(frames)
+        if self.transform is not None:
+            frames = self.transform(frames)
 
-        if self.__target_transforms is not None:
-            labels = self.__target_transforms(labels)
+        if self.target_transform is not None:
+            labels = self.target_transform(labels)
         return frames, labels
 
     def __repr__(self):
@@ -84,10 +86,16 @@ class VADFrameLevelDataset(Dataset):
         head = "Dataset " + self.__class__.__name__ + " includes:"
 
         body = [f"Number of datapoints: {self.__len__()} ({num_anomaly} anomaly, {num_normal} normal)"]
-        body += [f"Root localtion: {self.__root}"]
+        body += [f"Root location: {self.__root}"]
         body += [f"Annotation: {self.__annotation_fname}"]
 
         body += self.extra_repr().splitlines()
+
+        if hasattr(self, "transform") and self.transform is not None:
+            body += self._format_transform_repr(self.transform, 'Transform: ')
+
+        if hasattr(self, "target_transform") and self.target_transform is not None:
+            body += self._format_transform_repr(self.target_transform, 'Target transform: ')
 
         lines = [head] + [" " * self._repr_indent + line for line in body]
         return "\n".join(lines)
