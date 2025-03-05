@@ -55,6 +55,7 @@ def v1(instance: Union[Trainer],
     lr: None | float = None
     cur_step: int = (cur_epoch - 1) * len(dataloader)
 
+    instance.run_callbacks(f"on_{phase}_epoch_start")
     for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Forward v2, Phase: {phase}, Epoch: {cur_epoch}"):
         inps: Tensor
 
@@ -93,14 +94,14 @@ def v1(instance: Union[Trainer],
             "lr": lr,
             "loss": batch_loss.item(),
         }
+
         instance.batch_output = BatchOutput(**batch_output)
 
         # Update step
         cur_step += 1
 
-        if i == 2:
-            break
         instance.run_callbacks(f"on_{phase}_batch_end")
+    instance.run_callbacks(f"on_{phase}_epoch_end")
 
 
 def v2(T_max: int = 50,

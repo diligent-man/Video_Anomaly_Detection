@@ -1,4 +1,5 @@
-from typing import Tuple
+import os
+from typing import Tuple, Any
 
 import torch
 
@@ -24,7 +25,7 @@ __all__ = [
 ]
 
 
-def on_train_routine_start(instance: Trainer):
+def on_train_routine_start(instance: Trainer) -> None:
     # Inspect model architecture
     inspect_model_arch: bool = instance.config.Global.get("inspect_model_arch", False)
     dummy_shape: None | Tuple[int, ...] = instance.config.Global.get("dummy_input_shape", None)
@@ -42,6 +43,18 @@ def on_train_routine_start(instance: Trainer):
             instance.config["Model_arch"] = model_arch
         except Exception as e:
             instance.config["Model_arch"] = f"Fail to inspect model architecture due to {e}"
+
+    # Resume trained ckpt
+    if instance.config.Checkpoint.get("load", False):
+        resume_name: str = instance.config.Global.resume_name
+        assert os.path.isfile(resume_name), FileNotFoundError
+
+        ckpt: Any = torch.load(f=resume_name, map_location="cpu")
+        instance.start_epoch = ckpt["epoch"] + 1
+        instance.cur_epoch = ckpt["epoch"] + 1
+        instance.model.load_state_dict(ckpt["model"].state_dict() if isinstance(ckpt["model"], torch.nn.Module) else ckpt["model"])
+        instance.optimizer.load_state_dict(ckpt["optimizer"])
+        del ckpt
 
 # def on_train_routine_end(trainer): pass
 # def on_train_start(trainer): pass

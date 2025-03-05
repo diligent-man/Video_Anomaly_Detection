@@ -16,7 +16,7 @@ from ..metrics import MetricWrapper
 from ..data.model import BatchOutput
 from ..callbacks import add_callbacks
 from AI.src.utils.BatchForwarder import BatchForwarder
-from ..utils import DotDict, get_amp_cfg, EarlyStopping, ModelArchInspector
+from ..utils import DotDict, get_amp_cfg, EarlyStopping, Checkpointer
 
 
 __all__ = ["Trainer"]
@@ -33,18 +33,18 @@ class Trainer(object):
     __val_dataloader: DataLoader
     __callbacks: Dict[str, List[Callable]] = defaultdict(list, {})
 
-    __start_epoch: int
+    start_epoch: int
+    cur_epoch: int
     __best_val_loss: float
     __amp_cfg: Dict[str, Any]
     __grad_scaler: torch.GradScaler
     __sleep_time: float
     __device: str
 
+
     __early_stopping: None | EarlyStopping
     __train_batch_forwarder: BatchForwarder
     __test_batch_forwarder: BatchForwarder
-
-    __batch_output: BatchOutput = None
 
     def __init__(self,
                  config: DotDict,
@@ -66,12 +66,16 @@ class Trainer(object):
         self.__val_dataloader = val_dataloader
 
         # Declare misc attrs used during training
-        self.__start_epoch = 1
+        self.start_epoch = 1
+        self.cur_epoch = 1
         self.__best_val_loss = self._get_best_val_loss()
         self.__amp_cfg, self.__grad_scaler = get_amp_cfg(self.__config)
         self.__sleep_time = self.__config.Global.get("sleep", 0)
         self.__device: str = self.__config.Global.get("device", "cpu")
         self.__batch_forwarder: BatchForwarder = BatchForwarder(self.__device)
+
+        self.checkpointer: None | Checkpointer = None
+        self.batch_output: None | BatchOutput = None
 
         add_callbacks(self)
         # self._setup_train()
@@ -105,24 +109,8 @@ class Trainer(object):
         return self.__callbacks
 
     @property
-    def start_epoch(self) -> int:
-        return self.__start_epoch
-
-    @start_epoch.setter
-    def start_epoch(self, start_epoch: int) -> None:
-        self.__start_epoch = start_epoch
-
-    @property
     def amp_config(self) -> Dict[str, Any]:
         return self.__amp_cfg
-
-    @property
-    def batch_output(self) -> BatchOutput:
-        return self.__batch_output
-
-    @batch_output.setter
-    def batch_output(self, batch_output: BatchOutput):
-        self.__batch_output = batch_output
 
     def run_callbacks(self, event: str, *args, **kwargs) -> None:
         """Run all existing callbacks associated with a particular event."""
@@ -132,7 +120,7 @@ class Trainer(object):
     def _get_best_val_loss(self) -> float:
         checkpoint_path: str = self.__config.Global.checkpoint_path
 
-        if self.__config.Checkpoint.get("load", False) and os.path.exists(ckpt_patcheckpoint_path):
+        if self.__config.Checkpoint.get("load", False) and os.path.exists(checkpoint_path):
             if "best_ckpt.pt" in os.listdir(checkpoint_path):
                 return torch.load(f=os.path.join(checkpoint_path, "best_checkpoint.pt"))["val_loss"]
         else:
@@ -193,34 +181,31 @@ class Trainer(object):
         print("Start training model ...")
         self.run_callbacks("on_train_routine_start")
 
-        # for epoch in range(self.__start_epoch, self.__start_epoch + self.__config.Global.epochs):
-        #     self.run_callbacks("on_train_epoch_start")
-        #
-        #     for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
-        #         # if phase == "train" or phase == "val":
-        #         #     continue
-        #
-        #         self.__batch_forwarder(
-        #             self.__config.Data[phase].forward_strategy,
-        #             self,
-        #             phase,
-        #             self.__model,
-        #             dataloader,
-        #             self.__amp_cfg,
-        #             self.__loss,
-        #             self.__metrics if self.config.Metric[f"in_{phase}"] else None,
-        #             self.__optimizer if phase == "train" else None,
-        #             self.__scheduler if phase == "train" else None,
-        #             self.__grad_scaler,
-        #             **{
-        #                 "epochs": self.__config.Global.epochs,
-        #                 "cur_epoch": epoch,
-        #                 "overridden_args": self.__config.Data[phase].get("overridden_args", DotDict({})).get_dict()
-        #             }
-        #         )
-        #
-        #     # Stop program in the meantime
-        #     print("Sleeping...")
-        #     time.sleep(self.__sleep_time)
+        for epoch in range(self.start_epoch, self.start_epoch + self.__config.Global.epochs):
+            self.cur_epoch = epoch
+
+            for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
+                self.__batch_forwarder(
+                    self.__config.Data[phase].forward_strategy,
+                    self,
+                    phase,
+                    self.__model,
+                    dataloader,
+                    self.__amp_cfg,
+                    self.__loss,
+                    self.__metrics if self.config.Metric[f"in_{phase}"] else None,
+                    self.__optimizer if phase == "train" else None,
+                    self.__scheduler if phase == "train" else None,
+                    self.__grad_scaler,
+                    **{
+                        "epochs": self.__config.Global.epochs,
+                        "cur_epoch": epoch,
+                        "overridden_args": self.__config.Data[phase].get("overridden_args", DotDict({})).get_dict()
+                    }
+                )
+
+            # Stop program in the meantime
+            print("Sleeping...")
+            time.sleep(self.__sleep_time)
         print("Training finished")
         return None
