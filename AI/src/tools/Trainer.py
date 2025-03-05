@@ -66,14 +66,16 @@ class Trainer(object):
         self.__val_dataloader = val_dataloader
 
         # Declare misc attrs used during training
-        self.__start_epoch = 0
+        self.__start_epoch = 1
         self.__best_val_loss = self._get_best_val_loss()
         self.__amp_cfg, self.__grad_scaler = get_amp_cfg(self.__config)
         self.__sleep_time = self.__config.Global.get("sleep", 0)
         self.__device: str = self.__config.Global.get("device", "cpu")
+        self.__batch_forwarder: BatchForwarder = BatchForwarder(self.__device)
 
         add_callbacks(self)
         self._setup_train()
+
 
     @property
     def callbacks(self) -> Dict[str, List[Callable]]:
@@ -180,25 +182,26 @@ class Trainer(object):
             self.run_callbacks("on_train_epoch_start")
 
             for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
-                if phase == "val":
+                if phase == "train":
                     continue
 
-                BatchForwarder(
-                    self.__config.Global.epochs,
-                    epoch,
-                    self.__device
-                )(
+                self.__batch_forwarder(
+                    self.__config.Data[phase].forward_strategy,
                     self,
                     phase,
-                    self.__config.Data[phase].forward_strategy,
                     self.__model,
                     dataloader,
-                    self.__loss,
-                    self.__metrics,
                     self.__amp_cfg,
-                    self.__optimizer,
-                    self.__scheduler,
-                    self.__grad_scaler
+                    self.__loss,
+                    self.__metrics if self.config.Metric[f"in_{phase}"] else None,
+                    self.__optimizer if phase == "train" else None,
+                    self.__scheduler if phase == "train" else None,
+                    self.__grad_scaler,
+                    **{
+                        "epochs": self.__config.Global.epochs,
+                        "cur_epoch": epoch,
+                        "overridden_args": self.__config.Data[phase].get("overridden_args", DotDict({})).get_dict()
+                    }
                 )
 
                 # Logging

@@ -33,16 +33,16 @@ def main(args: argparse.Namespace) -> None:
 
     train_dataloader = build_dataloader(copy.deepcopy(config), "train")
     val_dataloader = build_dataloader(copy.deepcopy(config), "val")
-    #
-    # model: torch.nn.Module = build_model(copy.deepcopy(config))
-    # optim, scheduler = build_optimizer(copy.deepcopy(config), model)
-    # model, optim = load_ckpt(copy.deepcopy(config), model, optim)
-    #
-    # loss: LossWrapper = LossWrapper(copy.deepcopy(config))
-    # metrics: MetricWrapper = MetricWrapper(copy.deepcopy(config))
 
-    # trainer = Trainer(config, model, optim, scheduler, loss, metrics, train_dataloader, val_dataloader)
-    # trainer.fit()
+    model: torch.nn.Module = build_model(copy.deepcopy(config))
+    optim, scheduler = build_optimizer(copy.deepcopy(config), model)
+    model, optim = load_ckpt(copy.deepcopy(config), model, optim)
+
+    loss: LossWrapper = LossWrapper(copy.deepcopy(config))
+    metrics: MetricWrapper = MetricWrapper(copy.deepcopy(config))
+
+    trainer = Trainer(config, model, optim, scheduler, loss, metrics, train_dataloader, val_dataloader)
+    trainer.fit()
     return None
 
 

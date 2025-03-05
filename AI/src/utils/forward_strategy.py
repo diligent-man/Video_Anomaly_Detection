@@ -1,3 +1,4 @@
+import warnings
 from typing import Dict, Any, Callable, Union, List
 
 import torch
@@ -20,20 +21,21 @@ __all__ = ["FORWARD_STRATEGIES"]
 
 def v1(instance: Union[Trainer],
        phase: str,
-       epochs: int,
-       cur_epoch: int,
-       grad_ctx_manager,
        model: Module,
        dataloader: DataLoader,
-       loss: LossWrapper,
-       metrics: MetricWrapper,
        amp_cfg: Dict[str, Any],
+       epochs: int,
+       cur_epoch: int,
+       device: str,
+       grad_ctx_manager,
+       loss: LossWrapper = None,
        optim: Optimizer = None,
        scheduler: LRScheduler = None,
        grad_scaler: GradScaler = None,
-       device: str = "cpu"
        ) -> None:
     """
+    This phase use for train/ val single MIL VAD problem
+
     for i, (inps, targets) in enumerate(DataLoader):
         forward -> batch loss
         backward + step optim (phase == "train")
@@ -52,88 +54,116 @@ def v1(instance: Union[Trainer],
 
         compute metrics (if have)
     """
-    cur_step: int = 0 + cur_epoch * len(dataloader)
 
-    for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Foward v2, Phase: {phase}, Epoch: {cur_epoch+1}"):
-        inps: Tensor
+    # if phase == "train":
+    #     cur_step: int = 0 + cur_epoch * len(dataloader)
+    #
+    #     for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Foward v2, Phase: {phase}, Epoch: {cur_epoch+1}"):
+    #         inps: Tensor
+    #         optim.zero_grad()
+    #
+    #         with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
+    #             anomaly, normal = torch.chunk(inps, 2, 1)
+    #
+    #             anomaly_preds: Tensor = model(anomaly.to(device)).preds  # (B, S)
+    #             normal_preds: Tensor = model(normal.to(device)).preds  # (B, S)
+    #
+    #             batch_loss: Tensor = loss.compute_batch_loss([anomaly_preds, normal_preds])
+    #
+    #         # Exits the context manager before backward and compute metrics
+    #         if grad_scaler is not None:
+    #             grad_scaler.scale(batch_loss).backward()
+    #             # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm) add later on
+    #             grad_scaler.step(optim)
+    #             grad_scaler.update()
+    #         else:
+    #             batch_loss.backward()
+    #             optim.step()
+    #
+    #         if scheduler is not None:
+    #             scheduler.step(cur_step)
+    #
+    #         if metrics.in_train:
+    #             warnings.warn("Metrics are not applied during train in v1 forward strategy")
+    #
+    #         # Per step logging
+    #         batch_output: Dict[str, Any] = {
+    #             "phase": phase,
+    #             "cur_step": cur_step,
+    #             "loss": batch_loss.item(),
+    #         }
+    #
+    #         lr: float = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
+    #         batch_output["lr"] = lr
+    #
+    #         # Update step
+    #         cur_step += 1
+    #
+    #         if i == 0:
+    #             break
+    #
+    #         instance.batch_output = BatchOutput(**batch_output)
+    #         instance.run_callbacks("on_train_batch_end")
+    # elif phase in ("val", "test"):
+    #     cur_step: int = 0 + cur_epoch * len(dataloader)
+    #
+    #     for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Foward v2, Phase: {phase}, Epoch: {cur_epoch + 1}"):
+    #         inps: Tensor = inps.squeeze()  # (B,C,T,H,W) -> (C,T,H,W)
+    #         labels: Tensor = labels.squeeze()  # (T,)
+    #
+    #         total_frames: int = inps.shape[1]
+    #         preds: Tensor = torch.zeros_like(labels, dtype=torch.float16)
+    #
+    #         with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
+    #             for j in range(total_frames):
+    #                 if j < T_max:
+    #                     pad = (0, 0, 0, 0, T_max-j, 0)
+    #                     model_inps = inps[:, :j, ...]
+    #                     model_inps = torch.nn.ZeroPad3d(pad)(model_inps)
+    #                 else:
+    #                     model_inps = inps[:, j-T_max:j, ...]
+    #
+    #                 model_inps = model_inps.unsqueeze(0)
+    #                 pred: Tensor = model(model_inps.to(device)).preds
+    #                 preds[j] = pred
+    #
+    #         metrics.update(preds, labels)
+    #
+    #         # Per step logging
+    #         batch_output: Dict[str, Any] = {
+    #             "phase": phase,
+    #             "cur_step": cur_step,
+    #             "loss": batch_loss.item(),
+    #         }
+    #
+    #         lr: float = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
+    #         batch_output["lr"] = lr
+    #
+    #         # Update step
+    #         cur_step += 1
+    #
+    #         if i == 0:
+    #             break
+    #
+    #         instance.batch_output = BatchOutput(**batch_output)
+    #         instance.run_callbacks("on_train_batch_end")
+    #
+    #         if i == 0:
+    #             break
+    #
+    #     metrics.compute()
+    #     a=metrics.get_result()
+    # return None
 
-        print(inps.shape)
-        from torchvision.transforms import v2, Compose, InterpolationMode
-        compose = Compose([
-            v2.ToDtype(torch.float32, scale=True),
-            v2.RandomHorizontalFlip(),
-            v2.RandomResizedCrop((224, 224), (.5, 1),  interpolation=InterpolationMode.NEAREST, antialias=True),
-            v2.RandomResizedCrop((224, 224), (1., 1.5),  interpolation=InterpolationMode.BICUBIC, antialias=True),
-            v2.RandomRotation((-90, 90), InterpolationMode.NEAREST, False),
 
-            Permute((0, 1, 3, 2, 4, 5)),
-            # v2.ColorJitter(.5, .5, .5, .25),
-
-            v2.RandomGrayscale(.5),
-            v2.GaussianBlur((3, 3), (.1, 2)),
-            Permute((0, 1, 3, 2, 4, 5))
-        ])
-
-        inps = compose(inps)
-        print(inps.shape)
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if phase == "train":
-            optim.zero_grad()
-
-        with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
-            anomaly, normal = torch.chunk(inps, 2, 1)
-
-            anomaly_preds: Tensor = model(anomaly.to(device)).preds  # (B, S)
-            normal_preds: Tensor = model(normal.to(device)).preds  # (B, S)
-
-            batch_loss: Tensor = loss.compute_batch_loss([anomaly_preds, normal_preds])
-
-        # Exits the context manager before backward and compute metrics
-        if phase == "train":
-            batch_loss.backward()
-            optim.step()
-
-            if scheduler is not None:
-                scheduler.step(cur_step)
-
-            if metrics.in_train:
-                metrics.update(torch.hstack((anomaly_preds, normal_preds)), labels)
-        else:
-            metrics.update(torch.hstack((anomaly_preds, normal_preds)), labels)
-
-        # Per step logging
-        batch_output: Dict[str, Any] = {
-            "phase": phase,
-            "cur_step": cur_step,
-            "loss": batch_loss.item(),
-        }
-
-        if phase == "train":
-            lr: float = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
-            batch_output["lr"] = lr
-
-        # Update step
-        cur_step += 1
-
-        if i == 3:
-            break
-        instance.batch_output = BatchOutput(**batch_output)
-        instance.run_callbacks("on_train_batch_end")
-    return None
+def v2(T_max: int = 50,
+       frame_overlap_ratio: float = 0.5
+       ) -> None:
+    raise NotImplementedError
 
 
 FORWARD_STRATEGIES: Dict[str, Callable] = {
-    "v1": v1
+    "v1": v1,
+    "v2": v2,
+
 }

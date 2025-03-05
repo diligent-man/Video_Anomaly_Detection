@@ -35,8 +35,8 @@ class VideoDataset(Dataset):
         :param loader: video loader api. Defaults to "v2"
         :param loader_args: arguments for video loader
         :param extensions: video extension
-        :param transforms: transform function for input video
-        :param target_transforms: transform function for label
+        :param transform: transform function for input video
+        :param target_transform: transform function for label
         :param device: device that used to load video
         :param return_device: device that used to return read video
         :param target: target for input video if necessary
@@ -76,8 +76,6 @@ class VideoDataset(Dataset):
             target: torch.Tensor = self.__target_transform(self.__target)
         else:
             target: Any = self.__target
-
-        # sample = sample[:200, ...]  # temporary add for loading
         return sample.to(self.__return_device), target
 
     def __len__(self) -> int:

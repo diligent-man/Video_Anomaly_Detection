@@ -52,7 +52,7 @@ def stage_one(args: Namespace, dl: DataLoader, ds_name: str) -> None:
         pool.map(partial(VideoPreprocessor.stage_one, run_async=args.run_async), preprocessors)
 
         if args.run_async:
-            time.sleep(5)
+            time.sleep(10)
     return None
 
 
@@ -81,8 +81,11 @@ def stage_two(args: Namespace, dl: DataLoader, ds_name: str) -> None:
         is_labeled_processors: List[VideoPreprocessor] = [preprocessor for preprocessor in preprocessors if preprocessor.is_label]
         not_is_labeled_processors: List[VideoPreprocessor] = [preprocessor for preprocessor in preprocessors if not preprocessor.is_label]
 
-        pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), is_labeled_processors)
-        pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), not_is_labeled_processors)
+        if len(is_labeled_processors) > 0:
+            pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), is_labeled_processors)
+
+        if len(not_is_labeled_processors) > 0:
+            pool.map(partial(VideoPreprocessor.stage_two, del_prev_result=args.del_prev_result), not_is_labeled_processors)
     return None
 
 

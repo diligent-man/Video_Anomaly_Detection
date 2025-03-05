@@ -5,8 +5,7 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from AI.src.data.dataset.VideoDataset import VideoDataset
-from AI.src.data.dataset.VideoFolderDataset import VideoFolderDataset
+from ..dataset import VideoDataset, VideoFolderDataset
 
 
 __all__ = ["VADVideoLevelDataset"]

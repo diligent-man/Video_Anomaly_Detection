@@ -79,20 +79,16 @@ def visualize_lr(optimizer: torch.optim.Optimizer,
 
 
 def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScaler]:
-    use_amp: bool = config.Global.get("use_amp", False)
-    use_grad_scaler: bool = config.Global.get("use_grad_scaler", False)
-
     scaler: None | torch.GradScaler = None
     device: str = config.Global.get("device", "cpu")
+    use_amp: bool = config.Global.get("use_amp", False)
 
     if use_amp:
-        amp_dtype: torch.dtype = config.Global.get("amp_dtype", torch.float16)  # cpu also use torch.float16 ???
+        amp_dtype: torch.dtype = torch.float16 if device == "cuda" else torch.bfloat16  # cpu also use torch.float16 ???
 
-        # currently use default arg for GradScaler
-        if use_grad_scaler:
-            scaler: torch.GradScaler = torch.amp.GradScaler("cuda", enabled=use_amp)  # if TORCH_2_4 else torch.cuda.amp.GradScaler(enabled=use_amp)
-        else:
-            warnings.warn("use_grad_scaler should be True if use_amp=True")
+        # Currently use default arg for GradScaler
+        if device == "cuda":
+            scaler: torch.GradScaler = torch.amp.GradScaler(device, enabled=use_amp)
     else:
         amp_dtype: torch.dtype = torch.float32
 

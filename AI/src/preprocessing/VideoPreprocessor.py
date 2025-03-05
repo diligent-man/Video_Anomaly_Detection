@@ -87,22 +87,23 @@ class VideoPreprocessor(object):
             c/ Central crop frame
             d/ Save video stream as output
         """
-        if self.__is_labeled:
-            self.__filters.pop("fps", None)
+        if not os.path.exists(self.__spath):
+            if self.__is_labeled:
+                self.__filters.pop("fps", None)
 
-        probe_info: Dict[str, Any] = ffmpeg.probe(self.fpath)
-        stream = self._find_video_stream(probe_info["streams"])
+            probe_info: Dict[str, Any] = ffmpeg.probe(self.fpath)
+            stream = self._find_video_stream(probe_info["streams"])
 
-        stream = ffmpeg.input(self.__fpath, hwaccel="cuda")[stream] if self.__device == "cuda" else \
-            ffmpeg.input(self.__fpath)[stream]
+            stream = ffmpeg.input(self.__fpath, hwaccel="cuda")[stream] if self.__device == "cuda" else \
+                ffmpeg.input(self.__fpath)[stream]
 
-        for filter_name, kwargs in self.__filters.items():
-            stream = stream.filter(filter_name, **kwargs)
+            for filter_name, kwargs in self.__filters.items():
+                stream = stream.filter(filter_name, **kwargs)
 
-        stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="error")
-        stream = stream.overwrite_output()
+            stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="error")
+            stream = stream.overwrite_output()
 
-        stream.run_async() if run_async else stream.run()
+            stream.run_async() if run_async else stream.run()
 
     def stage_two(self,
                   del_prev_result: bool = False

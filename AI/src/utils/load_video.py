@@ -96,7 +96,6 @@ def v2(path: str,
         decoder_option=__DEFAULT_DECODER_CONFIG,
         hw_accel=device if device == "cuda" else None
     )
-
     video: torch.Tensor | None = None
     for chunk in stream_reader.stream():
         frames = chunk[0]

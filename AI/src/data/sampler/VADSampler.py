@@ -12,14 +12,15 @@ __all__ = ["VADSampler"]
 class VADSampler(Sampler):
     """
     Sampler for video anomaly detection. Dataset folder is placed as below:
-        anomaly
-            class 1
+        unlabeled
+            anomaly
+                class 1
+                    *.mp4
+                class 2
+                    *.mp4
+                ...
+            normal
                 *.mp4
-            class 2
-                *.mp4
-            ...
-        normal
-            *.mp4
 
     Two approaches for sampling:
         1/ For each epoch,

@@ -105,7 +105,7 @@ def main() -> None:
 
     images = glob.glob("./images/*")
     images.sort()
-    images = images[:100]
+    images = images[:33]
 
     segment = len(images) // 16
 
@@ -126,7 +126,7 @@ def main() -> None:
             inputs[:, :, 15, :, :] = ToTensor(1)(Image.open(i)).permute(0, -1, 1)[..., :240]
             inputs = inputs.cuda()
             start = time.time()
-            output, feature = model(inputs)
+            _, feature = model(inputs)
             feature = F.normalize(feature, p=2, dim=1)
 
             out = classifier(feature)
@@ -136,6 +136,10 @@ def main() -> None:
             out_str = str(out.item())[:5]
 
             print(len(x_value) / len(y_pred), num)
+            # print("feat", feature.shape)
+            # print("out", out.shape)
+            print("y_pred", y_pred)
+            print()
 
             cv_img = cv2.imread(i)
             cv_img = cv2.putText(cv_img, 'FPS :' + FPS + ' Pred :' + out_str, (5, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
@@ -149,9 +153,9 @@ def main() -> None:
         path = save_path + '/' + os.path.basename(i)
         cv2.imwrite(path, cv_img)
 
-        if num == 100:
+        if num == 33:
             break
-    os.system('ffmpeg -y -pattern_type glob -i "%s" "%s"' % (save_path + '/*.png', save_path + '.mp4'))
+    os.system('ffmpeg -y -pattern_type glob -loglevel error -i "%s" "%s"' % (save_path + '/*.png', save_path + '.mp4'))
     plt.plot(x_time, y_pred)
     plt.savefig(save_path + '.png', dpi=300)
     plt.cla()

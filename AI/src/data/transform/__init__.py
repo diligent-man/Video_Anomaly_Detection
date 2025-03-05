@@ -167,14 +167,14 @@ def build_transform(transform_cfg: None | Dict[str, Dict] = None) -> None | Comp
         assert transform in TRANSFORMS.keys(), "Your selected transform method is unavailable"
 
         # Verify interpolation mode & replace str name to its corresponding func
-        if transform in ("Resize", "RandomRotation"):
-            assert transform_cfg[transform]["interpolation"] in INTERPOLATIONS.keys(), "Your selected interpolation mode in unavailable"
-            transform_cfg[transform]["interpolation"] = INTERPOLATIONS[transform_cfg[transform]["interpolation"]]
+        if transform in ("Resize", "RandomRotation", "RandomResizedCrop"):
+            assert args["interpolation"] in INTERPOLATIONS.keys(), "Your selected interpolation mode in unavailable"
+            args["interpolation"] = INTERPOLATIONS[args["interpolation"]]
 
         # Verify dtype & replace str name to its corresponding func
         if transform in "ToDtype":
-            assert transform_cfg[transform]["dtype"] in DTYPES.keys(), "Your selected dtype in unavailable"
-            transform_cfg[transform]["dtype"] = DTYPES[transform_cfg[transform]["dtype"]]
+            assert args["dtype"] in DTYPES.keys(), "Your selected dtype in unavailable"
+            args["dtype"] = DTYPES[args["dtype"]]
 
         # TODO: Add transform for lambda fn
         # if transform in ("Lambda"):

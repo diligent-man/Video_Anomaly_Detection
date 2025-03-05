@@ -83,8 +83,6 @@ class VideoFolderDataset(DatasetFolder):
 
         if self.target_transform is not None:
             target = self.target_transform(target)
-
-        # sample = sample[:200, ...]  # temporary add for loading
         return sample, target
 
     def __len__(self) -> int:
