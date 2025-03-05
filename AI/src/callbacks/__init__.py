@@ -1,5 +1,7 @@
 from typing import Union, List, Dict, Callable, Tuple
 
+from .base import base_callbacks
+
 from ..tools import Trainer
 from ..utils import get_services
 
@@ -7,12 +9,11 @@ from ..utils import get_services
 __all__ = [
     "add_callbacks",
     "SUPPORTED_CALLBACKS",
-    # "get_default_callbacks"
 ]
 
 
 SUPPORTED_CALLBACKS: Tuple[str, ...] = (
-    "tensorboard",
+    "checkpoint",
     "mlflow"
 )
 
@@ -25,7 +26,7 @@ def add_callbacks(instance: Union[Trainer]) -> None:
         instance (Trainer, Predictor, Validator, Exporter): An object with a 'callbacks' attribute that is a dictionary
             of callback lists.
     """
-    callbacks_lst: List[Dict[str, Callable]] = []
+    callbacks_lst: List[Dict[str, Callable]] = [base_callbacks]
 
     # Load training callbacks
     if instance.__class__.__name__ == "Trainer":
@@ -35,6 +36,9 @@ def add_callbacks(instance: Union[Trainer]) -> None:
             if service == "mlflow":
                 from .mlflow import mlflow_callbacks
                 callbacks_lst.append(mlflow_callbacks)
+            elif service == "checkpoint":
+                from .checkpoint import checkpoint_callbacks
+                callbacks_lst.append(checkpoint_callbacks)
 
             # from .dvc import callbacks as dvc_cb
             # from .neptune import callbacks as neptune_cb

@@ -1,22 +1,18 @@
 """MLflow Logging service. Adopted and modified from Ultralytics src code"""
 import os
 import pathlib
-import warnings
-import requests as rq
-from typing import Dict, Any
+from typing import Dict, Any, Callable
 
 import mlflow
 
 
 from ..tools import Trainer
-from ..data.model import BatchOutput
-from ..utils.service import ping_server
 from ..utils import ANSIColor, make_border, ModelArchInspector
 
 __all__ = ["mlflow_callbacks"]
 
 
-def on_pretrain_routine_start(instance: Trainer) -> None:
+def on_train_routine_start(instance: Trainer) -> None:
     """
     Log training info to local mlflow folder at the beginning of the training routine.
     At this stage, mlflow logs
@@ -40,6 +36,19 @@ def on_pretrain_routine_start(instance: Trainer) -> None:
     mlflow.set_tracking_uri(uri)
     mlflow.set_experiment(experiment_name)
 
+    # old_run = mlflow.get_run("7bdad1ed7a4b4c1fab7f897903bd6cff")
+
+    # active_run = mlflow.start_run(run_name=run_name)
+    # for key, value in old_run.data.metrics.items():
+    #     mlflow.log_metric(key, value)
+
+    # for key, value in old_run.data.params.items():
+        # if key == 'REPLACE_WITH_YOUR_KEY':
+        #     new_value = REPLACE_WITH_YOUR_VALUE
+        #     mlflow.log_param(key, new_value)
+        # else:
+        #     mlflow.log_param(key, value)
+
     # try:
     #     ping_server(uri, auth=auth, timeout=(.5, .5), total=3)
     #     mlflow.set_tracking_uri(uri)
@@ -53,6 +62,7 @@ def on_pretrain_routine_start(instance: Trainer) -> None:
     #     print(f"View at http://localhost:5000 with 'mlflow server --backend-store-uri {uri}'\n")
 
     active_run = mlflow.active_run() or mlflow.start_run(
+        run_id=instance.config.Mlflow.get("run_id", None),
         run_name=run_name,
         tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
         description=instance.config.Mlflow.get("description", None),
@@ -127,9 +137,10 @@ def on_train_end(trainer):
     )
 
 
-mlflow_callbacks = {
-    "on_pretrain_routine_start": on_pretrain_routine_start,
+mlflow_callbacks: Dict[str, Callable] = {
+    "on_train_routine_start": on_train_routine_start,
     "on_train_batch_end": on_train_batch_end,
+
     "on_val_batch_end": on_val_batch_end,
     # "on_train_epoch_end": on_train_epoch_end,
     # "on_fit_epoch_end": on_fit_epoch_end,

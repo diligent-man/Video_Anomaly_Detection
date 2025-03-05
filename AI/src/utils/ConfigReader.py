@@ -27,7 +27,7 @@ class ConfigReader(object):
         "fields": ["global", "data", "architecture", "optim", "metric", "loss", "checkpoint", "early_stopping", "services"]
     }
 
-    __supported_services: Tuple[str, ...] = ("tensorboard", "mlflow")
+    __supported_services: Tuple[str, ...] = ("checkpoint", "mlflow")
 
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
@@ -128,10 +128,15 @@ class ConfigReader(object):
                                ]
 
         save_dir: str = f"{os.sep}".join(save_dir)
-        save_dir: pathlib.Path = create_increment_path(save_dir, False, "", True)
+        save_dir: pathlib.Path = create_increment_path(
+            save_dir,
+            self.__config.Global.get("exist_ok", False),
+            self.__config.Global.get("sep", ""),
+            True
+        )
 
         services: List[str] = get_services(self.__config)
-        dirs = ("ckpt", "log", *services)
+        dirs = ("log", *services)
 
         print("Save dir:")
         for dir_name in dirs:

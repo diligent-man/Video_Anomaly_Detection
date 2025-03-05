@@ -88,7 +88,8 @@ def v1(instance: Union[Trainer],
         # Per step logging
         batch_output: Dict[str, Any] = {
             "phase": phase,
-            "cur_step": cur_step,
+            "epoch": cur_epoch,
+            "step": cur_step,
             "lr": lr,
             "loss": batch_loss.item(),
         }
@@ -97,7 +98,7 @@ def v1(instance: Union[Trainer],
         # Update step
         cur_step += 1
 
-        if i == 3:
+        if i == 2:
             break
         instance.run_callbacks(f"on_{phase}_batch_end")
 

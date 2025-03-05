@@ -74,24 +74,15 @@ class Trainer(object):
         self.__batch_forwarder: BatchForwarder = BatchForwarder(self.__device)
 
         add_callbacks(self)
-        self._setup_train()
-
-
-    @property
-    def callbacks(self) -> Dict[str, List[Callable]]:
-        return self.__callbacks
+        # self._setup_train()
 
     @property
     def config(self) -> DotDict:
         return self.__config
 
     @property
-    def train_dataloader(self) -> DataLoader:
-        return self.__train_dataloader
-
-    @property
-    def val_dataloader(self) -> DataLoader:
-        return self.__val_dataloader
+    def model(self) -> torch.nn.Module:
+        return self.__model
 
     @property
     def optimizer(self) -> Optimizer:
@@ -102,7 +93,31 @@ class Trainer(object):
         return self.__scheduler
 
     @property
-    def batch_output(self):
+    def train_dataloader(self) -> DataLoader:
+        return self.__train_dataloader
+
+    @property
+    def val_dataloader(self) -> DataLoader:
+        return self.__val_dataloader
+
+    @property
+    def callbacks(self) -> Dict[str, List[Callable]]:
+        return self.__callbacks
+
+    @property
+    def start_epoch(self) -> int:
+        return self.__start_epoch
+
+    @start_epoch.setter
+    def start_epoch(self, start_epoch: int) -> None:
+        self.__start_epoch = start_epoch
+
+    @property
+    def amp_config(self) -> Dict[str, Any]:
+        return self.__amp_cfg
+
+    @property
+    def batch_output(self) -> BatchOutput:
         return self.__batch_output
 
     @batch_output.setter
@@ -115,54 +130,54 @@ class Trainer(object):
             callback(self, *args, **kwargs)
 
     def _get_best_val_loss(self) -> float:
-        ckpt_path: str = self.__config.Global.ckpt_path
+        checkpoint_path: str = self.__config.Global.checkpoint_path
 
-        if self.__config.Checkpoint.get("load", False) and os.path.exists(ckpt_path):
-            if "best_ckpt.pt" in os.listdir(ckpt_path):
-                return torch.load(f=os.path.join(ckpt_path, "best_checkpoint.pt"))["val_loss"]
+        if self.__config.Checkpoint.get("load", False) and os.path.exists(ckpt_patcheckpoint_path):
+            if "best_ckpt.pt" in os.listdir(checkpoint_path):
+                return torch.load(f=os.path.join(checkpoint_path, "best_checkpoint.pt"))["val_loss"]
         else:
             return float("inf")
 
-    def _setup_train(self):
+    # def _setup_train(self):
         # Load trained checkpoint for continuous training
-        if self.__config.Checkpoint.load:
-            ckpt_path: str = self.__config.Global.ckpt_path
-            resume_name: str = self.__config.Checkpoint.get("resume_name", "")
-
-            ckpt_path = os.path.join(ckpt_path, resume_name)
-            assert os.path.isfile(ckpt_path), FileNotFoundError
-
-            ckpt = torch.load(f=ckpt_path, map_location="cpu")
-            self.__start_epoch = ckpt["epoch"] + 1
-            self.__model.load_state_dict(ckpt["model_state_dict"])
-            self.__optimizer.load_state_dict(ckpt["optimizer_state_dict"])
-            del ckpt
+        # if self.__config.Checkpoint.load:
+        #     checkpoint_path: str = self.__config.Global.checkpoint_path
+        #     resume_name: str = self.__config.Checkpoint.get("resume_name", "")
+        #
+        #     checkpoint_path = os.path.join(checkpoint_path, resume_name)
+        #     assert os.path.isfile(checkpoint_path), FileNotFoundError
+        #
+        #     ckpt = torch.load(f=checkpoint_path, map_location="cpu")
+        #     self.__start_epoch = ckpt["epoch"] + 1
+        #     self.__model.load_state_dict(ckpt["model"])
+        #     self.__optimizer.load_state_dict(ckpt["optimizer"])
+        #     del ckpt
 
         # Init early stopping
-        apply_early_stopping = self.__config.Early_stopping.pop("apply", False)
-        if apply_early_stopping:
-            self.__early_stopping = EarlyStopping(self.__best_val_loss,
-                                                  **self.__config.Early_stopping.get("args", DotDict({})).get_dict()
-                                                  )
-        else:
-            self.__early_stopping = None
+        # apply_early_stopping = self.__config.Early_stopping.pop("apply", False)
+        # if apply_early_stopping:
+        #     self.__early_stopping = EarlyStopping(self.__best_val_loss,
+        #                                           **self.__config.Early_stopping.get("args", DotDict({})).get_dict()
+        #                                           )
+        # else:
+        #     self.__early_stopping = None
 
         # Inspect model architecture
-        inspect_model_arch: bool = self.__config.Global.get("inspect_model_arch", False)
-        dummy_shape: None | Tuple[int, ...] = self.__config.Global.get("dummy_input_shape", None)
-        if inspect_model_arch and dummy_shape is not None:
-            try:
-                with torch.amp.autocast(**self.__amp_cfg):
-                    model_arch = ModelArchInspector(
-                        self.__model,
-                        self.__config.Global.dummy_input_shape,
-                        depth=self.__config.Global.get("inspect_depth", 3),
-                        mode="train",
-                        verbose=0
-                    )
-                self.__config["Model_arch"] = model_arch
-            except Exception as e:
-                self.__config["Model_arch"] = f"Fail to inspect model architecture due to {e}"
+        # inspect_model_arch: bool = self.__config.Global.get("inspect_model_arch", False)
+        # dummy_shape: None | Tuple[int, ...] = self.__config.Global.get("dummy_input_shape", None)
+        # if inspect_model_arch and dummy_shape is not None:
+        #     try:
+        #         with torch.amp.autocast(**self.__amp_cfg):
+        #             model_arch = ModelArchInspector(
+        #                 self.__model,
+        #                 self.__config.Global.dummy_input_shape,
+        #                 depth=self.__config.Global.get("inspect_depth", 3),
+        #                 mode="train",
+        #                 verbose=0
+        #             )
+        #         self.__config["Model_arch"] = model_arch
+        #     except Exception as e:
+        #         self.__config["Model_arch"] = f"Fail to inspect model architecture due to {e}"
 
     def fit(self):
         """
@@ -176,38 +191,36 @@ class Trainer(object):
         Note: # iters = epochs * len(DataLoader)
         """
         print("Start training model ...")
-        self.run_callbacks("on_pretrain_routine_start")
+        self.run_callbacks("on_train_routine_start")
 
-        for epoch in range(self.__start_epoch, self.__start_epoch + self.__config.Global.epochs):
-            self.run_callbacks("on_train_epoch_start")
-
-            for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
-                # if phase == "train":
-                #     continue
-
-                self.__batch_forwarder(
-                    self.__config.Data[phase].forward_strategy,
-                    self,
-                    phase,
-                    self.__model,
-                    dataloader,
-                    self.__amp_cfg,
-                    self.__loss,
-                    self.__metrics if self.config.Metric[f"in_{phase}"] else None,
-                    self.__optimizer if phase == "train" else None,
-                    self.__scheduler if phase == "train" else None,
-                    self.__grad_scaler,
-                    **{
-                        "epochs": self.__config.Global.epochs,
-                        "cur_epoch": epoch,
-                        "overridden_args": self.__config.Data[phase].get("overridden_args", DotDict({})).get_dict()
-                    }
-                )
-
-                # Logging
-
-            # Stop program in the meantime
-            print("Sleeping...")
-            time.sleep(self.__sleep_time)
+        # for epoch in range(self.__start_epoch, self.__start_epoch + self.__config.Global.epochs):
+        #     self.run_callbacks("on_train_epoch_start")
+        #
+        #     for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
+        #         # if phase == "train" or phase == "val":
+        #         #     continue
+        #
+        #         self.__batch_forwarder(
+        #             self.__config.Data[phase].forward_strategy,
+        #             self,
+        #             phase,
+        #             self.__model,
+        #             dataloader,
+        #             self.__amp_cfg,
+        #             self.__loss,
+        #             self.__metrics if self.config.Metric[f"in_{phase}"] else None,
+        #             self.__optimizer if phase == "train" else None,
+        #             self.__scheduler if phase == "train" else None,
+        #             self.__grad_scaler,
+        #             **{
+        #                 "epochs": self.__config.Global.epochs,
+        #                 "cur_epoch": epoch,
+        #                 "overridden_args": self.__config.Data[phase].get("overridden_args", DotDict({})).get_dict()
+        #             }
+        #         )
+        #
+        #     # Stop program in the meantime
+        #     print("Sleeping...")
+        #     time.sleep(self.__sleep_time)
         print("Training finished")
         return None

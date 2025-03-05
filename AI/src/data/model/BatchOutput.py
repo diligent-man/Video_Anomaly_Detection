@@ -8,35 +8,43 @@ __all__ = ["BatchOutput"]
 @dataclasses.dataclass
 class BatchOutput:
     __phase: str
+    __epoch: int
+    __step: int
     __lr: float
-    __cur_step: int
     __loss: float
     __metric_names: List[str]
     __metric_values: float | List[float]
 
     def __init__(self,
                  phase: str,
-                 cur_step: int,
+                 epoch: int,
+                 step: int,
                  lr: float = None,
                  loss: float = None,
                  metric_names: List[str] = None,
                  metric_values: float | List[float] = None
                  ) -> None:
         self.__phase = phase
+        self.__epoch = epoch
+        self.__step = step
         self.__lr = lr
-        self.__cur_step = cur_step
         self.__loss = loss
         self.__metric_names = metric_names
         self.__metric_values = metric_values
 
     @property
     def step(self) -> int:
-        return self.__cur_step
+        return self.__step
+
+    @property
+    def epoch(self) -> int:
+        return self.__epoch
 
     def to_dict(self) -> Dict[str, Any]:
         batch_output: Dict[str, Any] = {
             "phase": self.__phase,
-            "cur_step": self.__cur_step,
+            "epoch": self.__epoch,
+            "step": self.__step,
             "lr": self.__lr,
             "loss": self.__loss,
             "metric_names": self.__metric_names,
@@ -63,4 +71,3 @@ class BatchOutput:
                 if isinstance(value, float):
                     metrics[f"{self.__phase}_{name}"] = value
         return metrics
-

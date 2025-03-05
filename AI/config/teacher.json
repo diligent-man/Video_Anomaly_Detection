@@ -3,13 +3,14 @@
     {
 //        "save_dir": "/home/trong/Downloads/training_results/",
         "project_name": "AIP391",
-//        "experiment_name": "run",
+        "experiment_name": "run1",
 //        "technique": "single",
 //        "mode": "train",
+        "exist_ok": true,
+        "sep": "_",
 
-        "epochs": 3,
+        "epochs": 1,
         "print_step": 1,
-        "save_step": 1,
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
@@ -29,7 +30,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor2/unlabeled/train",
+                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/unlabeled/train",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -56,7 +57,7 @@
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 8,
-                "prefetch_factor": 2,
+                "prefetch_factor": 1,
                 "persistent_workers": false
             },
             "forward_strategy": "v1"
@@ -67,7 +68,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor2/unlabeled/val",
+                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/unlabeled/val",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -86,7 +87,7 @@
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 8,
-                "prefetch_factor": 2,
+                "prefetch_factor": 1,
                 "persistent_workers": false
             },
             "forward_strategy": "v1"
@@ -147,7 +148,7 @@
     "optim":
     {
         "lr": {"name": "Adam", "lr": 1e-6, "amsgrad": true},
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  12, "num_warmup_steps": 12},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  9, "num_warmup_steps": 9},
         "regularizer": {}
     },
 
@@ -173,17 +174,11 @@
         "reduction": "mean"
     },
 
-    "checkpoint":
-    {
-        "load": false,
-        "resume_name": "../results",
-
-        "save": false,
-        "save_step": true,
-        "save_weight_only": true,
-        "include_config": true
-    },
-
+//    "checkpoint":
+//    {
+//
+//    },
+//
     "early_stopping":
     {
         "apply": false,
@@ -194,19 +189,33 @@
 
     "services": [
         {
-            "name": "tensorboard",
-            "apply": false,
-            "inspect_model": true,
-            "tracking_metric": ["BinaryAccuracy", "BinaryF1Score"]
+            "name": "checkpoint",
+            "apply": true,
+
+            "load": false,
+            "resume_ckpt": "../results",
+
+            "save": true,
+            "save_step": 1,
+
+            "save_weights_only": true,
+            "include_config": true
         },
 
         {
             "name": "mlflow",
             "apply": true,
-            "tracking_uri": "http://183.80.97.114:5000"
+            "tracking_uri": "http://183.80.97.114:5000",
+//            "run_id": "800bdcf7ca9b4b2ab51ebd6e243a8757"
+
 //            "username": "root" ,
 //            "password":  "Root123!"
-        }
+        },
+
+//        {
+//            "name": "early_stopping",
+//            "apply": true
+//        }
     ]
 //    "EVALUATION_STRATEGY": "no"
 }
