@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Dict
 
 import torch
 
@@ -43,10 +43,8 @@ class LossWrapper:
     __loss: torch.nn.Module
 
     def __init__(self, config: DotDict) -> None:
-
         name: None | str = config.Loss.pop("name", None)
         has_aux: bool = config.Loss.pop("has_aux", False)
-
         assert name in LOSSES.keys(), ValueError(f"Provided loss is invalid. Get '{name}'")
 
         self.__name = name
@@ -63,13 +61,36 @@ Has aux logits: {self.__has_aux}""")
     def name(self) -> str:
         return self.__name
 
+    def _to_float32(self, preds) -> Union[torch.Tensor, List[torch.Tensor], Dict[str, torch.Tensor]]:
+        if isinstance(preds, dict):
+            for k in preds:
+                if isinstance(preds[k], dict) or isinstance(preds[k], list):
+                    preds[k] = self._to_float32(preds[k])
+                elif isinstance(preds[k], torch.Tensor):
+                    preds[k] = preds[k].type(torch.float32)
+
+        elif isinstance(preds, list):
+            for k in range(len(preds)):
+                if isinstance(preds[k], dict):
+                    preds[k] = self._to_float32(preds[k])
+                elif isinstance(preds[k], list):
+                    preds[k] = self._to_float32(preds[k])
+                elif isinstance(preds[k], torch.Tensor):
+                    preds[k] = preds[k].type(torch.float32)
+
+        elif isinstance(preds, torch.Tensor):
+            preds = preds.type(torch.float32)
+        return preds
+
     def compute_batch_loss(self,
                            inputs: Union[torch.Tensor, List[torch.Tensor]],
                            targets: torch.Tensor = None,
-                           aux_logits_weight: float=0.3
+                           aux_logits_weight: float = 0.3
                            ) -> torch.Tensor:
         if isinstance(inputs, torch.Tensor):
             inputs = [inputs]
+
+        inputs = self._to_float32(inputs)
 
         # aux logits (GoogleLeNet, InceptionV3)
         if self.__has_aux:

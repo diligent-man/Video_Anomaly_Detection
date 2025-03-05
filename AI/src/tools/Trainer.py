@@ -182,8 +182,8 @@ class Trainer(object):
             self.run_callbacks("on_train_epoch_start")
 
             for phase, dataloader in zip(("train", "val"), (self.__train_dataloader, self.__val_dataloader)):
-                if phase == "train":
-                    continue
+                # if phase == "train":
+                #     continue
 
                 self.__batch_forwarder(
                     self.__config.Data[phase].forward_strategy,

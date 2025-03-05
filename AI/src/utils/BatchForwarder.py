@@ -85,12 +85,9 @@ class BatchForwarder(object):
         """
         assert phase in ("train", "val", "test"), ValueError("Selected phase is invalid")
         assert forward_strategy in FORWARD_STRATEGIES.keys(), ValueError(f"Selected strategy '{forward_strategy}' is not supported")
-        forward_fn: Callable = FORWARD_STRATEGIES[forward_strategy]
 
-        if phase == "train":
-            model.train()
-        else:
-            model.eval()
+        forward_fn: Callable = FORWARD_STRATEGIES[forward_strategy]
+        model.train() if phase == "train" else model.eval()
 
         args: Dict[str, Any] = self._prep_args(
             forward_fn,

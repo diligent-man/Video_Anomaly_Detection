@@ -7,7 +7,7 @@
 //        "technique": "single",
 //        "mode": "train",
 
-        "epochs": 1,
+        "epochs": 3,
         "print_step": 1,
         "save_step": 1,
 
@@ -18,7 +18,7 @@
 
         "inspect_model_arch": true,
         "inspect_depth": 5,
-        "dummy_input_shape": [1, 32, 3, 13, 224, 224],
+        "dummy_input_shape": [1, 32, 3, 13, 224, 224]
 
     },
 
@@ -29,7 +29,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/unlabeled",
+                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor2/unlabeled/train",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -52,7 +52,7 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 1,
+                "batch_size": 4,
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 8,
@@ -66,20 +66,14 @@
         {
             "dataset":
             {
-                "name": "VADFrameLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/labeled",
-                "annotation": "label.csv",
+                "name": "VADVideoLevelDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor2/unlabeled/val",
                 "loader": "v4",
-                "transform":
-                {
+                "transform": {
                     "ToDtype":
                     {
                         "dtype": "float32",
                         "scale": true
-                    },
-                    "Permute":
-                    {
-                        "dims": [1, 0, 2, 3]
                     }
                 },
                 "target_transform": {}
@@ -87,19 +81,16 @@
 
             "dataloader":
             {
-                "name": "DefaultDataLoader",
-                "batch_size": 1,
-                "shuffle": false
+                "name": "VADVideoLevelDataLoader",
+                "batch_size": 4,
+                "shuffle": false,
+                "method": 1,  // sampled by min datasource
+                "num_workers": 8,
+                "prefetch_factor": 2,
+                "persistent_workers": false
             },
-            "forward_strategy": "v1",
-            "forward_strategy_args":
-            {
-                // Double to preprocessed FPS
-                "T_max": 50,
-                "frame_overlap_ratio": 1
-            }
-
-        },
+            "forward_strategy": "v1"
+        }
 
         /////////////////////////////////////////////////////////
 //        "test": {
@@ -156,7 +147,7 @@
     "optim":
     {
         "lr": {"name": "Adam", "lr": 1e-6, "amsgrad": true},
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  7, "num_warmup_steps":  14},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  12, "num_warmup_steps": 12},
         "regularizer": {}
     },
 

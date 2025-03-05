@@ -86,6 +86,9 @@ def on_train_batch_end(instance: Trainer) -> None:
     mlflow.log_metrics(batch_output, step=instance.batch_output.step)
 
 
+def on_val_batch_end(instance: Trainer) -> None:
+    on_train_batch_end(instance)
+
 # def on_train_epoch_end(trainer: Trainer):
 #     """Log training metrics at the end of each train epoch to MLflow."""
 #     if mlflow:
@@ -127,6 +130,7 @@ def on_train_end(trainer):
 mlflow_callbacks = {
     "on_pretrain_routine_start": on_pretrain_routine_start,
     "on_train_batch_end": on_train_batch_end,
+    "on_val_batch_end": on_val_batch_end,
     # "on_train_epoch_end": on_train_epoch_end,
     # "on_fit_epoch_end": on_fit_epoch_end,
     # "on_train_end": on_train_end,
