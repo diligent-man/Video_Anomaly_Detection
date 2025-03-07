@@ -33,7 +33,7 @@ def on_train_routine_start(instance: Trainer) -> None:
     experiment_name: str = uri.split(os.sep)[-5]  # project_name
     run_name: str = "_".join(uri.split(os.sep)[-4: -1])  # technique_mode_experiment_name
 
-    mlflow.set_tracking_uri(uri)
+    mlflow.set_tracking_uri("file:/" + uri)
     mlflow.set_experiment(experiment_name)
 
     # old_run = mlflow.get_run("7bdad1ed7a4b4c1fab7f897903bd6cff")

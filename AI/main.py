@@ -1,7 +1,7 @@
+import torch
+
 def main() -> None:
-    # Your code
-    
-    
+    print(torch.cuda.is_available())
     return None
 
 if __name__ == '__main__':
