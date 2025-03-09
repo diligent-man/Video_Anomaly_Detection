@@ -10,9 +10,9 @@
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 2,
-        "eval_strategy": "epoch",
-        "eval_steps": 12,
+        "epochs": 1,
+        "eval_strategy": "step",
+        "eval_steps": 3,
 
         "print_step": 1,
 

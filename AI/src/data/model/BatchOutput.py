@@ -10,6 +10,7 @@ class BatchOutput:
     __phase: str
     __epoch: int
     __step: int
+
     __lr: float
     __loss: float
     __metric_names: List[str]
@@ -43,6 +44,10 @@ class BatchOutput:
     @property
     def phase(self):
         return self.__phase
+
+    @property
+    def loss(self) -> float:
+        return self.__loss
 
     def to_dict(self) -> Dict[str, Any]:
         batch_output: Dict[str, Any] = {

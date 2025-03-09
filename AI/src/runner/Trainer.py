@@ -174,16 +174,9 @@ class Trainer(object):
             )()
 
             # Stop program in the meantime
-            print("Sleeping...\n")
+            print("\nSleeping...\n")
             time.sleep(self.__sleep_time)
-            print(self.control.state())
-            print(self.state)
-            print()
-            print()
+
         self.__callback("on_train_end")
-
-        print(self.control.state())
-        print(self.state)
-
         print("Training finished")
         return None

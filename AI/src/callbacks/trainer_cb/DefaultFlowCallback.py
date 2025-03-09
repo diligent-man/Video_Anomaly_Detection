@@ -100,6 +100,7 @@ class DefaultFlowCallback(BaseCallback):
             instance.state.phase = "train"
 
     def on_val_epoch_begin(self, instance: Trainer):
+        instance.state.batch_output = None
         instance.control.should_evaluate = False
 
     def on_val_epoch_end(self, instance: Trainer):
@@ -112,9 +113,8 @@ class DefaultFlowCallback(BaseCallback):
         instance.control.should_evaluate = False
 
     def on_step_end(self, instance: Trainer) -> None:
-        # print(instance.state.batch_output.to_dict())
         # Currently, log at the end of train/ val phase
-        if instance.state.batch_output.step + 1 % getattr(instance, f"{instance.state.phase}_dataloader").__len__() == 0:
+        if (instance.state.batch_output.step + 1) % len(getattr(instance, f"{instance.state.phase}_dataloader")) == 0:
             instance.control.should_log = True
 
         # Evaluate
@@ -126,7 +126,7 @@ class DefaultFlowCallback(BaseCallback):
         ) or (
                 instance.state.batch_output.phase == "train" and
                 instance.state.eval_strategy == "epoch" and
-                instance.state.step + 1 == instance.state.epoch * instance.train_dataloader.__len__()
+                instance.state.step + 1 == instance.state.epoch * len(instance.train_dataloader)
         ):
             instance.state.phase = "val"
             instance.control.should_evaluate = True
@@ -136,6 +136,5 @@ class DefaultFlowCallback(BaseCallback):
             instance.control.should_training_stop = True
 
         # Update step
-        from transformers.trainer_callback import TrainerCallback
         if instance.state.phase == "train":
             instance.state.step += 1

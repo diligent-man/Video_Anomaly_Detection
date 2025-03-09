@@ -3,7 +3,7 @@ from .DefaultFlowCallback import DefaultFlowCallback
 from .ProgressCallback import ProgressCallback
 
 
-DEFAULT_TRAINER_CALLBACKS = [DefaultFlowCallback]
+DEFAULT_TRAINER_CALLBACKS = [DefaultFlowCallback, ProgressCallback]
 
 
 __all__ = [

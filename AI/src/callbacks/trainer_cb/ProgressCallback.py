@@ -1,4 +1,8 @@
 from tqdm import tqdm
+from typing import Tuple
+
+from torch.utils.data import DataLoader
+
 from ...runner import Trainer
 from .BaseCallback import BaseCallback
 
@@ -11,67 +15,79 @@ class ProgressCallback(BaseCallback):
     A [`TrainerCallback`] that displays the progress of training or evaluation.
     You can modify `max_str_len` to control how long strings are truncated when logging.
     """
+    __train_bar: tqdm = None
+    __val_bar: tqdm = None
 
-    def __init__(self, max_str_len: int = 100):
+    def __init__(self, max_str_len: int = 100) -> None:
         """
         Initialize the callback with optional max_str_len parameter to control string truncation length.
 
-        Args:
-            max_str_len (`int`):
-                Maximum length of strings to display in logs.
-                Longer strings will be truncated with a message.
+        :param max_str_len:
+            Maximum length of strings to display in logs. Longer strings will be truncated with a message.
         """
-        self.training_bar = None
-        self.prediction_bar = None
-        self.max_str_len = max_str_len
-        self.current_step = 0
+        self.__max_str_len: int = max_str_len
+
+    @staticmethod
+    def _find_initial_total(instance: Trainer, dataloader: DataLoader) -> Tuple[int, int]:
+        if instance.state.phase == "train" or instance.state.eval_strategy == "epoch":
+            initial: int = instance.state.epoch
+            initial = (initial - 1) * len(dataloader)
+
+            total: int = instance.state.epochs
+            total *= len(dataloader)
+        else:
+            initial: int = instance.state.step // instance.state.eval_steps
+            initial *= len(dataloader)
+
+            total: int = instance.state.steps // instance.state.eval_steps
+            total *= len(dataloader)
+        return initial, total
+
+    @staticmethod
+    def _make_desc(instance: Trainer, phase: str, loss: None | float) -> str:
+        desc: str = f"Forward: {instance.config.Data[phase].forward_strategy}, " \
+                    f"Phase: {phase}, " \
+                    f"Loss: {loss}"
+        return desc
+
+    def _trigger_tqdm(self, instance: Trainer) -> None:
+        if instance.state.batch_output is not None:
+            phase: str = instance.state.batch_output.phase
+            loss: float = instance.state.batch_output.loss
+        else:
+            phase = instance.state.phase
+            loss: None = None
+
+        dataloader = getattr(instance, f"{phase}_dataloader")
+        initial, total = self._find_initial_total(instance, dataloader)
+
+        setattr(self,
+                f"_{self.__class__.__name__}__{phase}_bar",
+                tqdm(None,
+                     self._make_desc(instance, phase, loss),
+                     total,
+                     initial=initial,
+                     dynamic_ncols=True,
+                     colour="cyan" if phase == "train" else "yellow",
+                     )
+                )
 
     def on_train_begin(self, instance: Trainer) -> None:
-        self.training_bar = tqdm(total=instance.state.steps, dynamic_ncols=True)
+        self._trigger_tqdm(instance)
+
+    def on_val_epoch_begin(self, instance: Trainer) -> None:
+        self._trigger_tqdm(instance)
 
     def on_step_end(self, instance: Trainer) -> None:
-        self.training_bar.update(instance.state.step)
-        self.current_step = instance.state.step
+        # self._trigger_tqdm(instance)
+        attr_name: str = f"_{self.__class__.__name__}__{instance.state.batch_output.phase}_bar"
 
-    # def on_prediction_step(self, args, state, control, eval_dataloader=None, **kwargs):
-    #     if state.is_world_process_zero and has_length(eval_dataloader):
-    #         if self.prediction_bar is None:
-    #             self.prediction_bar = tqdm(
-    #                 total=len(eval_dataloader), leave=self.training_bar is None, dynamic_ncols=True
-    #             )
-    #         self.prediction_bar.update(1)
-    #
-    # def on_evaluate(self, args, state, control, **kwargs):
-    #     if state.is_world_process_zero:
-    #         if self.prediction_bar is not None:
-    #             self.prediction_bar.close()
-    #         self.prediction_bar = None
-    #
-    # def on_predict(self, args, state, control, **kwargs):
-    #     if state.is_world_process_zero:
-    #         if self.prediction_bar is not None:
-    #             self.prediction_bar.close()
-    #         self.prediction_bar = None
-    #
-    # def on_log(self, args, state, control, logs=None, **kwargs):
-    #     if state.is_world_process_zero and self.training_bar is not None:
-    #         # make a shallow copy of logs so we can mutate the fields copied
-    #         # but avoid doing any value pickling.
-    #         shallow_logs = {}
-    #         for k, v in logs.items():
-    #             if isinstance(v, str) and len(v) > self.max_str_len:
-    #                 shallow_logs[k] = (
-    #                     f"[String too long to display, length: {len(v)} > {self.max_str_len}. "
-    #                     "Consider increasing `max_str_len` if needed.]"
-    #                 )
-    #             else:
-    #                 shallow_logs[k] = v
-    #         _ = shallow_logs.pop("total_flos", None)
-    #         # round numbers so that it looks better in console
-    #         if "epoch" in shallow_logs:
-    #             shallow_logs["epoch"] = round(shallow_logs["epoch"], 2)
-    #         self.training_bar.write(str(shallow_logs))
+        if instance.state.batch_output is not None:
+            phase: str = instance.state.batch_output.phase
+            loss: float = instance.state.batch_output.loss
+        else:
+            phase = instance.state.phase
+            loss: None = None
 
-    def on_train_end(self, instance: Trainer):
-        self.training_bar.close()
-        self.training_bar = None
+        getattr(self, attr_name).set_description_str(self._make_desc(instance, phase, loss), refresh=False)
+        getattr(self, attr_name).update(1)

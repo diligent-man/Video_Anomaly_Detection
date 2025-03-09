@@ -65,11 +65,7 @@ def v1(instance: Union[Trainer],
         total *= len(dataloader)
 
     instance.callback(f"on_{instance.state.phase}_epoch_begin")
-    for step, (inps, labels) in tqdm(enumerate(dataloader),
-                                  initial=initial,
-                                  total=total,
-                                  desc=f"Forward v2, Phase: {instance.state.phase}"
-                                  ):
+    for step, (inps, labels) in enumerate(dataloader):
         inps: Tensor
         lr: None | float = None
         batch_loss: None | torch.Tensor = None
@@ -116,6 +112,7 @@ def v1(instance: Union[Trainer],
         instance.callback(f"on_step_end")
 
         if instance.control.should_evaluate:
+            instance.state.batch_output = None  # reset batch_output
             BatchForwarder.BatchForwarder(
                 instance.config.Data[instance.state.phase].forward_strategy,
                 instance,
