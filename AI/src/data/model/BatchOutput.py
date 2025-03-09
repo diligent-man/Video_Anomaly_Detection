@@ -40,6 +40,10 @@ class BatchOutput:
     def epoch(self) -> int:
         return self.__epoch
 
+    @property
+    def phase(self):
+        return self.__phase
+
     def to_dict(self) -> Dict[str, Any]:
         batch_output: Dict[str, Any] = {
             "phase": self.__phase,

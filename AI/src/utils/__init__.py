@@ -6,6 +6,7 @@ from .EarlyStopping import EarlyStopping
 from .ModelArchInspector import ModelArchInspector
 
 from .load_video import video_loader
+from .runner_utils import ExportableState
 from .create_feature_extractor import create_feature_extractor
 from .visualize_dataset import prompt_dataset_statistics, plot_dataset_statistics
 
@@ -25,6 +26,10 @@ from .model_ops import (
     load_ckpt
 )
 
+from .intergration_ops import (
+    is_mlflow_available
+)
+
 from .misc import (
     get_amp_cfg,
     visualize_lr,
@@ -42,6 +47,7 @@ __all__ = [
     "ModelArchInspector",
 
     "video_loader",
+    "ExportableState",
     "prompt_dataset_statistics",
     "plot_dataset_statistics",
 
@@ -53,6 +59,8 @@ __all__ = [
 
     "load_weights",
     "load_ckpt",
+
+    "is_mlflow_available",
 
     "get_amp_cfg",
     "visualize_lr",

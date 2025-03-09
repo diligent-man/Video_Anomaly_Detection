@@ -3,33 +3,29 @@ from typing import Dict, Any, Callable, Union
 import torch
 from tqdm import tqdm
 from torch import GradScaler, Tensor
-
-from torch.nn import Module
+from torch.utils.data import DataLoader
 from torch.optim.optimizer import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
-from torch.utils.data import DataLoader
+from torch.autograd.grad_mode import set_grad_enabled, inference_mode
 
-from AI.src.tools import Trainer
-from AI.src.losses import LossWrapper
-from AI.src.data.model import BatchOutput
+from .DotDict import DotDict
+from ..runner import Trainer
+from ..losses import LossWrapper
+from ..data.model import BatchOutput
+import AI.src.utils.BatchForwarder as BatchForwarder  # Circular dependency
 
 
 __all__ = ["FORWARD_STRATEGIES"]
 
 
 def v1(instance: Union[Trainer],
-       phase: str,
-       model: Module,
+       grad_ctx: set_grad_enabled | inference_mode,
        dataloader: DataLoader,
        amp_cfg: Dict[str, Any],
-       epochs: int,
-       cur_epoch: int,
-       device: str,
-       grad_ctx_manager,
+       grad_scaler: GradScaler = None,
        loss: LossWrapper = None,
        optim: Optimizer = None,
-       scheduler: LRScheduler = None,
-       grad_scaler: GradScaler = None,
+       scheduler: LRScheduler = None
        ) -> None:
     """
     This phase use for train/ val single MIL VAD problem
@@ -52,26 +48,47 @@ def v1(instance: Union[Trainer],
 
         compute metrics (if have)
     """
-    lr: None | float = None
-    cur_step: int = (cur_epoch - 1) * len(dataloader)
+    phase = instance.state.phase
+    device: str = instance.config.Global.get("device", "cpu")
 
-    instance.run_callbacks(f"on_{phase}_epoch_start")
-    for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Forward v2, Phase: {phase}, Epoch: {cur_epoch}"):
+    if phase == "train" or instance.state.eval_strategy == "epoch":
+        initial: int = instance.state.epoch
+        initial = (initial - 1) * len(dataloader)
+
+        total: int = instance.state.epochs
+        total *= len(dataloader)
+    else:
+        initial: int = instance.state.step // instance.state.eval_steps
+        initial *= len(dataloader)
+
+        total: int = instance.state.steps // instance.state.eval_steps
+        total *= len(dataloader)
+
+    instance.callback(f"on_{instance.state.phase}_epoch_begin")
+    for step, (inps, labels) in tqdm(enumerate(dataloader),
+                                  initial=initial,
+                                  total=total,
+                                  desc=f"Forward v2, Phase: {instance.state.phase}"
+                                  ):
         inps: Tensor
+        lr: None | float = None
+        batch_loss: None | torch.Tensor = None
 
-        if phase == "train" and optim is not None:
-            optim.zero_grad()
+        if instance.state.phase == "train" and optim is not None:
+            instance.model.zero_grad()  # safer than optimizer.zero_grad() in case of num of optimizer > 1
 
-        with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
+        instance.callback("on_step_begin")
+        with grad_ctx, torch.amp.autocast(**amp_cfg):
             anomaly, normal = torch.chunk(inps, 2, 1)
 
-            anomaly_preds: Tensor = model(anomaly.to(device)).preds  # (B, S)
-            normal_preds: Tensor = model(normal.to(device)).preds  # (B, S)
+            anomaly_preds: Tensor = instance.model(anomaly.to(device)).preds  # (B, S)
+            normal_preds: Tensor = instance.model(normal.to(device)).preds  # (B, S)
 
-            batch_loss: Tensor = loss.compute_batch_loss([anomaly_preds, normal_preds])
+            if loss is not None:
+                batch_loss: Tensor = loss.compute_batch_loss([anomaly_preds, normal_preds])
 
         # Exits the context manager before backward
-        if phase == "train":
+        if instance.state.phase == "train":
             if grad_scaler is not None:
                 grad_scaler.scale(batch_loss).backward()
                 # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm) add later on
@@ -82,26 +99,31 @@ def v1(instance: Union[Trainer],
                 optim.step()
 
             if scheduler is not None:
-                scheduler.step(cur_step)
+                scheduler.step(instance.state.step)
 
-            lr: float = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
+            lr = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
 
         # Per step logging
         batch_output: Dict[str, Any] = {
-            "phase": phase,
-            "epoch": cur_epoch,
-            "step": cur_step,
+            "phase": instance.state.phase,
+            "epoch": instance.state.epoch,
+            "step": initial+step,
             "lr": lr,
-            "loss": batch_loss.item(),
+            "loss": batch_loss.item() if batch_loss is not None else batch_loss,
         }
 
-        instance.batch_output = BatchOutput(**batch_output)
+        instance.state.batch_output = BatchOutput(**batch_output)
+        instance.callback(f"on_step_end")
 
-        # Update step
-        cur_step += 1
-
-        instance.run_callbacks(f"on_{phase}_batch_end")
-    instance.run_callbacks(f"on_{phase}_epoch_end")
+        if instance.control.should_evaluate:
+            BatchForwarder.BatchForwarder(
+                instance.config.Data[instance.state.phase].forward_strategy,
+                instance,
+                **{
+                    "overridden_args": instance.config.Data[instance.state.phase].get("overridden_args", DotDict({})).get_dict()
+                }
+            )()
+    instance.callback(f"on_{instance.state.phase}_epoch_end")
 
 
 def v2(T_max: int = 50,

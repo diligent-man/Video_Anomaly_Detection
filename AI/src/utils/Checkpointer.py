@@ -18,6 +18,7 @@ class Checkpointer(object):
     __save_freq: str | int
     __save_best_only: bool
     __save_weights_only: bool
+    __save_total_limit: int
     __include_config: bool
     __best: float
     __verbose: bool
@@ -33,6 +34,7 @@ class Checkpointer(object):
                  save_freq: str | int = "epoch",
                  save_best_only: bool = False,
                  save_weights_only: bool = False,
+                 save_total_limit: int = 5,
                  include_config: bool = False,
                  initial_value_threshold: float = None,
                  verbose: bool = True,
@@ -47,6 +49,7 @@ class Checkpointer(object):
         self.__save_freq = save_freq
         self.__save_best_only = save_best_only
         self.__save_weights_only = save_weights_only
+        self.__save_total_limit = save_total_limit
         self.__include_config = include_config
         self.__best = initial_value_threshold
         self.__verbose = verbose
@@ -103,7 +106,7 @@ class Checkpointer(object):
             self.__best = cur_val
         else:
             if self.__verbose:
-                print(f"\nEpoch {self.cur_epoch}: {self.__monitor} did not improve from {self.__best:.5f}")
+                print(f"Epoch {self.cur_epoch}: {self.__monitor} did not improve from {self.__best:.5f}")
 
         # Save by freq
         if not self.__save_best_only:

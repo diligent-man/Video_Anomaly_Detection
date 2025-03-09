@@ -1,4 +1,4 @@
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Any
 
 import torch
 
@@ -61,7 +61,9 @@ Has aux logits: {self.__has_aux}""")
     def name(self) -> str:
         return self.__name
 
-    def _to_float32(self, preds) -> Union[torch.Tensor, List[torch.Tensor], Dict[str, torch.Tensor]]:
+    def _to_float32(self, preds: Union[torch.Tensor, List[torch.Tensor], Dict[str, Any]]
+                    ) -> Union[torch.Tensor, List[torch.Tensor], Dict[str, torch.Tensor]]:
+        # cast to float32 in case of using torch.amp.autocast, cuz dtype != float32 can't precisely visualize
         if isinstance(preds, dict):
             for k in preds:
                 if isinstance(preds[k], dict) or isinstance(preds[k], list):

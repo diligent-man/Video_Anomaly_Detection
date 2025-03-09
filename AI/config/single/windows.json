@@ -1,16 +1,24 @@
 {
+
     "global":
     {
 //        "save_dir": "/home/trong/Downloads/training_results/",
         "project_name": "AIP391",
-        "experiment_name": "run1",
+//        "experiment_name": "run",
 //        "technique": "single",
 //        "mode": "train",
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 5,
+        "epochs": 2,
+        "eval_strategy": "epoch",
+        "eval_steps": 12,
+
         "print_step": 1,
+
+        // Resume training
+        "resume": false,
+        "resume_ckpt": "D:\\Local\\Source\\Python\\semester_9\\AIP391\\Video_anomaly_detection\\AI\\results\\AIP391\\single\\train\\run1\\checkpoint\\best_epoch4.pt",
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
@@ -56,7 +64,7 @@
                 "batch_size": 3,
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
-                "num_workers": 8,
+                "num_workers": 6,
                 "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "spawn"
@@ -87,7 +95,7 @@
                 "batch_size": 3,
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
-                "num_workers": 8,
+                "num_workers": 4,
                 "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "spawn"
@@ -147,17 +155,10 @@
 //        "postprocessing": {}
     },
 
-    "checkpoint":
-    {
-        "load": false,
-        "resume_ckpt": "../results"
-    },
-
-
     "optim":
     {
         "lr": {"name": "Adam", "lr": 1e-6, "amsgrad": true},
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  9, "num_warmup_steps": 9},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  12, "num_warmup_steps": 12},
         "regularizer": {}
     },
 
@@ -195,7 +196,6 @@
         "min_delta": 0
 
     },
-
     "services": [
         {
             "name": "checkpoint",
@@ -203,9 +203,10 @@
 
             "mode": "min",
             "monitor": "val_loss",
-            "save_freq": 1,
+            "save_strategy": 2,
             "save_best_only": false,
             "save_weights_only": true,
+            "save_total_limit": 5,
             "include_config": true
         },
 
@@ -224,5 +225,4 @@
 //            "apply": true
 //        }
     ]
-//    "EVALUATION_STRATEGY": "no"
 }

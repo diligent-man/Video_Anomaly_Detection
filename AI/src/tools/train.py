@@ -8,6 +8,7 @@ import warnings
 from typing import Dict
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
 
+
 import torch
 
 from AI.src.modeling import build_model
@@ -17,7 +18,7 @@ from AI.src.optimizer import build_optimizer
 from AI.src.losses import LossWrapper
 from AI.src.metrics import MetricWrapper
 
-from AI.src.tools.Trainer import Trainer
+from AI.src.runner import Trainer
 from AI.src.utils import DotDict, ConfigReader, load_ckpt
 
 warnings.filterwarnings("once")
