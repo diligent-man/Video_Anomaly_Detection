@@ -22,8 +22,8 @@ class TemporalAggregation(torch.nn.Module):
         super().__init__()
         embed_dim: List[int] = [in_channels] * num_backbones if isinstance(in_channels, int) else in_channels
         assert max_relative_position >= 0, ValueError("max_relative_positions must be >= 0")
-        assert embed_dim[0] > 0, ValueError(f"Embed_dim must be > 0. Get '{i}'")
-        assert embed_dim[0] % num_heads == 0, ValueError(f"Embed_dim must be divisible by num_heads. Get '{i}' % {num_heads}")
+        assert embed_dim[0] > 0, ValueError(f"Embed_dim must be > 0. Get '{in_channels}'")
+        assert embed_dim[0] % num_heads == 0, ValueError(f"Embed_dim must be divisible by num_heads. Get '{in_channels}' % {num_heads}")
 
         self._out_channels: int | List[int] = embed_dim
         self._num_backbones: int = num_backbones

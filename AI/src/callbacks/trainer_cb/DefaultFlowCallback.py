@@ -70,20 +70,19 @@ class DefaultFlowCallback(BaseCallback):
         # Inspect model architecture
         inspect_model_arch: bool = instance.config.Global.get("inspect_model_arch", False)
         dummy_shape: None | Tuple[int, ...] = instance.config.Global.get("dummy_input_shape", None)
+
         if inspect_model_arch and dummy_shape is not None:
-            try:
-                amp_cfg, _ = get_amp_cfg(instance.config)
-                with torch.amp.autocast(**amp_cfg):
-                    model_arch = ModelArchInspector(
-                        instance.model,
-                        instance.config.Global.dummy_input_shape,
-                        depth=instance.config.Global.get("inspect_depth", 3),
-                        mode="train",
-                        verbose=0
-                    )
-                instance.config["Model_arch"] = model_arch
-            except Exception as e:
-                instance.config["Model_arch"] = f"Fail to inspect model architecture due to {e}"
+            amp_cfg, _ = get_amp_cfg(instance.config)
+            with torch.amp.autocast(**amp_cfg):
+                model_arch = ModelArchInspector(
+                    instance.model,
+                    instance.config.Global.dummy_input_shape,
+                    depth=instance.config.Global.get("inspect_depth", 3),
+                    verbose=0,
+                    mode="train",
+                    device=instance.config.Global.get("device", "cpu")
+                )
+            instance.config["Model_arch"] = str(model_arch())
 
     def on_train_begin(self, instance: Trainer) -> None:
         instance.state.phase = "train"
@@ -130,6 +129,8 @@ class DefaultFlowCallback(BaseCallback):
         ):
             instance.state.phase = "val"
             instance.control.should_evaluate = True
+
+        # Checkpointing is relegated to ModelCheckpoint callback
 
         # End training
         if instance.state.step >= instance.state.steps:

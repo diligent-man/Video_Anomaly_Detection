@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Any
+from typing import Callable, Optional, Any, Mapping
 from functools import partial
 
 import torch
@@ -72,8 +72,8 @@ class S3D(torch.nn.Module):
 
 
 def s3d(weights: None | str | S3D_Weights = True, **kwargs) -> torch.nn.Module:
-    model: S3D = S3D(**kwargs)
-    weights: None | dict[str, Any] = load_weights(weights)
+    model = S3D(**kwargs)
+    weights: str | Mapping[str, Any] = load_weights(weights)
 
     if weights is not None:
         model.load_state_dict(weights)

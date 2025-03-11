@@ -10,17 +10,23 @@ from . import DotDict
 __all__ = ["load_weights", "load_ckpt"]
 
 
-def load_weights(weights: str | WeightsEnum) -> Mapping[str, Any]:
+def load_weights(weights: str | WeightsEnum, src: str = "pytorch", return_path: bool = False) -> str | Mapping[str, Any]:
     if isinstance(weights, WeightsEnum):
         # Consider path from this file
         rel_path: str = str(os.path.join(os.path.dirname(__file__), "..", "..", weights.url))
 
-        if os.path.exists(rel_path):
-            weights: Mapping[str, Any] = torch.load(rel_path, weights_only=True)
+        if src == "hugging_face" or return_path:
+            weights: str = rel_path
         else:
-            weights: Mapping[str, Any] = weights.get_state_dict(progress=True)
+            if os.path.exists(rel_path):
+                weights: Mapping[str, Any] = torch.load(rel_path, weights_only=True)
+            else:
+                weights: Mapping[str, Any] = weights.get_state_dict(progress=True)
     elif isinstance(weights, str):
-        weights: Mapping[str, Any] = torch.load(weights, weights_only=True)
+        if src == "hugging_face" or return_path:
+            weights: str = weights
+        else:
+            weights: Mapping[str, Any] = torch.load(weights, weights_only=True)
     return weights
 
 

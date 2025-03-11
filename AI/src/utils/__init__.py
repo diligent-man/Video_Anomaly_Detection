@@ -1,6 +1,5 @@
 from .DotDict import DotDict
 from .ANSIColor import ANSIColor
-from .Checkpointer import Checkpointer
 from .ConfigReader import ConfigReader
 from .EarlyStopping import EarlyStopping
 from .ModelArchInspector import ModelArchInspector
@@ -41,7 +40,6 @@ from .misc import (
 __all__ = [
     "DotDict",
     "ANSIColor",
-    "Checkpointer",
     "ConfigReader",
     "EarlyStopping",
     "ModelArchInspector",

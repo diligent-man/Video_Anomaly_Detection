@@ -1,3 +1,6 @@
+import gc
+import warnings
+from pprint import pformat
 from typing import Union, Sequence, Any, Mapping, Iterable
 
 import torch
@@ -54,20 +57,28 @@ class ModelArchInspector(object):
         self.__verbose = verbose
         self.__kwargs = kwargs
 
-    def __call__(self):
-        return torchinfo.summary(
-            self.__model,
-            self.__input_size,
-            self.__input_data,
-            None,
-            None,
-            self.__col_names,
-            self.__col_width,
-            self.__depth,
-            self.__device,
-            self.__dtypes,
-            self.__mode,
-            None,
-            self.__verbose,
-            **self.__kwargs
-        )
+    def __call__(self) -> str | torchinfo.ModelStatistics:
+        try:
+            result = torchinfo.summary(
+                self.__model,
+                self.__input_size,
+                self.__input_data,
+                None,
+                None,
+                self.__col_names,
+                self.__col_width,
+                self.__depth,
+                self.__device,
+                self.__dtypes,
+                self.__mode,
+                None,
+                self.__verbose,
+                **self.__kwargs
+            )
+        except RuntimeError as e:
+            result = pformat(f"Fail to inspect model arch due to '{str(e)}'", indent=4)
+            warnings.warn(result)
+
+        gc.collect()
+        torch.cuda.empty_cache()
+        return result

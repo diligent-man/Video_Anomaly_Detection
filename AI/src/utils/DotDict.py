@@ -35,7 +35,7 @@ class DotDict(dict):
             k: str = self._preprocess_key(k, depth, kwargs.get("capitalize_first_level_key", True if depth == 0 else False))
 
             if isinstance(v, (list, tuple, set)):
-                v = self._remove_duplicated_dicts(v)
+                # v = self._remove_duplicated_dicts(v)  #  don't remember why I have to remove duplications :v
                 setattr(self, k, [DotDict(x, depth + 1, **kwargs) if isinstance(x, dict) else x for x in v])
             else:
                 setattr(self, k, DotDict(v, depth + 1, **kwargs) if isinstance(v, dict) else v)

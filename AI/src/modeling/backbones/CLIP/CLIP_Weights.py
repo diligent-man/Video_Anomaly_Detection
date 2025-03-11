@@ -97,4 +97,5 @@ class CLIP_Weights(WeightsEnum):
              }
          }
      )
+
      DEFAULT = BASE_PATCH16_224

@@ -27,7 +27,7 @@ class ConfigReader(object):
         "fields": ["global", "data", "architecture", "optim", "metric", "loss", "checkpoint", "early_stopping", "services"]
     }
 
-    __supported_services: Tuple[str, ...] = ("checkpoint", "mlflow")
+    __supported_services: Tuple[str, ...] = ("Checkpointer", "mlflow")
 
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
@@ -136,7 +136,12 @@ class ConfigReader(object):
         )
 
         services: List[str] = get_services(self.__config)
-        dirs = ("log", *services)
+
+        # Exclude default callbacks
+        if "Checkpointer" in services:
+            services.remove("Checkpointer")
+
+        dirs = ("log", "ckpt", *services)
 
         print("Save dir:")
         for dir_name in dirs:

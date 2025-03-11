@@ -198,12 +198,12 @@
     },
     "services": [
         {
-            "name": "checkpoint",
+            "name": "Checkpointer",
             "apply": true,
 
             "mode": "min",
             "monitor": "val_loss",
-            "save_strategy": 2,
+            "save_freq": 2,
             "save_best_only": false,
             "save_weights_only": true,
             "save_total_limit": 5,

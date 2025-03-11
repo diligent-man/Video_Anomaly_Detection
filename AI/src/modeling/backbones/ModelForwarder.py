@@ -1,5 +1,4 @@
 import functools
-import gc
 from typing import Dict, Any
 
 import torch
@@ -29,6 +28,8 @@ class ModelForwarder(object):
         if x.dim() == 5:
             x = x.unsqueeze(0)
 
+        self._model = self._model.to(x.device)
+
         if self._name in NET_2D:
             x: torch.Tensor = self._forward_2D_net(x)
         elif self._name in NET_3D:
@@ -41,15 +42,26 @@ class ModelForwarder(object):
         try:
             # (B,S,C,T,H,W) -> (B*S,T,C,H,W) -> (B*S*T,C,H,W)
             tmp: torch.Tensor = x.view(-1, C, T, H, W).permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
-            x: torch.Tensor = _resolve_backbone_output(self._model.to(x.device)(tmp))
+
+            x: torch.Tensor = _resolve_backbone_output(self._model(tmp))
             x = x.view(B * S, T, -1)
         except torch.OutOfMemoryError:
-            cache: None | torch.Tensor = None
+            batch_cache: None | torch.Tensor = None
             for i in range(B):
-                tmp: torch.Tensor = x[i, ...].permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
-                tmp: torch.Tensor = _resolve_backbone_output(self._model.to(x.device)(tmp))
-                cache = tmp if cache is None else torch.cat((cache, tmp), dim=0)
-            x = cache.view(B*S, T, -1)
+                try:
+                    batch: torch.Tensor = x[i, ...].permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
+                    batch: torch.Tensor = _resolve_backbone_output(self._model(batch))
+                    batch_cache = batch if batch_cache is None else torch.cat((batch_cache, batch), dim=0)
+                except torch.OutOfMemoryError:
+                    snippet_cache: None | torch.Tensor = None
+                    for j in range(S):
+                        snippet: torch.Tensor = x[i, j, ...].permute(1, 0, 2, 3)
+                        snippet: torch.Tensor = _resolve_backbone_output(self._model(snippet))
+
+                        snippet_cache = snippet if snippet_cache is None else torch.cat((snippet_cache, snippet), dim=0)
+                    batch_cache = snippet_cache if batch_cache is None else torch.cat((batch_cache, snippet_cache), dim=0)
+
+            x = batch_cache.view(B*S, T, -1)
         # (B*S,T,Hid_dim) -> # (B*S,Hid_dim,T)
         x = x.permute(0, -1, -2)
 
@@ -66,12 +78,12 @@ class ModelForwarder(object):
         try:
             # (B,S,C,T,H,W) -> (B*S,T,C,H,W)
             tmp: torch.Tensor = x.view(-1, C, T, H, W)
-            x: torch.Tensor = _resolve_backbone_output(self._model.to(x.device)(tmp))
+            x: torch.Tensor = _resolve_backbone_output(self._model(tmp))
         except torch.OutOfMemoryError:
             cache: None | torch.Tensor = None
             for i in range(B):
                 tmp: torch.Tensor = x[i, ...]
-                tmp: torch.Tensor = _resolve_backbone_output(self._model.to(x.device)(tmp))
+                tmp: torch.Tensor = _resolve_backbone_output(self._model(tmp))
                 cache = tmp if cache is None else torch.cat((cache, tmp), dim=0)
             x = cache
         # (B*S,Hid_dim,T_out,H_out,W_out) -> (B*S,Hid_dim,1,1,1)

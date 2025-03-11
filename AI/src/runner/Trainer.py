@@ -1,10 +1,5 @@
-import sys
 import time
 
-from typing import Dict, Any
-
-
-import torch
 from torch.nn import Module
 from torch.utils.data import DataLoader
 from torch.optim.optimizer import Optimizer
@@ -33,9 +28,9 @@ class Trainer(object):
     __callback: CallbackWrapper
     __sleep_time: float
 
-    model: Module
-    optimizer: Optimizer
-    scheduler: LRScheduler
+    __model: Module
+    __optimizer: Optimizer
+    __scheduler: LRScheduler
     control: TrainerControl
     state: TrainerState
 
@@ -55,26 +50,17 @@ class Trainer(object):
         self.__train_dataloader = train_dataloader
         self.__val_dataloader = val_dataloader
         self.__sleep_time = self.__config.Global.get("sleep", 0)
+        self.__callback = CallbackWrapper(self, get_services(config))
+        self.__model = model
+        self.__optim = optim
+        self.__scheduler = scheduler
 
-        self.__callback = CallbackWrapper(
-            self,
-            get_services(config),
-            model=model,
-            optim=optim,
-            scheduler=scheduler,
-            train_dataloader=train_dataloader,
-            val_dataloader=val_dataloader
-        )
-
-        self.model = model
-        self.optim = optim
-        self.scheduler = scheduler
         self.control: TrainerControl = TrainerControl()
         self.state = TrainerState(
             stateful_callbacks=[cb for cb in [*self.__callback.callback_lst, self.control]
                                 if isinstance(cb, ExportableState)]
         )
-        # self.__best_val_loss = self._get_best_val_loss()
+
         self.control = self.__callback("on_init_end", self.control)
 
     @property
@@ -100,6 +86,18 @@ class Trainer(object):
     @property
     def callback(self) -> CallbackWrapper:
         return self.__callback
+
+    @property
+    def model(self):
+        return self.__model
+
+    @property
+    def optim(self) -> Optimizer:
+        return self.__optim
+
+    @property
+    def scheduler(self) -> LRScheduler:
+        return self.__scheduler
 
     # def _get_best_val_loss(self) -> float:
     #     checkpoint_path: str = self.__config.Global.checkpoint_path
@@ -133,23 +131,6 @@ class Trainer(object):
         #                                           )
         # else:
         #     self.__early_stopping = None
-
-        # Inspect model architecture
-        # inspect_model_arch: bool = self.__config.Global.get("inspect_model_arch", False)
-        # dummy_shape: None | Tuple[int, ...] = self.__config.Global.get("dummy_input_shape", None)
-        # if inspect_model_arch and dummy_shape is not None:
-        #     try:
-        #         with torch.amp.autocast(**self.__amp_cfg):
-        #             model_arch = ModelArchInspector(
-        #                 self.__model,
-        #                 self.__config.Global.dummy_input_shape,
-        #                 depth=self.__config.Global.get("inspect_depth", 3),
-        #                 mode="train",
-        #                 verbose=0
-        #             )
-        #         self.__config["Model_arch"] = model_arch
-        #     except Exception as e:
-        #         self.__config["Model_arch"] = f"Fail to inspect model architecture due to {e}"
 
     def fit(self):
         """

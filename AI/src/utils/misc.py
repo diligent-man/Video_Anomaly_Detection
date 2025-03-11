@@ -84,7 +84,7 @@ def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScale
     use_amp: bool = config.Global.get("use_amp", False)
 
     if use_amp:
-        amp_dtype: torch.dtype = torch.float16 if device == "cuda" else torch.bfloat16  # cpu also use torch.float16 ???
+        amp_dtype: torch.dtype = torch.float16 # if device == "cuda" else torch.bfloat16  # cpu also use torch.float16 ???
 
         # Currently use default arg for GradScaler
         if device == "cuda":
@@ -111,11 +111,6 @@ def get_services(config: DotDict) -> List[str]:
             else:
                 setattr(service, "apply", False)
     return services
-
-
-def emojis(string=""):
-    """Return platform-dependent emoji-safe version of string."""
-    return string.encode().decode("ascii", "ignore") if WINDOWS else string
 
 
 def check_version(

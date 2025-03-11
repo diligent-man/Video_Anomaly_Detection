@@ -1,3 +1,4 @@
+import re
 import functools
 from typing import Dict, Any, List, Tuple, Union
 
@@ -13,7 +14,7 @@ from .constant import (
 )
 
 from ..nn import MLP
-from ...utils import DotDict, create_feature_extractor
+from ...utils import DotDict, create_feature_extractor, get_amp_cfg
 
 
 __all__ = [
@@ -34,15 +35,24 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
         "reduce": [],
         "out_channels": []
     }
+
     names: None | List[str] = config.Architecture.backbone.pop("name", None)
     compile_model: bool = config.Architecture.backbone.pop("compile", False)
     out_proj: Dict[str, Any] = config.Architecture.backbone.pop("out_proj", DotDict({})).get_dict()
 
+    offloading = config.Architecture.backbone.pop("offloading", False)
+    device_maps: List[None | DotDict] = config.Architecture.backbone.pop("device_maps", [None] * len(names))
+    device_maps: List[None | Dict[str, str]] = [device_map.get_dict() for device_map in device_maps
+                                                if isinstance(device_map, DotDict)]
+
     assert isinstance(names, list), ValueError(f"Name for feat extractor backbone must be string list. Get '{type(names)}'")
     assert len(names) > 0, ValueError("Number of backbone must be > 0")
+    if offloading:
+        assert len(device_maps) == len(names), ValueError(f"Provided device_map must be fully specified for all backbones")
 
-    for name in names:
+    for i, name in enumerate(names):
         assert name in NET_DEFAULT_CONFIG.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
+
         build_result["name"].append(name)
         model_args: Dict = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
 
@@ -54,6 +64,7 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
             model, NET_DEFAULT_CONFIG[name]["return_node"],
             concrete_args=NET_DEFAULT_CONFIG[name].get("concrete_args")
         )
+
         model = _freeze_layer(model)
         model.eval()
 
@@ -99,7 +110,10 @@ def build_reduce(name: str, config: DotDict) -> functools.partial:
 
 
 def _get_out_channels(model: torch.nn.Module | torch.fx.GraphModule, name: str) -> int:
-    dummy_input = torch.rand(NET_DEFAULT_CONFIG[name]["dummy_input"])
+    dummy_input = torch.rand(NET_DEFAULT_CONFIG[name]["dummy_input"],
+                             dtype=next(model.parameters()).dtype,
+                             device=next(model.parameters()).device)
+
     output = model(dummy_input)["features"]
 
     # Rule-based approach due to various model output

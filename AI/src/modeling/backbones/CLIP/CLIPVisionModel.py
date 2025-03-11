@@ -13,6 +13,7 @@ from transformers.models.clip import (
 )
 
 
+from ....utils import load_weights
 from .Transformer import VisionTransformer
 
 
@@ -71,4 +72,4 @@ class CLIPVisionModel(CLIPPreTrainedModel):
 
 
 def clip_vision(weights: str) -> torch.nn.Module:
-    return CLIPVisionModel.from_pretrained(weights)
+    return CLIPVisionModel.from_pretrained(load_weights(weights, "hugging_face"))

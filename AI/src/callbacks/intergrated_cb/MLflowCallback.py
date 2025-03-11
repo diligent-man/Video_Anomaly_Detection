@@ -50,7 +50,7 @@ class MLflowCallback(TrainerCallback):
         experiment_name: str = uri.split(os.sep)[-5]  # project_name
         run_name: str = "_".join(uri.split(os.sep)[-4: -1])  # technique_mode_experiment_name
 
-        self._ml_flow.set_tracking_uri("file:/" + uri)
+        self._ml_flow.set_tracking_uri("file:" + uri)
         self._ml_flow.set_experiment(experiment_name)
 
         # old_run = self._ml_flow.get_run("7bdad1ed7a4b4c1fab7f897903bd6cff")
@@ -86,9 +86,9 @@ class MLflowCallback(TrainerCallback):
             log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
         )
 
-        model_arch: None | ModelArchInspector = instance.config.pop("Model_arch", None)
+        model_arch: None | str = instance.config.pop("Model_arch", None)
         if model_arch is not None:
-            self._ml_flow.log_text(str(model_arch()), "model_arch.txt", active_run.info.run_id)
+            self._ml_flow.log_text(model_arch, "model_arch.txt", active_run.info.run_id)
 
         self._ml_flow.log_dict(instance.config.get_dict(),
                                f"config{pathlib.Path(instance.config.Global.config_path).suffixes[0]}")
@@ -104,8 +104,8 @@ class MLflowCallback(TrainerCallback):
 Experiment id: {active_run.info.experiment_id}
 Run name: {run_name}
 Run id: {active_run.info.run_id}
-Uri: {"file:/" + uri}
-Command: 'mlflow server --backend-store-uri {"file:/" + uri}'
+Uri: {"file:" + uri}
+Command: 'mlflow server --backend-store-uri {"file:" + uri}'
 ** Disabling by setting services.self._ml_flow.apply=false
 """)
         print(bottom)
