@@ -107,16 +107,22 @@ def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
     draw_bar_chart(["Anomalies", "Normal"], [anomaly_count, normal_count],
                    "Anomaly vs Normal videos",
                    None, None,
-                   {"rotation": 45, "ha": "right"}, None,
+                   {"rotation": 0, "ha": "center"}, None,
                    None,  {"bottom": 0, "top": max([anomaly_count, normal_count]) * 1.2},
                    True,
+                   width=0.5,  # Chỉ áp dụng cho biểu đồ này
                    **kwargs
                    )
+    # quay anomaly với normal ngang lại , bóp cột 2/3 hay 1/2 nhỏ lại
 
     # 3. Plot video duration distribution
-    bins = np.concatenate([np.arange(0, 110, 20), np.arange(200, 800, 100)])
+    bins = np.concatenate([np.arange(0, 120, 30), np.arange(120, 900, 120),np.arange(900, 960, 60), [np.inf]])
+    # bins = np.concatenate([np.arange(0, 120, 30), np.arange(120, 600, 120),np.arange(600, 660, 60), [np.inf]])
+
     bin_counts, _ = np.histogram(durations, bins=bins)
-    bin_labels = [f"[{bins[i]}, {bins[i + 1]})" for i in range(len(bins) - 1)]
+    bin_labels = [f"{int(bins[i])}-{int(bins[i+1])}" for i in range(len(bins)-2)] + ["900+"]
+
+
 
     draw_bar_chart(bin_labels, bin_counts.tolist(),
                    "Time Distribution",
@@ -133,7 +139,8 @@ def draw_bar_chart(x: Any, y: Any, title: str,
                    xticks: dict = None, yticks: dict = None,
                    xlim: dict = None, ylim: dict = None,
                    force_y_int: bool = False,
-                   fpath: str = None
+                   fpath: str = None,
+                   width: float = 0.8  # Thêm tham số width với giá trị mặc định
                    ) -> None:
     """
     Draws a bar chart using Seaborn and Matplotlib.
@@ -172,7 +179,7 @@ def draw_bar_chart(x: Any, y: Any, title: str,
         colors = ["#c2c2c2"] * len(y)  # Xám thay vì đen (#808080 là màu xám trung bình)
 
 
-    ax = sns.barplot(x=x, y=y, palette=colors, legend=False)
+    ax = sns.barplot(x=x, y=y, palette=colors, legend=False, width=width)
 
     if force_y_int:
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -186,6 +193,16 @@ def draw_bar_chart(x: Any, y: Any, title: str,
     plt.ylabel(ylabel)
 
     plt.xticks(**xticks)
+
+    # Đặt màu đỏ cho nhãn "0-120" và "900+"
+    xticklabels = ax.get_xticklabels()
+    for label in xticklabels:
+        if label.get_text() in ["0-30", "30-60", "60-90", "90-120"]:
+            label.set_color("green")
+        elif label.get_text() == "900+":
+            label.set_color("red")
+
+
     plt.yticks([])  # Remove Y-axis labels as required
 
     plt.xlim(**xlim)
