@@ -4,7 +4,7 @@ python3 ../src/tools/preprocess.py\
   --device both \
   --processes 32 \
   --batch_size 32 \
-  --root /home/trong/Downloads/Dataset/VAD/ubi-fight/ \
+  --root /home/trong/Downloads/Dataset/VAD/ucf/ \
   --cpu_ratio 0.5 \
   --save_root out \
   --run_async true\

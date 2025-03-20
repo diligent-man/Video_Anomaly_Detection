@@ -7,6 +7,7 @@ python3 ../src/tools/preprocess.py\
   --root /home/trong/Downloads/Dataset/VAD/ubi-fight/ \
   --cpu_ratio 0.5 \
   --save_root out \
+  --wait-time 30 \
   --del_prev_result true \
   --fn_name stage_two
 
