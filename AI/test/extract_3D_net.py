@@ -31,10 +31,10 @@ TRACER_ARGS = {
 
 def main() -> None:
     trace: bool = True
-    inspect_model: bool = False
+    inspect_model: bool = True
     compile_model: bool = False
 
-    B, S, C, T = 1, 32, 3, 15
+    B, S, C, T = 1, 32, 3, 13
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     with (torch.autocast(device_type=device, dtype=torch.float16)):

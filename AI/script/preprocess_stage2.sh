@@ -2,9 +2,9 @@
 # Run in alienware
 python3 ../src/tools/preprocess.py\
   --device cpu \
-  --processes 4 \
-  --batch_size 4 \
-  --root /home/trong/Downloads/Dataset/VAD/ubi-fight \
+  --processes 8 \
+  --batch_size 8 \
+  --root /home/trong/Downloads/Dataset/VAD/ubi-fight/ \
   --cpu_ratio 0.5 \
   --save_root out \
   --del_prev_result true \

@@ -9,6 +9,6 @@ def compute_pad(kernel_size: int | Tuple[int, int, int],
                 dim: int,
                 dim_len: int
                 ) -> int:
-    pad = max(kernel_size[dim] - stride[dim], 0) if dim_len % stride[dim] == 0 else \
-          max(kernel_size[dim] - (dim_len % stride[dim]), 0)
+    pad = max(int(kernel_size[dim]) - stride[dim], 0) if int(dim_len) % int(stride[dim]) == 0 else \
+          max(int(kernel_size[dim]) - (int(dim_len) % stride[dim]), 0)
     return pad

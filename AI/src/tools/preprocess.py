@@ -1,4 +1,5 @@
 """Script for preprocessing train video."""
+import gc
 import os
 import sys
 import glob
@@ -20,7 +21,6 @@ from torch.utils.data import Dataset, DataLoader
 from AI.src.preprocessing import VideoPreprocessor
 from AI.src.data.dataset import VideoFolderDataset
 from AI.src.data.dataloader import DefaultDataLoader
-
 
 
 def _custom_collate_fn(batch) -> List[str]:
@@ -99,11 +99,11 @@ def stage_three(args: Namespace, dl: DataLoader, ds_name: str) -> None:
     save_root.insert(ds_name_idx, args.save_root)
     save_root: str = f"{os.sep}".join(save_root)
 
-    objs_in_save_root: Set[str] = set([path.replace(save_root, "") for path in \
+    objs_in_save_root: Set[str] = set([path.replace(save_root, "") for path in
                                        glob.glob(f"{save_root}/**", recursive=True, include_hidden=True)])
 
     objs_in_original_root: Set[str] = set([
-        path.replace(args.root, "").replace(args.vid_ext, "pt") for path in \
+        path.replace(args.root, "").replace(args.vid_ext, "pt") for path in
         glob.glob(f"{args.root}/**", recursive=True, include_hidden=True)
     ])
 
@@ -194,7 +194,6 @@ if __name__ == "__main__":
     argument_parser.add_argument("--vid_ext",
                                  type=str,
                                  help="Video extension")
-
 
     parsed_args = argument_parser.parse_args()
     main(parsed_args)

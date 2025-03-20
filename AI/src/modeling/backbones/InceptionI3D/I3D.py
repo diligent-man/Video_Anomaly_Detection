@@ -22,13 +22,16 @@ class InceptionI3d(torch.nn.Module):
     """
     __VALID_ENDPOINTS: Tuple[str] = (
         "conv3d_1a_7x7",
+
         "maxPool3d_2a_3x3",
         "conv3d_2b_1x1",
         "conv3d_2c_3x3",
+
         "maxPool3d_3a_3x3",
         "mixed_3b",
         "mixed_3c",
         "maxPool3d_4a_3x3",
+
         "mixed_4b",
         "mixed_4c",
         "mixed_4d",

@@ -88,7 +88,7 @@ class VisionEmbeddings(torch.nn.Module):
         """
         batch_size, _, height, width = pixel_values.shape
 
-        if not interpolate_pos_encoding and (height != self.image_size or width != self.image_size):
+        if not interpolate_pos_encoding and (height != int(self.image_size) or width != int(self.image_size)):
             raise ValueError(
                 f"Input image size ({height}*{width}) doesn't match model" f" ({self.image_size}*{self.image_size})."
             )

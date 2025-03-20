@@ -45,6 +45,7 @@ def main() -> None:
         for name, weights in TEST_DATA.items():
             model, _, return_node, dummy_input = NET_DEFAULT_CONFIG[name].values()
             model: torch.nn.Module = model(weights)
+            torch.save(model, r"C:\Users\NDT\Downloads\model.pt")
 
             if inspect_model:
                 ModelArchInspector(
