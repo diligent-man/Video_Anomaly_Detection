@@ -19,7 +19,7 @@ class VideoPreprocessor(object):
     ]
 
     __filters: Dict[str, Dict[str, Any]] = {
-        "fps": {"fps": 30, "round": "up"},
+        "fps": {"fps": 15, "round": "up"},
         "scale": {"w": 320, "h": 320, "sws_flags": "neighbor"},
         "crop": {"out_w": 224, "out_h": 224, "exact": 1, "keep_aspect": 1},
     }

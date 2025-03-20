@@ -1,13 +1,13 @@
 #!/bin/sh
 # Run in alienware
 python3 ../src/tools/preprocess.py\
-  --device cpu \
+  --device both \
   --processes 32 \
   --batch_size 32 \
-  --root /home/trong/Downloads/Dataset/VAD/ubi-fight \
+  --root /home/trong/Downloads/Dataset/VAD/ubi-fight/ \
   --cpu_ratio 0.5 \
   --save_root out \
-  --run_async false\
+  --run_async true\
   --fn_name stage_one
 
 

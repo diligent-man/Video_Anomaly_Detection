@@ -13,6 +13,8 @@ from multiprocessing import Pool
 from argparse import ArgumentParser, Namespace
 from typing import List, Dict, Callable, Set, Any
 
+from matplotlib import __getattr__
+
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
 
 from tqdm import tqdm
@@ -52,7 +54,7 @@ def stage_one(args: Namespace, dl: DataLoader, ds_name: str) -> None:
         pool.map(partial(VideoPreprocessor.stage_one, run_async=args.run_async), preprocessors)
 
         if args.run_async:
-            time.sleep(10)
+            time.sleep(args.wait_time)
     return None
 
 
@@ -183,6 +185,11 @@ if __name__ == "__main__":
                                  default=False,
                                  type=lambda x: (str(x).lower() == "true"),
                                  help="Run ffmpeg in an async manner")
+
+    argument_parser.add_argument("--wait_time",
+                                 default=20,
+                                 type=int,
+                                 help="Waiting time when running async manner")
 
     # Take effect from stage 2
     argument_parser.add_argument("--del_prev_result",
