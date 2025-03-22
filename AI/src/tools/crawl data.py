@@ -22,6 +22,7 @@ videos = {
     "https://www.youtube.com/watch?v=GyAJvaEUUpM&list=PL3HxEb3s-wfYZ_kGn_xwvvDCsYX3HL97a&pp=gAQB":"shoplifting",
     "https://www.youtube.com/watch?v=AKOnSEDDzDM&list=PL3HxEb3s-wfYZRfCcZnzcpdN-5L77N_Mn&pp=gAQB":"suspicious",
     "https://www.youtube.com/watch?v=H9hq3onxf0o&list=PL3HxEb3s-wfbCqq76rFlriL45Og2Z8WDT&pp=gAQB":"vandalism",
+    "https://www.youtube.com/watch?v=84lYjtCfIvY&list=PL3HxEb3s-wfZGi6UK_FYPdlvMO7KYxeBl&pp=gAQB":"normal",
 
 }
 crawled = "crawled"
