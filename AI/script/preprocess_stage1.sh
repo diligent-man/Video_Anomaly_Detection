@@ -2,25 +2,26 @@
 # Run in alienware
 python3 ../src/tools/preprocess.py\
   --device both \
-  --processes 32 \
-  --batch_size 32 \
-  --root /home/trong/Downloads/Dataset/VAD/ucf/ \
+  --processes 8 \
+  --batch_size 8 \
+  --root /home/trong/Downloads/Dataset/VAD/UCF/ \
   --cpu_ratio 0.5 \
   --save_root out \
-  --run_async true\
+  --wait_time 30 \
+  --run_async false\
   --fn_name stage_one
 
-
-# Run in Vostro
-# python3 ../src/tools/preprocess_video.py \
-#   --device both --processes 16 \
-#   --batch_size 16 \
-#   --root /media/trong/Backup/Dataset/VAD/iitb \
-#   --save_root /media/trong/Backup/Dataset/VAD/out
-
-# Note
-#UCF error file:
+# Error notes
+# UBI-FIGHT dataset
+# Error:
+#   [h264 @ 0x5cfefea3ca80] left block unavailable for requested intra4x4 mode -1
+#   [h264 @ 0x5cfefea3ca80] error while decoding MB 0 19, bytestream 14868
+#
+#
+# UCF dataset
+# UCF error file:
 #    unlabeled/anomaly/arrest/Arrest050_x264.mp4
 #    unlabeled/anomaly/assault/Assault017_x264.mp4
 #    unlabeled/anomaly/robbery/Robbery077_x264.mp4
-#Cause: Expected string index (e.g. 'a'); got None
+# Error:
+#   Expected string index (e.g. 'a'); got None

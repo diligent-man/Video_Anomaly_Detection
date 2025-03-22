@@ -12,9 +12,6 @@ from functools import partial
 from multiprocessing import Pool
 from argparse import ArgumentParser, Namespace
 from typing import List, Dict, Callable, Set, Any
-
-from matplotlib import __getattr__
-
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
 
 from tqdm import tqdm
@@ -23,6 +20,14 @@ from torch.utils.data import Dataset, DataLoader
 from AI.src.preprocessing import VideoPreprocessor
 from AI.src.data.dataset import VideoFolderDataset
 from AI.src.data.dataloader import DefaultDataLoader
+
+
+# Ignore some error video from stage 1. Inspect reason later
+video_to_ignore = [
+   "Arrest050_x264.mp4",
+   "Assault017_x264.mp4",
+   "Robbery077_x264.mp4"
+]
 
 
 def _custom_collate_fn(batch) -> List[str]:
@@ -62,6 +67,8 @@ def stage_two(args: Namespace, dl: DataLoader, ds_name: str) -> None:
     pool: Pool = Pool(processes=args.processes)
 
     for fpaths in tqdm(dl, total=len(dl), desc=f"Dataset: {ds_name}", colour="red"):
+        fpaths = list(filter(lambda fpath: pathlib.Path(fpath).name not in video_to_ignore, fpaths))  # tmp workaround
+
         if args.device == "both":
             cpu_ratio: int = int(args .cpu_ratio * len(fpaths))
             devices: List[str] = list(map(lambda i: "cpu" if i < cpu_ratio else "cuda", range(len(fpaths))))
@@ -105,8 +112,9 @@ def stage_three(args: Namespace, dl: DataLoader, ds_name: str) -> None:
                                        glob.glob(f"{save_root}/**", recursive=True, include_hidden=True)])
 
     objs_in_original_root: Set[str] = set([
-        path.replace(args.root, "").replace(args.vid_ext, "pt") for path in
-        glob.glob(f"{args.root}/**", recursive=True, include_hidden=True)
+        path.replace(args.root, "").replace(args.vid_ext, "pt")
+        for path in glob.glob(f"{args.root}/**", recursive=True, include_hidden=True)
+        if pathlib.Path(path).name not in video_to_ignore
     ])
 
     for f in objs_in_original_root.difference(objs_in_save_root):
