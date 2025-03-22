@@ -46,10 +46,10 @@ class CallbackWrapper(object):
             if cb.__name__ == "Checkpointer":
                 checkpointer_config: Dict[str, Any] = self.__instance.config.get("Checkpointer", DotDict({})).get_dict()
                 name, apply = checkpointer_config.pop("name"), checkpointer_config.pop("apply", True)
+
                 if apply:
                     if "save_dir" not in checkpointer_config.keys():
                         checkpointer_config["save_dir"] = self.__instance.config.Global.ckpt_path
-
                     cb = cb(**checkpointer_config) if isinstance(cb, type) else partial(cb, **checkpointer_config)
                 else:
                     continue

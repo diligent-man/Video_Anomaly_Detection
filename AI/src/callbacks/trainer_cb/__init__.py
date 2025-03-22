@@ -1,14 +1,14 @@
 from .BaseCallback import BaseCallback as TrainerCallback
 
-from .Progress import ProgressCallback
-from .DefaultFlowCallback import DefaultFlowCallback
-from .CheckpointerCallback import CheckpointerCallback
+from .Progress import Progress
+from .DefaultFlow import DefaultFlow
+from .Checkpointer import Checkpointer
 
 # Should place with execution order awareness
 DEFAULT_TRAINER_CALLBACKS = [
-    DefaultFlowCallback,
-    ProgressCallback,
-    CheckpointerCallback
+    DefaultFlow,
+    Progress,
+    Checkpointer
 ]
 
 

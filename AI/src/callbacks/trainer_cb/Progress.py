@@ -7,10 +7,10 @@ from ...runner import Trainer
 from .BaseCallback import BaseCallback
 
 
-__all__ = ["ProgressCallback"]
+__all__ = ["Progress"]
 
 
-class ProgressCallback(BaseCallback):
+class Progress(BaseCallback):
     """
     A [`TrainerCallback`] that displays the progress of training or evaluation.
     You can modify `max_str_len` to control how long strings are truncated when logging.
@@ -25,6 +25,7 @@ class ProgressCallback(BaseCallback):
         :param max_str_len:
             Maximum length of strings to display in logs. Longer strings will be truncated with a message.
         """
+        super(Progress, self).__init__()
         self.__max_str_len: int = max_str_len
 
     @staticmethod

@@ -19,7 +19,7 @@ from AI.src.losses import LossWrapper
 from AI.src.metrics import MetricWrapper
 
 from AI.src.runner import Trainer
-from AI.src.utils import DotDict, ConfigReader, load_ckpt
+from AI.src.utils import DotDict, ConfigReader
 
 warnings.filterwarnings("once")
 warnings.filterwarnings("ignore", category=DeprecationWarning)

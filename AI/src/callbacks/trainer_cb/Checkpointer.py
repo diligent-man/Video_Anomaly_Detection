@@ -8,10 +8,10 @@ from ...runner import Trainer
 from .BaseCallback import BaseCallback
 
 
-__all__ = ["CheckpointerCallback"]
+__all__ = ["Checkpointer"]
 
 
-class CheckpointerCallback(BaseCallback):
+class Checkpointer(BaseCallback):
     """
     This callback idea is adopted from Keras src
     """
@@ -48,7 +48,7 @@ class CheckpointerCallback(BaseCallback):
             assert save_freq == "epoch", ValueError(f"'epoch' or int for step saving. Get {save_freq}, type: {type(save_freq)}")
         else:
             assert isinstance(save_freq, int), ValueError(f"'epoch' or int for step saving. Get {save_freq}, type: {type(save_freq)}")
-        super(CheckpointerCallback, self).__init__()
+        super(Checkpointer, self).__init__()
 
         self.__save_dir = save_dir
         self.__monitor = monitor

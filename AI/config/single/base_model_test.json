@@ -21,7 +21,7 @@
             "dataset":
             {
                 "name": "VideoDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+                "root": "/home/trong/Downloads/Dataset/VAD/out/IITB",
                 "ext": "mp4",
                 "loader": "v2",
                 "device": "cpu",
@@ -51,7 +51,7 @@
             "dataset":
             {
                 "name": "VideoDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/UCF-Crime/Anomaly_videos/Abuse",
+                "root": "/home/trong/Downloads/Dataset/VAD/out/IITB",
                 "ext": "mp4",
                 "loader": "v2",
                 "device": "cpu",

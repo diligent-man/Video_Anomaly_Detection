@@ -9,9 +9,9 @@
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 1,
-        "eval_strategy": "step",
-        "eval_steps": 1,
+        "epochs": 2,
+        "eval_strategy": "epoch",
+        "eval_steps": 7,
 
         "print_step": 1,
 
@@ -37,7 +37,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/unlabeled/train",
+                "root": "/home/trong/Downloads/Dataset/VAD/out/IITB (Copy)/unlabeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -76,7 +76,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/iitb_tensor/unlabeled/val",
+                "root": "/home/trong/Downloads/Dataset/VAD/out/IITB (Copy)/unlabeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -94,7 +94,7 @@
                 "batch_size": 4,
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
-                "num_workers": 6,
+                "num_workers": 3,
                 "prefetch_factor": 2,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
@@ -113,7 +113,8 @@
     {
         "backbone":
         {
-            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+//            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+            "name": ["rgb_i3d", ],
             "compile": false,
             "out_proj":
             {

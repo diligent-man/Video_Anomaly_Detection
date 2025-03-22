@@ -10,10 +10,10 @@ from .BaseCallback import BaseCallback
 from ...utils import ModelArchInspector, get_amp_cfg
 
 
-__all__ = ["DefaultFlowCallback"]
+__all__ = ["DefaultFlow"]
 
 
-class DefaultFlowCallback(BaseCallback):
+class DefaultFlow(BaseCallback):
     """
     A [`TrainerCallback`] that handles the default flow of the training loop for logs, evaluation and checkpoints.
     """
