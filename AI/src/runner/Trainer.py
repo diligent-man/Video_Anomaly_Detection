@@ -99,15 +99,6 @@ class Trainer(object):
     def scheduler(self) -> LRScheduler:
         return self.__scheduler
 
-    # def _get_best_val_loss(self) -> float:
-    #     checkpoint_path: str = self.__config.Global.checkpoint_path
-    #
-    #     if self.__config.Checkpoint.get("load", False) and os.path.exists(checkpoint_path):
-    #         if "best_ckpt.pt" in os.listdir(checkpoint_path):
-    #             return torch.load(f=os.path.join(checkpoint_path, "best_checkpoint.pt"))["val_loss"]
-    #     else:
-    #         return float("inf")
-
     # def _setup_train(self):
         # Load trained checkpoint for continuous training
         # if self.__config.Checkpoint.load:
@@ -157,6 +148,9 @@ class Trainer(object):
             # Stop program in the meantime
             print("\nSleeping...\n")
             time.sleep(self.__sleep_time)
+
+            if self.control.should_training_stop:
+                break
 
         self.__callback("on_train_end")
         print("Training finished")

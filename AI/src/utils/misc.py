@@ -1,3 +1,5 @@
+import os
+import sys
 import warnings
 import platform
 from importlib import metadata
@@ -20,6 +22,19 @@ __all__ = [
     "check_version",
     "make_border"
 ]
+
+
+# Manually call the _init_dll_path method to ensure that the system path is searched for FFMPEG.
+# Calling torchaudio._extension.utils._init_dll_path does not work because it is initializing the torchadio module prematurely or something.
+# See: https://github.com/pytorch/audio/issues/3789
+if sys.platform == "win32":
+    print("Initializing DLL path for Windows")
+    for path in os.environ.get("Path", "").split(";"):
+        if os.path.exists(path):
+            try:
+                os.add_dll_directory(path)
+            except Exception:
+                pass
 
 
 def inspect_ffmpeg() -> None:

@@ -66,7 +66,7 @@ def v2(path: str,
         return imgs
 
     # Ignore audio frame and info in returned result
-    __DECODERS = ["h264", "mpeg4"]
+    __DECODERS = ["h264", "mpeg4", "vp9", "mjpeg", "av1"]
     __DECODERS = {codec: f"{codec}_cuvid" for codec in __DECODERS}
 
     # Check option by cmd: ffmpeg -h decoder=h264_cuvid

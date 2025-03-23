@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 
 from ....data.model import BatchOutput
 from ..ExportableState import ExportableState
@@ -19,17 +19,19 @@ class State:
     step requires going through *n* batches.
     """
     phase: str = None
-    
-    epoch: int = 1
+
     step: int = 0
-    steps: int = None   # derived from on_init_end of DefaultFlowCallback
-    epochs: int = None  # derived from on_init_end of DefaultFlowCallback
+    epoch: int = 1
+
+    steps: int = None   # derived from on_init_end of DefaultFlow callback
+    epochs: int = None  # derived from on_init_end of DefaultFlow callback
+
     # logging_steps: int = None  # currently default at the end of train/ val
-    eval_strategy: str = None  # derived from eval_strategy and in on_init_end of DefaultFlowCallback
-    eval_steps: str | int = None   # derived from eval_strategy and in on_init_end of DefaultFlowCallback
+    eval_strategy: str = None  # derived from eval_strategy and in on_init_end of DefaultFlow callback
+    eval_steps: str | int = None   # derived from eval_strategy and in on_init_end of DefaultFlow callback
     
-    best_ckpt: Optional[str] = None  # derived from on_init_end of DefaultFlowCallback
-    best_metric: float = None  # derived from Checkpoint callback
+    best_ckpt: Optional[str] = None  # derived from on_init_end of DefaultFlow callback
+    monitor: Tuple[str, float] = None  # derived when checkpointing or from  on_init_end of DefaultFlow callback
 
     batch_output: BatchOutput = None
     stateful_callbacks: List[ExportableState] | Dict[str, Any] = None

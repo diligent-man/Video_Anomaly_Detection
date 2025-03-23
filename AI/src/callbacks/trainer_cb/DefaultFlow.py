@@ -42,18 +42,29 @@ class DefaultFlow(BaseCallback):
         elif eval_strategy == "epoch":
             eval_steps: int = instance.val_dataloader.__len__()
 
-        # Resume training
-        keys_to_check = ["model", "optim", "scheduler", "config", "best_metric", "epoch", "step"]
-        if instance.config.Global.get("resume", False):
-            # point directly to checkpoint
-            resume_ckpt: str = str(pathlib.Path(instance.config.Global.get("resume_ckpt", "")))
-            assert os.path.isfile(resume_ckpt), FileNotFoundError
 
-            ckpt = torch.load(f=resume_ckpt, map_location="cpu")
-            # self.__start_epoch = ckpt["epoch"] + 1
-            # self.__model.load_state_dict(ckpt["model"])
-            # self.__optimizer.load_state_dict(ckpt["optimizer"])
-            # del ckpt
+        # Resume training
+        # if instance.config.Global.get("resume", False):
+        #     # point directly to checkpoint
+        #     resume_ckpt: str = str(pathlib.Path(instance.config.Global.get("resume_ckpt", "")))
+        #     assert os.path.isfile(resume_ckpt), FileNotFoundError
+        #
+        #     ckpt = torch.load(f=resume_ckpt, map_location="cpu")
+        #
+        #     epoch = ckpt["epoch"] + 1
+        #     step = ckpt["step"] + 1
+        #     monitor = ckpt["monitor"]
+        #
+        #     if isinstance(dict, ckpt["model"]):
+        #         instance.model.load_state_dict(ckpt["model"])
+        #     else:
+        #         instance.model.load_state_dict(ckpt["model"].state_dict())
+        #
+        #     instance.optim.load_state_dict(ckpt["optimizer"])
+        #     instance.scheduler.load_state_dict(ckpt["scheduler"])
+        #     del ckpt
+        # else:
+        #     monitor = None
 
         # Update state
         instance.state = replace(instance.state, **{
@@ -64,7 +75,7 @@ class DefaultFlow(BaseCallback):
             "eval_steps": eval_steps,
             "eval_strategy": eval_strategy,
         #   "best_ckpt":
-        #   "best_metric":
+        #     "minitor":
         })
 
         # Inspect model architecture

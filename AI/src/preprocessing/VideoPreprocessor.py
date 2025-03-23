@@ -15,7 +15,7 @@ __all__ = ["VideoPreprocessor"]
 class VideoPreprocessor(object):
     # Add more if necessary
     __CODECS = [
-        "h264", "mpeg4"
+        "h264", "mpeg4", "vp9", "mjpeg", "av1"
     ]
 
     __filters: Dict[str, Dict[str, Any]] = {

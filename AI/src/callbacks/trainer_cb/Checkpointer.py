@@ -65,6 +65,7 @@ class Checkpointer(BaseCallback):
 
         if mode == "min":
             self.__monitor_op = torch.less
+
             if self.__best is None:
                 self.__best = torch.inf
 
