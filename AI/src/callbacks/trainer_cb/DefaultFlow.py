@@ -1,7 +1,8 @@
 import os
+import copy
 import pathlib
 from dataclasses import replace
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
 import torch
 
@@ -28,8 +29,9 @@ class DefaultFlow(BaseCallback):
             6/ Trained epochs & steps
         """
         epoch: int = 1
-        step: int = 0
         epochs: int = instance.config.Global.get("epochs", 1)
+
+        step: int = 0
         steps: int = epochs * instance.train_dataloader.__len__()
 
         # Calculate eval_steps (if have)
@@ -42,29 +44,37 @@ class DefaultFlow(BaseCallback):
         elif eval_strategy == "epoch":
             eval_steps: int = instance.val_dataloader.__len__()
 
-
         # Resume training
-        # if instance.config.Global.get("resume", False):
-        #     # point directly to checkpoint
-        #     resume_ckpt: str = str(pathlib.Path(instance.config.Global.get("resume_ckpt", "")))
-        #     assert os.path.isfile(resume_ckpt), FileNotFoundError
-        #
-        #     ckpt = torch.load(f=resume_ckpt, map_location="cpu")
-        #
-        #     epoch = ckpt["epoch"] + 1
-        #     step = ckpt["step"] + 1
-        #     monitor = ckpt["monitor"]
-        #
-        #     if isinstance(dict, ckpt["model"]):
-        #         instance.model.load_state_dict(ckpt["model"])
-        #     else:
-        #         instance.model.load_state_dict(ckpt["model"].state_dict())
-        #
-        #     instance.optim.load_state_dict(ckpt["optimizer"])
-        #     instance.scheduler.load_state_dict(ckpt["scheduler"])
-        #     del ckpt
-        # else:
-        #     monitor = None
+        if instance.config.Global.get("resume", False):
+            # point directly to checkpoint
+            resume_ckpt: str = str(pathlib.Path(instance.config.Global.get("resume_ckpt", "")))
+            assert os.path.isfile(resume_ckpt), FileNotFoundError
+
+            ckpt: Dict[str, Any] | torch.nn.Module = torch.load(f=resume_ckpt, map_location="cpu")
+
+            epoch += ckpt["epoch"]
+            step += ckpt["step"] + 1
+            steps = step + epochs * instance.train_dataloader.__len__()
+
+            monitor = ckpt["monitor"]
+
+            # Load model's weights
+            if isinstance(ckpt["model"], dict):
+                instance.model.load_state_dict(ckpt["model"])
+            else:
+                instance.model.load_state_dict(ckpt["model"].state_dict())
+
+            # Load model's weights to optim & scheduler
+            instance.optim.load_state_dict(ckpt["optim"])
+            for state in instance.optim.state.values():
+                for k, v in state.items():
+                    if isinstance(v, torch.Tensor):
+                        state[k] = v.to(instance.config.Global.get("device", "cpu"))
+
+            instance.scheduler.load_state_dict(ckpt["scheduler"])
+            del ckpt
+        else:
+            monitor = None
 
         # Update state
         instance.state = replace(instance.state, **{
@@ -74,8 +84,7 @@ class DefaultFlow(BaseCallback):
             "epochs": epochs,
             "eval_steps": eval_steps,
             "eval_strategy": eval_strategy,
-        #   "best_ckpt":
-        #     "minitor":
+            "monitor": monitor
         })
 
         # Inspect model architecture
@@ -86,7 +95,7 @@ class DefaultFlow(BaseCallback):
             amp_cfg, _ = get_amp_cfg(instance.config)
             with torch.amp.autocast(**amp_cfg):
                 model_arch = ModelArchInspector(
-                    instance.model,
+                    copy.deepcopy(instance.model),
                     instance.config.Global.dummy_input_shape,
                     depth=instance.config.Global.get("inspect_depth", 3),
                     verbose=0,
@@ -102,10 +111,12 @@ class DefaultFlow(BaseCallback):
         pass
 
     def on_train_epoch_begin(self, instance: Trainer) -> None:
+        instance.state.batch_output = None
         instance.control.should_epoch_stop = False
 
     def on_train_epoch_end(self, instance: Trainer) -> None:
         instance.state.epoch += 1
+
         if instance.config.Global.get("eval_strategy", "no") == "epoch":
             instance.state.phase = "train"
 
@@ -116,6 +127,10 @@ class DefaultFlow(BaseCallback):
     def on_val_epoch_end(self, instance: Trainer):
         instance.state.step += 1
         instance.state.phase = "train"
+
+        # Update monitor and will be overridden if EarlyStopping callback is used
+        if instance.state.batch_output.phase == "val":
+            instance.state.monitor = (instance.state.monitor[0], instance.state.batch_output.loss)
 
     def on_step_begin(self, instance: Trainer) -> None:
         instance.control.should_log = False
@@ -141,7 +156,7 @@ class DefaultFlow(BaseCallback):
             instance.state.phase = "val"
             instance.control.should_evaluate = True
 
-        # Checkpointing is relegated to ModelCheckpoint callback
+        # Checkpointing logic is relegated to ModelCheckpoint callback
 
         # End training
         if instance.state.step >= instance.state.steps:

@@ -1,7 +1,6 @@
 from typing import Dict, Any, Callable, Union
 
 import torch
-from tqdm import tqdm
 from torch import GradScaler, Tensor
 from torch.utils.data import DataLoader
 from torch.optim.optimizer import Optimizer
@@ -12,6 +11,7 @@ from .DotDict import DotDict
 from ..runner import Trainer
 from ..losses import LossWrapper
 from ..data.model import BatchOutput
+from ..utils.runner_utils.trainer import find_initial_total
 import AI.src.utils.BatchForwarder as BatchForwarder  # Circular dependency
 
 
@@ -50,27 +50,15 @@ def v1(instance: Union[Trainer],
     """
     phase = instance.state.phase
     device: str = instance.config.Global.get("device", "cpu")
+    initial, _ = find_initial_total(instance, dataloader)
 
-    if phase == "train" or instance.state.eval_strategy == "epoch":
-        initial: int = instance.state.epoch
-        initial = (initial - 1) * len(dataloader)
-
-        total: int = instance.state.epochs
-        total *= len(dataloader)
-    else:
-        initial: int = instance.state.step // instance.state.eval_steps
-        initial *= len(dataloader)
-
-        total: int = instance.state.steps // instance.state.eval_steps
-        total *= len(dataloader)
-
-    instance.callback(f"on_{instance.state.phase}_epoch_begin")
+    instance.callback(f"on_{phase}_epoch_begin")
     for step, (inps, labels) in enumerate(dataloader):
         inps: Tensor
         lr: None | float = None
         batch_loss: None | torch.Tensor = None
 
-        if instance.state.phase == "train" and optim is not None:
+        if phase == "train" and optim is not None:
             instance.model.zero_grad()  # safer than optimizer.zero_grad() in case of num of optimizer > 1
 
         instance.callback("on_step_begin")
@@ -84,9 +72,10 @@ def v1(instance: Union[Trainer],
                 batch_loss: Tensor = loss.compute_batch_loss([anomaly_preds, normal_preds])
 
         # Exits the context manager before backward
-        if instance.state.phase == "train":
+        if phase == "train":
             if grad_scaler is not None:
                 grad_scaler.scale(batch_loss).backward()
+
                 # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm) add later on
                 grad_scaler.step(optim)
                 grad_scaler.update()
@@ -101,7 +90,7 @@ def v1(instance: Union[Trainer],
 
         # Per step logging
         batch_output: Dict[str, Any] = {
-            "phase": instance.state.phase,
+            "phase": phase,
             "epoch": instance.state.epoch,
             "step": initial+step,
             "lr": lr,
@@ -112,15 +101,14 @@ def v1(instance: Union[Trainer],
         instance.callback(f"on_step_end")
 
         if instance.control.should_evaluate:
-            instance.state.batch_output = None  # reset batch_output
             BatchForwarder.BatchForwarder(
-                instance.config.Data[instance.state.phase].forward_strategy,
+                instance.config.Data[phase].forward_strategy,
                 instance,
                 **{
-                    "overridden_args": instance.config.Data[instance.state.phase].get("overridden_args", DotDict({})).get_dict()
+                    "overridden_args": instance.config.Data[phase].get("overridden_args", DotDict({})).get_dict()
                 }
             )()
-    instance.callback(f"on_{instance.state.phase}_epoch_end")
+    instance.callback(f"on_{phase}_epoch_end")
 
 
 def v2(T_max: int = 50,

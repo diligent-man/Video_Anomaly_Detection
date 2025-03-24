@@ -99,30 +99,6 @@ class Trainer(object):
     def scheduler(self) -> LRScheduler:
         return self.__scheduler
 
-    # def _setup_train(self):
-        # Load trained checkpoint for continuous training
-        # if self.__config.Checkpoint.load:
-        #     checkpoint_path: str = self.__config.Global.checkpoint_path
-        #     resume_name: str = self.__config.Checkpoint.get("resume_name", "")
-        #
-        #     checkpoint_path = os.path.join(checkpoint_path, resume_name)
-        #     assert os.path.isfile(checkpoint_path), FileNotFoundError
-        #
-        #     ckpt = torch.load(f=checkpoint_path, map_location="cpu")
-        #     self.__start_epoch = ckpt["epoch"] + 1
-        #     self.__model.load_state_dict(ckpt["model"])
-        #     self.__optimizer.load_state_dict(ckpt["optimizer"])
-        #     del ckpt
-
-        # Init early stopping
-        # apply_early_stopping = self.__config.Early_stopping.pop("apply", False)
-        # if apply_early_stopping:
-        #     self.__early_stopping = EarlyStopping(self.__best_val_loss,
-        #                                           **self.__config.Early_stopping.get("args", DotDict({})).get_dict()
-        #                                           )
-        # else:
-        #     self.__early_stopping = None
-
     def fit(self):
         """
         As a rule of thumb, model is trained on the mini-batch manner (iteration), which means that after each

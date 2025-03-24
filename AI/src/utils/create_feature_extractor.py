@@ -1,6 +1,6 @@
 """
 Src code from torchvision.models.feature_extraction import create_feature_extractor
-but used with custom LeafModuleAwareTracer.py
+but run with custom LeafModuleAwareTracer.py
 """
 import inspect
 import math

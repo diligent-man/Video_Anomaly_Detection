@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 
 from ...runner import Trainer
 from .BaseCallback import BaseCallback
+from ...utils.runner_utils.trainer import find_initial_total
 
 
 __all__ = ["Progress"]
@@ -18,6 +19,9 @@ class Progress(BaseCallback):
     __train_bar: tqdm = None
     __val_bar: tqdm = None
 
+    __train_init_total: Tuple[int, int] = None
+    __val_init_total: Tuple[int, int] = None
+
     def __init__(self, max_str_len: int = 100) -> None:
         """
         Initialize the callback with optional max_str_len parameter to control string truncation length.
@@ -28,21 +32,21 @@ class Progress(BaseCallback):
         super(Progress, self).__init__()
         self.__max_str_len: int = max_str_len
 
-    @staticmethod
-    def _find_initial_total(instance: Trainer, dataloader: DataLoader) -> Tuple[int, int]:
-        if instance.state.phase == "train" or instance.state.eval_strategy == "epoch":
-            initial: int = instance.state.epoch
-            initial = (initial - 1) * len(dataloader)
-
-            total: int = instance.state.epochs
-            total *= len(dataloader)
-        else:
-            initial: int = instance.state.step // instance.state.eval_steps
-            initial *= len(dataloader)
-
-            total: int = instance.state.steps // instance.state.eval_steps
-            total *= len(dataloader)
-        return initial, total
+    # @staticmethod
+    # def _find_initial_total(instance: Trainer, dataloader: DataLoader) -> Tuple[int, int]:
+    #     if instance.state.phase == "train" or instance.state.eval_strategy == "epoch":
+    #         initial: int = instance.state.epoch - 1
+    #         total: int = initial + instance.state.epochs
+    #
+    #         initial *= len(dataloader)
+    #         total *= len(dataloader)
+    #     else:
+    #         initial: int = instance.state.step // instance.state.eval_steps
+    #         total: int = instance.state.steps // instance.state.eval_steps
+    #
+    #         initial *= len(dataloader)
+    #         total *= len(dataloader)
+    #     return initial, total
 
     @staticmethod
     def _make_desc(instance: Trainer, phase: str, loss: None | float) -> str:
@@ -60,20 +64,23 @@ class Progress(BaseCallback):
             loss: None = None
 
         dataloader = getattr(instance, f"{phase}_dataloader")
-        initial, total = self._find_initial_total(instance, dataloader)
+        attr_name = f"_{self.__class__.__name__}__{instance.state.phase}_init_total"
 
-        setattr(self,
-                f"_{self.__class__.__name__}__{phase}_bar",
-                tqdm(None,
-                     self._make_desc(instance, phase, loss),
-                     total,
-                     initial=initial,
-                     dynamic_ncols=True,
-                     colour="cyan" if phase == "train" else "yellow",
-                     )
-                )
+        if getattr(self, attr_name, None) is None:
+            setattr(self, attr_name, find_initial_total(instance, dataloader))
 
-    def on_train_begin(self, instance: Trainer) -> None:
+            setattr(self,
+                    f"_{self.__class__.__name__}__{phase}_bar",
+                    tqdm(None,
+                         self._make_desc(instance, phase, loss),
+                         getattr(self, attr_name)[1],
+                         initial=getattr(self, attr_name)[0],
+                         dynamic_ncols=True,
+                         colour="cyan" if phase == "train" else "yellow",
+                         )
+                    )
+
+    def on_train_epoch_begin(self, instance: Trainer) -> None:
         self._trigger_tqdm(instance)
 
     def on_val_epoch_begin(self, instance: Trainer) -> None:

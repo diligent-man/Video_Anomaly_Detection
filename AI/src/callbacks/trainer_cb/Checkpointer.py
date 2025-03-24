@@ -108,7 +108,7 @@ Best: {self.__best}"""
             "model": instance.model.state_dict() if self.__save_weights_only else instance.model,
             "optim": instance.optim.state_dict(),
             "scheduler": instance.scheduler.state_dict() if instance.scheduler is not None else None,
-            "epoch": instance.state.epoch-1,
+            "epoch": instance.state.epoch,
             "step": instance.state.step,
             "monitor": (self.__monitor, instance.state.batch_output.loss)
         }

@@ -27,7 +27,7 @@ class ConfigReader(object):
         "fields": ["global", "data", "architecture", "optim", "metric", "loss", "checkpoint", "early_stopping", "services"]
     }
 
-    __supported_services: Tuple[str, ...] = ("Checkpointer", "mlflow")
+    __supported_services: Tuple[str, ...] = ("Checkpointer", "mlflow", "EarlyStopping")
 
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path

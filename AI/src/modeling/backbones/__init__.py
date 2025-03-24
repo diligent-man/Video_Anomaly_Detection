@@ -14,7 +14,7 @@ from .constant import (
 )
 
 from ..nn import MLP
-from ...utils import DotDict, create_feature_extractor, get_amp_cfg
+from ...utils import DotDict, create_feature_extractor
 
 
 __all__ = [
@@ -40,51 +40,55 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
     compile_model: bool = config.Architecture.backbone.pop("compile", False)
     out_proj: Dict[str, Any] = config.Architecture.backbone.pop("out_proj", DotDict({})).get_dict()
 
-    offloading = config.Architecture.backbone.pop("offloading", False)
-    device_maps: List[None | DotDict] = config.Architecture.backbone.pop("device_maps", [None] * len(names))
-    device_maps: List[None | Dict[str, str]] = [device_map.get_dict() for device_map in device_maps
-                                                if isinstance(device_map, DotDict)]
-
-    assert isinstance(names, list), ValueError(f"Name for feat extractor backbone must be string list. Get '{type(names)}'")
+    assert isinstance(names, list), ValueError(
+        f"Name for feat extractor backbone must be string list. Get '{type(names)}'")
     assert len(names) > 0, ValueError("Number of backbone must be > 0")
-    if offloading:
-        assert len(device_maps) == len(names), ValueError(f"Provided device_map must be fully specified for all backbones")
+
+    # Dev later
+    # offloading = config.Architecture.backbone.pop("offloading", False)
+    # device_maps: List[None | DotDict] = config.Architecture.backbone.pop("device_maps", [None] * len(names))
+    # device_maps: List[None | Dict[str, str]] = [device_map.get_dict() for device_map in device_maps
+    #                                             if isinstance(device_map, DotDict)]
+
+    # if offloading:
+    #     assert len(device_maps) == len(names), ValueError(f"Provided device_map must be fully specified for all backbones")
 
     for i, name in enumerate(names):
-        assert name in NET_DEFAULT_CONFIG.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
+            assert name in NET_DEFAULT_CONFIG.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
 
-        build_result["name"].append(name)
-        model_args: Dict = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
+            build_result["name"].append(name)
+            model_args: Dict = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
 
-        if model_args.get("weights") is None:
-            model_args["weights"] = NET_DEFAULT_CONFIG[name]["weights"]
+            if model_args.get("weights") is None:
+                model_args["weights"] = NET_DEFAULT_CONFIG[name]["weights"]
 
-        model: torch.nn.Module = NET_DEFAULT_CONFIG[name]["model"](**model_args)
-        model: torch.fx.GraphModule = create_feature_extractor(
-            model, NET_DEFAULT_CONFIG[name]["return_node"],
-            concrete_args=NET_DEFAULT_CONFIG[name].get("concrete_args")
-        )
+            model: torch.nn.Module = NET_DEFAULT_CONFIG[name]["model"](**model_args)
 
-        model = _freeze_layer(model)
-        model.eval()
+            model: torch.fx.GraphModule = create_feature_extractor(
+                model, NET_DEFAULT_CONFIG[name]["return_node"],
+                concrete_args=NET_DEFAULT_CONFIG[name].get("concrete_args")
+            )
 
-        if compile_model:
-            model.compile()
+            model = _freeze_layer(model)
+            model.train()
 
-        out_channels: int = _get_out_channels(model, name)
+            if compile_model:
+                model.compile()
 
-        if out_proj:
-            mlp: torch.nn.Module = MLP(out_channels, **out_proj)
-            out_channels: int = mlp.out_channels
+            out_channels: int = _get_out_channels(model, name)
 
-            if "out_proj" not in build_result.keys():
-                build_result["out_proj"] = torch.nn.ModuleList([mlp])
-            else:
-                build_result["out_proj"].append(mlp)
+            if out_proj:
+                mlp: torch.nn.Module = MLP(out_channels, **out_proj)
+                out_channels: int = mlp.out_channels
 
-        build_result["backbone"].append(model)
-        build_result["out_channels"].append(out_channels)
-        build_result["reduce"].append(build_reduce(name, config))
+                if "out_proj" not in build_result.keys():
+                    build_result["out_proj"] = torch.nn.ModuleList([mlp])
+                else:
+                    build_result["out_proj"].append(mlp)
+
+            build_result["backbone"].append(model)
+            build_result["out_channels"].append(out_channels)
+            build_result["reduce"].append(build_reduce(name, config))
     return (
         build_result["backbone"],
         build_result["name"],
