@@ -11,7 +11,7 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = "root"
 os.environ["MLFLOW_TRACKING_PASSWORD"] = "Root123!"
 
 
-mlflow.set_tracking_uri(uri="http://58.187.115.100:5000")
+mlflow.set_tracking_uri(uri="http://113.22.216.242:5000")
 
 
 def save_text(path, text):

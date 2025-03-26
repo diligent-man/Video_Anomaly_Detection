@@ -9,7 +9,7 @@
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 3,
+        "epochs": 1,
         "eval_strategy": "epoch",
         "eval_steps": 7,
 
@@ -207,11 +207,10 @@
         {
             "name": "mlflow",
             "apply": true,
-            "tracking_uri": "http://183.80.97.114:5000"
-//            "run_id": "800bdcf7ca9b4b2ab51ebd6e243a8757"
-
-//            "username": "root" ,
-//            "password":  "Root123!"
+            "username": "root",
+            "password":  "Root123!",
+            "tracking_uri": "http://113.22.216.242:5000",
+//            "run_id": "5ae147eba90948b99fee17787ad291d5"
         },
 
         {

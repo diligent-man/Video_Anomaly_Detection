@@ -127,7 +127,6 @@ class Trainer(object):
 
             if self.control.should_training_stop:
                 break
-
         self.__callback("on_train_end")
         print("Training finished")
         return None

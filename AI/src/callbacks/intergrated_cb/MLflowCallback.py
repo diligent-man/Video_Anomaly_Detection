@@ -8,6 +8,7 @@ from typing import Dict, Any
 
 from ...runner import Trainer
 from ..trainer_cb import TrainerCallback
+from ...utils.service import ping_server
 from ...utils import is_mlflow_available, make_border, ModelArchInspector
 
 
@@ -43,40 +44,11 @@ class MLflowCallback(TrainerCallback):
 
         uri: str = instance.config.Global.mlflow_path
 
-        # username = instance.config.Mlflow.get("username", None)
-        # password = instance.config.Mlflow.get("password", None)
-        # auth = (username, password) if username and password else None
-
         experiment_name: str = uri.split(os.sep)[-5]  # project_name
         run_name: str = "_".join(uri.split(os.sep)[-4: -1])  # technique_mode_experiment_name
 
         self._ml_flow.set_tracking_uri("file:" + uri)
         self._ml_flow.set_experiment(experiment_name)
-
-        # old_run = self._ml_flow.get_run("7bdad1ed7a4b4c1fab7f897903bd6cff")
-
-        # active_run = self._ml_flow.start_run(run_name=run_name)
-        # for key, value in old_run.data.metrics.items():
-        #     self._ml_flow.log_metric(key, value)
-
-        # for key, value in old_run.data.params.items():
-        # if key == 'REPLACE_WITH_YOUR_KEY':
-        #     new_value = REPLACE_WITH_YOUR_VALUE
-        #     self._ml_flow.log_param(key, new_value)
-        # else:
-        #     self._ml_flow.log_param(key, value)
-
-        # try:
-        #     ping_server(uri, auth=auth, timeout=(.5, .5), total=3)
-        #     self._ml_flow.set_tracking_uri(uri)
-        #     self._ml_flow.set_experiment(experiment_name)
-        #     print(f"View at {uri}\n")
-        # except (rq.exception.Timeout, self._ml_flow.exceptions.MlflowException) as e:
-        #     uri = instance.config.Global.mlflow_path
-        #     self._ml_flow.set_tracking_uri(uri)
-        #     self._ml_flow.set_experiment(experiment_name)
-        #     print(f"{e}.\nTracking uri is set to {ANSIColor().CYAN}mlflow_path{ANSIColor().RESET}\n")
-        #     print(f"View at http://localhost:5000 with 'self._ml_flow server --backend-store-uri {uri}'\n")
 
         active_run = self._ml_flow.active_run() or self._ml_flow.start_run(
             run_id=instance.config.Mlflow.get("run_id", None),
@@ -118,6 +90,24 @@ Command: 'mlflow server --backend-store-uri {"file:" + uri}'
     def on_step_end(self, instance: Trainer) -> None:
         batch_output: Dict[str, Any] = instance.state.batch_output.as_metrics()
         self._ml_flow.log_metrics(batch_output, step=instance.state.batch_output.step)
+
+    def on_train_end(self, instance: Trainer) -> None:
+        username = instance.config.Mlflow.get("username", None)
+        password = instance.config.Mlflow.get("password", None)
+        auth = (username, password) if username and password else None
+
+        try:
+            ping_server(uri, auth=auth, timeout=(.5, .5), total=3)
+            self._ml_flow.set_tracking_uri(uri)
+            self._ml_flow.set_experiment(experiment_name)
+            print(f"View at {uri}\n")
+        except (rq.exception.Timeout, self._ml_flow.exceptions.MlflowException) as e:
+            uri = instance.config.Global.mlflow_path
+            self._ml_flow.set_tracking_uri(uri)
+            self._ml_flow.set_experiment(experiment_name)
+            print(f"{e}.\nTracking uri is set to {ANSIColor().CYAN}mlflow_path{ANSIColor().RESET}\n")
+            print(f"View at http://localhost:5000 with 'self._ml_flow server --backend-store-uri {uri}'\n")
+
 
     # def on_log(self, args, state, control, logs, model=None, **kwargs):
     #     if not self._initialized:
