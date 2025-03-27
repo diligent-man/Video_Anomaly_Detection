@@ -15,7 +15,7 @@ def ping_server(uri: str, **kwargs) -> int | Type[Timeout]:
     try:
         with requests.Session() as s:
             retries = Retry(
-                total=kwargs.pop("total", 5),
+                total=kwargs.pop("total", 3),
                 backoff_factor=0.5,
                 allowed_methods=["GET"]
             )

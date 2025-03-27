@@ -1,3 +1,3 @@
-from .MLflowCallback import MLflowCallback
+from .Mlflow import Mlflow
 
-__all__ = ["MLflowCallback"]
+__all__ = ["Mlflow"]

@@ -4,12 +4,9 @@ from typing import List, Union, Any, Dict
 
 
 import AI.src.runner.Trainer as Trainer  # due to cyclic dependency
-
-from ..utils import DotDict
-from .trainer_cb import TrainerCallback
-from .trainer_cb import DEFAULT_TRAINER_CALLBACKS
-
+from ..utils import DotDict, is_mlflow_available
 from ..utils.runner_utils.trainer import TrainerControl
+from .trainer_cb import TrainerCallback, DEFAULT_TRAINER_CALLBACKS
 
 
 __all__ = ["CallbackWrapper"]
@@ -33,15 +30,17 @@ class CallbackWrapper(object):
             callbacks_to_add: List = [*DEFAULT_TRAINER_CALLBACKS]
 
             for name in integrated_callbacks:
-                if name == "mlflow":
-                    from .intergrated_cb import MLflowCallback
-                    callbacks_to_add.append(MLflowCallback)
+                if name == "Mlflow":
+                    if not is_mlflow_available():
+                        raise RuntimeError("MLflowCallback requires mlflow to be installed. Run `pip install mlflow`.")
+                    else:
+                        from .intergrated_cb import Mlflow
+                        callbacks_to_add.append(Mlflow)
         # Test callbacks
 
         # Inferer callbacks
 
         return_callbacks: List[Union[TrainerCallback]] = []
-
         for cb in callbacks_to_add:
             if cb.__name__ == "Checkpointer":
                 checkpointer_config: Dict[str, Any] = self.__instance.config.get("Checkpointer", DotDict({})).get_dict()
@@ -53,6 +52,15 @@ class CallbackWrapper(object):
                     cb = cb(**checkpointer_config) if isinstance(cb, type) else partial(cb, **checkpointer_config)
                 else:
                     continue
+            elif cb.__name__ == "Mlflow":
+                mlflow_config: Dict[str, Any] = self.__instance.config.get("Mlflow", DotDict({})).get_dict()
+                name, apply = mlflow_config.pop("name"), mlflow_config.pop("apply", False)
+
+                if apply:
+                    if mlflow_config.get("save_dir", None) is None:
+                        mlflow_config["save_dir"] = self.__instance.config.Global.Mlflow_path
+
+                    cb = cb(**mlflow_config) if isinstance(cb, type) else partial(cb, **mlflow_config)
             else:
                 cb = cb() if isinstance(cb, type) else cb
 

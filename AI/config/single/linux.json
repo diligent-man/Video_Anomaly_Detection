@@ -13,8 +13,8 @@
         "eval_strategy": "epoch",
         "eval_steps": 7,
 
-        "resume": false,
-        "resume_ckpt": "../../results/AIP391/single/train/run/ckpt/epoch3_step11.pt",
+        "resume": true,
+        "resume_ckpt": "../../results/AIP391/single/train/run/ckpt/epoch1_step3.pt",
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
@@ -100,12 +100,6 @@
             },
             "forward_strategy": "v1"
         }
-
-        /////////////////////////////////////////////////////////
-//        "test": {
-//            "dataset":{},
-//            "dataloader":{}
-//        }
     },
 
     "architecture":
@@ -149,8 +143,6 @@
             "dropout": 0.5,
             "layer_order": "fc->drop->act"
         }
-
-        //        "postprocessing": {}
     },
 
     "optim":
@@ -182,14 +174,6 @@
         "reduction": "mean"
     },
 
-    "early_stopping":
-    {
-        "apply": false,
-        "patience": 10,
-        "min_delta": 0
-
-    },
-
     "services": [
         {
             "name": "Checkpointer",
@@ -205,16 +189,17 @@
         },
 
         {
-            "name": "mlflow",
+            "name": "Mlflow",
             "apply": true,
-            "username": "root",
-            "password":  "Root123!",
-            "tracking_uri": "http://113.22.216.242:5000",
-//            "run_id": "5ae147eba90948b99fee17787ad291d5"
+            "prev_run_id": "9d5cb84c211f4aeabeecc129d026af48",
+            "init_server_on_run": true,
+            "username": "",
+            "password": "",
+            "remote_tracking_uri": ""
         },
 
         {
-            "name": "EarlyStopping",
+            "name": "Earlystopper",
             "mode": "min",
             "monitor": "val_loss",
             "patience": 5,

@@ -24,10 +24,16 @@ class ConfigReader(object):
         "mode": ["train", "test"],
         "dataset": ["train", "val", "test"],
         "technique": ["single", "distillation"],
-        "fields": ["global", "data", "architecture", "optim", "metric", "loss", "checkpoint", "early_stopping", "services"]
+        "fields": ["global", "data", "architecture", "optim", "metric", "loss", "services"]
     }
 
-    __supported_services: Tuple[str, ...] = ("Checkpointer", "mlflow", "EarlyStopping")
+    __supported_services: Tuple[str, ...] = (
+        # Trainer callbacks
+        "Checkpointer", "Earlystopper",
+        # Integrated callbacks
+        "Mlflow"
+    )
+    __required_path_services: Tuple[str, ...] = ("Checkpointer", "Mlflow")
 
     def __init__(self, config_path: Union[str, pathlib.Path]) -> None:
         self.__config_path = config_path
@@ -136,6 +142,7 @@ class ConfigReader(object):
         )
 
         services: List[str] = get_services(self.__config)
+        services = list(filter(lambda service: service in self.__required_path_services, services))
 
         # Exclude default callbacks
         if "Checkpointer" in services:

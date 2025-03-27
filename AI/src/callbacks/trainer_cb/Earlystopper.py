@@ -5,8 +5,10 @@ import torch
 from ...runner import Trainer
 from .BaseCallback import BaseCallback
 
+__all__ = ["Earlystopper"]
 
-class EarlyStopping(BaseCallback):
+
+class Earlystopper(BaseCallback):
     """
     This callback idea is adopted from Keras src
     """
@@ -32,7 +34,7 @@ class EarlyStopping(BaseCallback):
         assert mode in self.__support_mode, ValueError(f"Currently support {self.__support_mode}. Get {mode}")
         assert monitor in self.__support_monitor, ValueError(
             f"Currently support {self.__support_monitor}. Get {monitor}")
-        super(EarlyStopping, self).__init__()
+        super(Earlystopper, self).__init__()
 
         self.__mode = mode
         self.__monitor = monitor
@@ -81,5 +83,3 @@ class EarlyStopping(BaseCallback):
                 instance.control.should_training_stop = True
                 if self.__verbose:
                     print(f"Patience counter exceeds {self.__patience}")
-
-
