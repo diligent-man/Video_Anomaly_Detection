@@ -1,6 +1,6 @@
 from typing import Tuple
 
-import torch
+from torch.nn import Module
 
 from ...utils import DotDict
 from .TAN import TemporalAggregation
@@ -14,10 +14,10 @@ NECKS = {
 }
 
 
-def build_neck(config: DotDict) -> Tuple[torch.nn.Module, int]:
+def build_neck(config: DotDict) -> Tuple[Module, int]:
     name = config.Architecture.neck.pop("name")
     assert name in NECKS.keys(), ValueError(f"Provided neck is unavailable. Get '{name}'")
 
-    neck: torch.nn.Module = NECKS[name](**config.Architecture.neck.get_dict())
+    neck: Module = NECKS[name](**config.Architecture.neck.get_dict())
     out_channels: int = neck.out_channels
     return neck, out_channels

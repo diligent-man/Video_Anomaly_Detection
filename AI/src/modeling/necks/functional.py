@@ -1,15 +1,13 @@
 from typing import List
-
-import torch
-
+from torch import Tensor
 
 __all__ = ["dynamic_expand", "transform_multihead"]
 
 
-def dynamic_expand(x: torch.Tensor,
-                   ref: torch.Tensor,
+def dynamic_expand(x: Tensor,
+                   ref: Tensor,
                    ref_dim: List[int]
-                   ) -> torch.Tensor:
+                   ) -> Tensor:
     """
     :param x: tensor to be expanded
     :param ref: referenced tensor
@@ -20,7 +18,7 @@ def dynamic_expand(x: torch.Tensor,
     return x.expand(ref_dim)
 
 
-def transform_multihead(x: torch.Tensor, num_heads: int) -> torch.Tensor:
+def transform_multihead(x: Tensor, num_heads: int) -> Tensor:
     """
     :param x: tensor of shape [batch_size, seq_len, embed_dim]
     :param num_heads: number of heads for splitting

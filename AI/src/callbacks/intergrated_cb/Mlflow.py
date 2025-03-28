@@ -29,6 +29,7 @@ class Mlflow(TrainerCallback):
     """
     __initialized: bool = False
     __auto_end_run: bool = True
+    __proc: Popen = None
 
     __save_dir: str
     __prev_run_id: str
@@ -143,7 +144,7 @@ Cmd: 'mlflow server --backend-store-uri {"file:" + backend_store_uri}'
             self.setup(instance)
 
         if self.__init_server_on_run:
-            Popen(
+            self.__proc = Popen(
                 [
                     "mlflow",
                     "server",
@@ -172,7 +173,7 @@ Cmd: 'mlflow server --backend-store-uri {"file:" + backend_store_uri}'
                 self.__remote_tracking_uri
             )
         if self.__init_server_on_run:
-            Popen(["pkill", "-f", "mlflow"])
+            self.__proc.kill()
 
     def __del__(self):
         # if the previous run is not terminated correctly, the fluent API will

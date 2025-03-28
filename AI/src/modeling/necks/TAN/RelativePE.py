@@ -1,6 +1,8 @@
 from typing import Tuple
 
 import torch
+from torch import Tensor
+from torch.nn import Module
 from multimethod import multimethod
 
 from .QKV import QKV
@@ -9,7 +11,7 @@ from .QKV import QKV
 __all__ = ["RelativePE"]
 
 
-class RelativePE(torch.nn.Module):
+class RelativePE(Module):
     def __init__(self,
                  embed_dim: int,
                  max_rel_pos: int,
@@ -30,7 +32,7 @@ class RelativePE(torch.nn.Module):
         self._rel_pos_embed: torch.nn.Embedding = torch.nn.Embedding(2 * self._max_rel_pos, embed_dim, **factory_kwargs)
 
     @multimethod
-    def _compute_attn_span(self, query: torch.Tensor, key: torch.Tensor) -> torch.Tensor:
+    def _compute_attn_span(self, query: Tensor, key: Tensor) -> torch.Tensor:
         """
         :param query: [batch, seq_len, q_hidden_dim]
         :param key: [batch, seq_len, k_hidden_dim]
@@ -39,15 +41,15 @@ class RelativePE(torch.nn.Module):
         return torch.tensor(min(max(query.size(-2), key.size(-2)), self._max_rel_pos))
 
     @multimethod
-    def _compute_attn_span(self, seq_len: int) -> torch.Tensor:
+    def _compute_attn_span(self, seq_len: int) -> Tensor:
         return torch.tensor(min(seq_len, self._max_rel_pos))
 
     @multimethod
-    def _get_rel_pos_idx(self, seq_len: int, attn_span: torch.Tensor, rel_type: str) -> torch.Tensor:
+    def _get_rel_pos_idx(self, seq_len: int, attn_span: Tensor, rel_type: str) -> Tensor:
         """
         :param seq_len: sequence length
         :param attn_span: the span of relative position of query w.r.t key
-        :param rel_type: "c2p" | "c2p".
+        :param rel_type: "c2p" | "p2c".
         :return: relative indices b/t query and key
 
         Build relative position according to sequence length
@@ -58,7 +60,7 @@ class RelativePE(torch.nn.Module):
         """
         device = self._rel_pos_embed.weight.device
 
-        rel_pos: torch.Tensor = torch.arange(seq_len, dtype=torch.long, device=device)  # [seq_len, ]
+        rel_pos: Tensor = torch.arange(seq_len, dtype=torch.long, device=device)  # [seq_len, ]
         rel_pos = rel_pos.reshape((-1, 1)) - rel_pos.reshape((1, -1))  # [seq_len, seq_len]
 
         if rel_type == "c2p":
@@ -70,7 +72,7 @@ class RelativePE(torch.nn.Module):
         return rel_pos
 
     @multimethod
-    def _get_rel_pos_idx(self, query: torch.Tensor, key: torch.Tensor, attn_span: torch.Tensor, rel_type: str) -> torch.Tensor:
+    def _get_rel_pos_idx(self, query: Tensor, key: Tensor, attn_span: Tensor, rel_type: str) -> Tensor:
         """
         :param query: embedded query of shape [Batch, Seq_len, Embed_dim]
         :param key: embedded key of shape [Batch, Seq_len, Embed_dim]
@@ -84,10 +86,10 @@ class RelativePE(torch.nn.Module):
         """
         query_dim, key_dim = query.size(-2), key.size(-2)  # Different in cross-attn circumstance
         
-        q_ids: torch.Tensor = torch.arange(query_dim, dtype=torch.long)
-        k_ids: torch.Tensor = torch.arange(key_dim, dtype=torch.long)
+        q_ids: Tensor = torch.arange(query_dim, dtype=torch.long)
+        k_ids: Tensor = torch.arange(key_dim, dtype=torch.long)
 
-        rel_pos: torch.Tensor = q_ids.reshape((-1, 1)) - k_ids.reshape((1, -1))
+        rel_pos: Tensor = q_ids.reshape((-1, 1)) - k_ids.reshape((1, -1))
         rel_pos = rel_pos.reshape((-1, 1)) - rel_pos.reshape((1, -1))  # [seq_len, seq_len]
 
         if rel_type == "c2p":
@@ -105,16 +107,16 @@ class RelativePE(torch.nn.Module):
         :return: Q, K w.r.t relative position embeddings. Shape [seq_len, seq_len, embed_dim]
         """
         attn_span = self._compute_attn_span(seq_len)
-        c2p_rel_pos: torch.Tensor = self._get_rel_pos_idx(seq_len, attn_span, "c2p").unsqueeze(0)
-        p2c_rel_pos: torch.Tensor = self._get_rel_pos_idx(seq_len, attn_span, "p2c").unsqueeze(0)
+        c2p_rel_pos: Tensor = self._get_rel_pos_idx(seq_len, attn_span, "c2p").unsqueeze(0)
+        p2c_rel_pos: Tensor = self._get_rel_pos_idx(seq_len, attn_span, "p2c").unsqueeze(0)
 
         # Clone() reason: https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html#torch.nn.Embedding
         if self._rel_pos_embed.max_norm is None:
-            rel_embeds: torch.Tensor = self._rel_pos_embed.weight[self._max_rel_pos - attn_span:
-                                                                  self._max_rel_pos + attn_span, :]
+            rel_embeds: Tensor = self._rel_pos_embed.weight[self._max_rel_pos - attn_span:
+                                                            self._max_rel_pos + attn_span, :]
         else:
-            rel_embeds: torch.Tensor = self._rel_pos_embed.weight[self._max_rel_pos - attn_span:
-                                                                  self._max_rel_pos + attn_span, :].clone()
+            rel_embeds: Tensor = self._rel_pos_embed.weight[self._max_rel_pos - attn_span:
+                                                            self._max_rel_pos + attn_span, :].clone()
         # [seq_len, embed_dim] -> [1, seq_len, embed_dim]
         rel_embeds = rel_embeds.unsqueeze(0)
         rel_q, rel_k, _ = self._qkv(rel_embeds)

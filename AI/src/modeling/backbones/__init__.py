@@ -4,13 +4,12 @@ from typing import (
     Dict,
     Any,
     List,
-    Tuple,
-    Union
+    Tuple
 )
 
 
 import torch
-from torch.nn import Module
+from torch.nn import Module, ModuleList
 from torch.fx import GraphModule
 from transformers.modeling_outputs import BaseModelOutputWithPooling
 
@@ -41,14 +40,13 @@ __all__ = [
 ]
 
 
-def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[str], List[torch.nn.Module], List[int]],
-                                             Tuple[torch.nn.ModuleList, List[str], List[torch.nn.Module], torch.nn.ModuleList, List[int]]]:
+def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial], ModuleList, List[int]]:
     top, bottom = make_border("Build backbone")
     print(top)
 
     build_result: Dict[str, Any] = {
         "name": [],
-        "backbone": torch.nn.ModuleList(),
+        "backbone": ModuleList(),
         "reduce": [],
         "out_channels": []
     }
@@ -75,20 +73,19 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
         build_result["name"].append(name)
         model_args: Dict[str, Any] = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
 
-        freeze_lst: int | List[str] = model_args.pop("freeze", [])
-        assert isinstance(freeze_lst, (int, list)), ValueError("Freeze args must be a number or list of str layer to freeze")
+        trainable_layers: int | List[str] = model_args.pop("trainable_layers", [])
+        assert isinstance(trainable_layers, (int, list)), ValueError("Freeze args must be a number or list of str layer to freeze")
 
         if model_args.get("weights", None) is None:
             model_args["weights"] = NET_DEFAULT_CONFIG[name]["weights"]
 
-        model: torch.nn.Module = NET_DEFAULT_CONFIG[name]["model"](**model_args)
-
-        model: torch.fx.GraphModule = create_feature_extractor(
+        model: Module = NET_DEFAULT_CONFIG[name]["model"](**model_args)
+        model: GraphModule = create_feature_extractor(
             model, NET_DEFAULT_CONFIG[name]["return_node"],
             concrete_args=NET_DEFAULT_CONFIG[name].get("concrete_args")
         )
 
-        model, num_layers = freeze_layer(model, freeze_lst)
+        model, num_layers = freeze_layer(model, trainable_layers)
         model.train()
 
         if compile_model:
@@ -97,11 +94,11 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
         out_channels: int = _get_out_channels(model, name)
 
         if out_proj:
-            mlp: torch.nn.Module = MLP(out_channels, **out_proj)
+            mlp: Module = MLP(out_channels, **out_proj)
             out_channels: int = mlp.out_channels
 
             if "out_proj" not in build_result.keys():
-                build_result["out_proj"] = torch.nn.ModuleList([mlp])
+                build_result["out_proj"] = ModuleList([mlp])
             else:
                 build_result["out_proj"].append(mlp)
 
@@ -113,8 +110,8 @@ def build_backbone(config: DotDict) -> Union[Tuple[List[torch.nn.Module], List[s
     Name: {name}
     Num layers: {num_layers}
 """
-        msg += f"\tNum freeze layers: {freeze_lst}\n" if isinstance(freeze_lst, int) else \
-            f"\tFreeze layers:\n" + pformat(freeze_lst, indent=8)
+        msg += f"\tNum freeze layers: {trainable_layers}\n" if isinstance(trainable_layers, int) else \
+            f"\tFreeze layers:\n" + pformat(trainable_layers, indent=8)
         print(msg)
     print(bottom)
     return (
@@ -131,11 +128,11 @@ def build_reduce(name: str, config: DotDict) -> partial:
     if name in NET_2D:
         reduce_name = reduce_config.pop("name", DEFAULT_2D_REDUCE)
         assert reduce_name in NET_2D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
-        reduce: torch.nn.Module = NET_2D_REDUCE[reduce_name]
+        reduce: Module = NET_2D_REDUCE[reduce_name]
     else:
         reduce_name = reduce_config.get("name", DEFAULT_3D_REDUCE)
         assert reduce_name in NET_3D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
-        reduce: torch.nn.Module = NET_3D_REDUCE[reduce_name]
+        reduce: Module = NET_3D_REDUCE[reduce_name]
     reduce: partial = partial(reduce, **reduce_config)
     return reduce
 ########################################################################################################################

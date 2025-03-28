@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run in alienware
-python3 ../src/tools/preprocess.py\
+python3 ../../src/tools/preprocess.py\
     --device cpu \
     --processes 12 \
     --batch_size 12 \

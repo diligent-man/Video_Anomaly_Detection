@@ -21,7 +21,6 @@ from .file_ops import (
 
 from .model_ops import (
     load_weights,
-    load_ckpt,
     freeze_layer
 )
 
@@ -55,7 +54,6 @@ __all__ = [
     "convert_config_json_to_yaml",
 
     "load_weights",
-    "load_ckpt",
     "freeze_layer",
 
     "is_mlflow_available",

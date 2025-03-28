@@ -1,6 +1,6 @@
 # Run in alienware
 # How to use: Copy and paste to py-env-enabled terminal
-py ../src/tools/preprocess.py `
+py ../../src/tools/preprocess.py `
     --device both `
     --processes 32 `
     --batch_size 64 `

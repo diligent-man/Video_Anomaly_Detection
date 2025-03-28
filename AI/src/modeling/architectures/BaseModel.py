@@ -1,8 +1,12 @@
-import functools
 import gc
+from functools import partial
 from typing import List, Tuple, Any
 
+
 import torch
+from torch import Tensor
+from torch.nn import Module, ModuleList
+
 
 from ..necks import build_neck
 from ..heads import build_head
@@ -16,7 +20,7 @@ from .BaseModelOutput import BaseModelOutput
 __all__ = ["BaseModel"]
 
 
-class BaseModel(torch.nn.Module):
+class BaseModel(Module):
     def __init__(self, config: DotDict) -> None:
         super(BaseModel, self).__init__()
         # build transform,
@@ -35,26 +39,26 @@ class BaseModel(torch.nn.Module):
         neck, out_channels = build_neck(config)
 
         config.Architecture.head["in_channels"] = out_channels
-        head: torch.nn.Module = build_head(config)
+        head: Module = build_head(config)
 
-        postprocessing: None | torch.nn.Module = build_postprocessing(config)
+        postprocessing: None | Module = build_postprocessing(config)
         self.__config: DotDict = config
 
-        self.backbones: torch.nn.ModuleList = backbones
+        self.backbones: ModuleList = backbones
         self._names: List[str] = names
-        self._reduce: List[functools.partial] = reduce
-        self.out_proj: None | torch.nn.ModuleList = out_proj
+        self._reduce: List[partial] = reduce
+        self.out_proj: None | ModuleList = out_proj
 
-        self.neck: torch.nn.Module = neck
-        self.head: torch.nn.Module = head
-        self.postprocessing: None | torch.nn.Module = postprocessing
+        self.neck: Module = neck
+        self.head: Module = head
+        self.postprocessing: None | Module = postprocessing
 
         self._return_extracted_feats = config.Architecture.backbone.pop("return", False)
         self._return_projected_feats = config.Architecture.neck.pop("return", False)
         self._return_neck_out = config.Architecture.neck.pop("return", False)
         self._return_dict = config.Architecture.pop("return_dict", True)
 
-    def forward(self, x: torch.Tensor) -> BaseModelOutput | Tuple:
+    def forward(self, x: Tensor) -> BaseModelOutput | Tuple:
         """
         :param x: list of input tensors for corresponding backbones.
                   Shape (S,C,T,H,W) or (B,S,C,T,H,W)
@@ -69,22 +73,21 @@ class BaseModel(torch.nn.Module):
 
         device = x.device
         extracted_feats: None | List = None
-        projected_feats: None | torch.Tensor = None
+        projected_feats: None | Tensor = None
 
         for i in range(len(self.backbones)):
-            # backbone: torch.nn.Module = self.backbones[i].to(device)
-            backbone: torch.nn.Module = self.backbones[i]
+            backbone: Module = self.backbones[i]
             name: str = self._names[i]
-            reduce: functools.partial = self._reduce[i]
+            reduce: partial = self._reduce[i]
 
             with torch.autograd.inference_mode():
-                feats: torch.Tensor = ModelForwarder(backbone, name, reduce)(x.clone())
+                feats: Tensor = ModelForwarder(backbone, name, reduce)(x.clone())
 
             feats = feats.clone()
             extracted_feats = [feats] if extracted_feats is None else extracted_feats.append(feats)
 
             if self.out_proj is not None:
-                feats: torch.Tensor = self.out_proj[i].to(device)(feats)
+                feats: Tensor = self.out_proj[i].to(device)(feats)
 
             feats = feats.unsqueeze(0)
             projected_feats = feats if projected_feats is None else torch.cat((projected_feats, feats), 0)
@@ -94,8 +97,8 @@ class BaseModel(torch.nn.Module):
             gc.collect()
             torch.cuda.empty_cache()
 
-        neck_outs: torch.Tensor = self.neck.to(device)(projected_feats)
-        preds: torch.Tensor = self.head.to(device)(neck_outs).squeeze(-1)  # (B, S, 1) -> (B, S)
+        neck_outs: Tensor = self.neck.to(device)(projected_feats)
+        preds: Tensor = self.head.to(device)(neck_outs).squeeze(-1)  # (B, S, 1) -> (B, S)
 
         if self.postprocessing is not None:
             preds = self.postprocessing(preds)
