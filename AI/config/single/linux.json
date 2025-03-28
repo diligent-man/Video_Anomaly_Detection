@@ -104,14 +104,6 @@
         {
 //            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
             "name": ["rgb_i3d"],
-            "rgb_i3d_args": {"freeze": [
-                "mixed_5c.branch_3.1.batch3d.bias",
-                "mixed_5c.branch_3.1.batch3d.weight",
-                "mixed_5b.branch_3.1.batch3d.bias",
-                "mixed_5b.branch_3.1.batch3d.weight",
-                "mixed_5a.branch_3.1.batch3d.bias",
-                "mixed_5a.branch_3.1.batch3d.weight"
-            ]},
             "compile": false,
             "out_proj":
             {

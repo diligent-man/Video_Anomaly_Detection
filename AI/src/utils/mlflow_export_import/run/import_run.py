@@ -47,7 +47,7 @@ def import_run(src: str,
              The run and its parent run ID if the run is a nested run.
     """
     mlflow.set_tracking_uri(client.tracking_uri)
-    http_client = create_http_client(client)
+    # http_client = create_http_client(client)
 
     src_run_path: str = os.path.join(src, "run.json")
     src_run_dct: Dict[str, Any] = read_file_mlflow(src_run_path)

@@ -7,10 +7,12 @@ from torch.optim.optimizer import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.autograd.grad_mode import set_grad_enabled, inference_mode
 
+
 from .DotDict import DotDict
 from ..runner import Trainer
 from ..losses import LossWrapper
 from ..data.model import BatchOutput
+from ..utils.saving import save_video
 from ..utils.runner_utils.trainer import find_initial_total
 import AI.src.utils.BatchForwarder as BatchForwarder  # Circular dependency
 
@@ -28,7 +30,7 @@ def v1(instance: Union[Trainer],
        scheduler: LRScheduler = None
        ) -> None:
     """
-    This phase use for train/ val single MIL VAD problem
+    This fn is used for train/ val single MIL VAD problem
 
     for i, (inps, targets) in enumerate(DataLoader):
         forward -> batch loss
@@ -59,9 +61,9 @@ def v1(instance: Union[Trainer],
         batch_loss: None | torch.Tensor = None
 
         if phase == "train" and optim is not None:
-            instance.model.zero_grad()  # safer than optimizer.zero_grad() in case of num of optimizer > 1
+            # safer than optimizer.zero_grad() in case of num of optimizer > 1
+            instance.model.zero_grad()
 
-        from ..utils.saving import save_video
         instance.callback("on_step_begin")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             anomaly, normal = torch.chunk(inps, 2, 1)
