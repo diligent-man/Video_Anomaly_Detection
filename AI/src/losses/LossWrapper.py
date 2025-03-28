@@ -1,9 +1,10 @@
-from typing import Union, List, Dict, Any
+from typing import Union, List
 
 import torch
+from torch.nn import Module
 
-from ..utils import DotDict, make_border
 from .MILRankingLoss import MILRankingLoss
+from ..utils import DotDict, make_border, to_float32
 
 
 LOSSES = {
@@ -40,7 +41,7 @@ __all__ = ["LossWrapper"]
 class LossWrapper:
     __name: str
     __has_aux: bool
-    __loss: torch.nn.Module
+    __loss: Module
 
     def __init__(self, config: DotDict) -> None:
         name: None | str = config.Loss.pop("name", None)
@@ -61,29 +62,6 @@ Has aux logits: {self.__has_aux}""")
     def name(self) -> str:
         return self.__name
 
-    def _to_float32(self, preds: Union[torch.Tensor, List[torch.Tensor], Dict[str, Any]]
-                    ) -> Union[torch.Tensor, List[torch.Tensor], Dict[str, torch.Tensor]]:
-        # cast to float32 in case of using torch.amp.autocast, cuz dtype != float32 can't precisely visualize
-        if isinstance(preds, dict):
-            for k in preds:
-                if isinstance(preds[k], dict) or isinstance(preds[k], list):
-                    preds[k] = self._to_float32(preds[k])
-                elif isinstance(preds[k], torch.Tensor):
-                    preds[k] = preds[k].type(torch.float32)
-
-        elif isinstance(preds, list):
-            for k in range(len(preds)):
-                if isinstance(preds[k], dict):
-                    preds[k] = self._to_float32(preds[k])
-                elif isinstance(preds[k], list):
-                    preds[k] = self._to_float32(preds[k])
-                elif isinstance(preds[k], torch.Tensor):
-                    preds[k] = preds[k].type(torch.float32)
-
-        elif isinstance(preds, torch.Tensor):
-            preds = preds.type(torch.float32)
-        return preds
-
     def compute_batch_loss(self,
                            inputs: Union[torch.Tensor, List[torch.Tensor]],
                            targets: torch.Tensor = None,
@@ -92,7 +70,7 @@ Has aux logits: {self.__has_aux}""")
         if isinstance(inputs, torch.Tensor):
             inputs = [inputs]
 
-        inputs = self._to_float32(inputs)
+        inputs = to_float32(inputs)
 
         # aux logits (GoogleLeNet, InceptionV3)
         if self.__has_aux:

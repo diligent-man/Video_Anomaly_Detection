@@ -24,6 +24,10 @@ from .model_ops import (
     freeze_layer
 )
 
+from .tensor_ops import (
+    to_float32
+)
+
 from .intergration_ops import (
     is_mlflow_available
 )
@@ -55,6 +59,8 @@ __all__ = [
 
     "load_weights",
     "freeze_layer",
+
+    "to_float32",
 
     "is_mlflow_available",
 

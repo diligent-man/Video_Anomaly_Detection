@@ -133,7 +133,7 @@
         "neck":
         {
             "name":"TAN",
-            "num_backbones": 2,
+            "num_backbones": 1,
             "num_heads": 8,
             "relative_attention": true
         },
