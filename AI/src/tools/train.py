@@ -39,7 +39,6 @@ def main(args: argparse.Namespace) -> None:
     model: torch.nn.Module = build_model(copy.deepcopy(config))
 
     optim, scheduler = build_optimizer(copy.deepcopy(config), model)
-    # model, optim = load_ckpt(copy.deepcopy(config), model, optim)
 
     loss: LossWrapper = LossWrapper(copy.deepcopy(config))
     metrics: MetricWrapper = MetricWrapper(copy.deepcopy(config))

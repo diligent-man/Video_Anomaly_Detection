@@ -21,7 +21,8 @@ from .file_ops import (
 
 from .model_ops import (
     load_weights,
-    load_ckpt
+    load_ckpt,
+    freeze_layer
 )
 
 from .intergration_ops import (
@@ -55,6 +56,7 @@ __all__ = [
 
     "load_weights",
     "load_ckpt",
+    "freeze_layer",
 
     "is_mlflow_available",
 

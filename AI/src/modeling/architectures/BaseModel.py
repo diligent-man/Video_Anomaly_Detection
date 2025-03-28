@@ -19,7 +19,6 @@ __all__ = ["BaseModel"]
 class BaseModel(torch.nn.Module):
     def __init__(self, config: DotDict) -> None:
         super(BaseModel, self).__init__()
-
         # build transform,
         # if "Transform" not in config or config["Transform"] is None:
         #     self.use_transform = False

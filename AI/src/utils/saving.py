@@ -57,7 +57,8 @@ def save_batch_images(batch: torch.Tensor,
 def save_video(frames: torch.Tensor,
                save_dir: str,
                fps: int = 24,
-               name: str = "output_video"
+               name: str = "output_video",
+               verbose: bool = False
                ) -> None:
     """
     :param frames: shape (T, H, W, 3) and in range [0, 255] in lieu of [0, 1] due to write_video fn
@@ -67,10 +68,12 @@ def save_video(frames: torch.Tensor,
     :return: None
     """
     if not os.path.exists(save_dir):
-        print(f"{save_dir} not exist. Creating ...")
+        if verbose:
+            print(f"{save_dir} not exist. Creating ...")
         os.makedirs(save_dir, exist_ok=True)
     else:
-        print(f"{save_dir} existed so not create the new one.")
+        if verbose:
+            print(f"{save_dir} existed so not create the new one.")
 
     frames = frames.to("cpu").type(torch.uint8)
 

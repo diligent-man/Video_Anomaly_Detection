@@ -61,9 +61,21 @@ def v1(instance: Union[Trainer],
         if phase == "train" and optim is not None:
             instance.model.zero_grad()  # safer than optimizer.zero_grad() in case of num of optimizer > 1
 
+        from ..utils.saving import save_video
         instance.callback("on_step_begin")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             anomaly, normal = torch.chunk(inps, 2, 1)
+
+            # if instance.state.phase == "train":
+            #     _ = [
+            #         save_video(
+            #             255 * anomaly[i, ...].permute(0, 2, 3, 4, 1).reshape(-1, 224, 224, 3),
+            #             "/home/trong/Downloads/tmp",
+            #             15,
+            #             f"out_video_phase_{instance.state.phase}_epoch_{instance.state.epoch}_step_{instance.state.step}_{i}"
+            #         )
+            #         for i in range(anomaly.shape[0])
+            #     ]
 
             anomaly_preds: Tensor = instance.model(anomaly.to(device)).preds  # (B, S)
             normal_preds: Tensor = instance.model(normal.to(device)).preds  # (B, S)

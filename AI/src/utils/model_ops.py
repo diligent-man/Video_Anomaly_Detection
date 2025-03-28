@@ -1,13 +1,16 @@
 import os
-from typing import Any, Mapping, Tuple, Dict
+import warnings
+from typing import Any, Mapping, Tuple, Dict, List, Union
 
 import torch
+from torch.nn import Module
+from torch.fx import GraphModule
 from torchvision.models import WeightsEnum
 
 from . import DotDict
 
 
-__all__ = ["load_weights", "load_ckpt"]
+__all__ = ["load_weights", "load_ckpt", "freeze_layer"]
 
 
 def load_weights(weights: str | WeightsEnum, src: str = "pytorch", return_path: bool = False) -> str | Mapping[str, Any]:
@@ -55,3 +58,22 @@ def load_ckpt(config: DotDict,
     # if load:
     #     print("Loading checkpoint ...")
     return model, optimizer
+
+
+def freeze_layer(model: Module | GraphModule,
+                 freeze_list: int | List[str]
+                 ) -> Tuple[Union[Module, GraphModule], int]:
+    total_layers: int = len(list(model.parameters()))
+
+    if isinstance(freeze_list, int) and freeze_list == -1:
+        freeze_list = total_layers
+
+    for i, (para_name, para) in enumerate(reversed(list(model.named_parameters()))):
+        if (
+                isinstance(freeze_list, int) and
+                i in range(freeze_list)
+        ) or (
+                para_name in freeze_list
+        ):
+            para.requires_grad = False
+    return model, total_layers
