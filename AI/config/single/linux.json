@@ -1,11 +1,11 @@
 {
     "global":
     {
-//        "save_dir": "/home/trong/Downloads/training_results/",
+        "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
         "project_name": "AIP391",
-//        "experiment_name": "run",
-//        "technique": "single",
-//        "mode": "train",
+        "experiment_name": "run",
+        "technique": "single",
+        "mode": "train",
         "exist_ok": true,
         "sep": "_",
 
@@ -13,7 +13,7 @@
         "eval_strategy": "epoch",
         "eval_steps": 7,
 
-        "resume": true,
+        "resume": false,
         "resume_ckpt": "../../results/AIP391/single/train/run/ckpt/epoch1_step3.pt",
 
         // GradScaled is automatically init when use_amp=True
@@ -193,9 +193,9 @@
             "apply": true,
             "prev_run_id": "9d5cb84c211f4aeabeecc129d026af48",
             "init_server_on_run": true,
-            "username": "",
-            "password": "",
-            "remote_tracking_uri": ""
+            "username": "root",
+            "password": "Root123!",
+            "remote_tracking_uri": "http://113.23.3.195:5000"
         },
 
         {

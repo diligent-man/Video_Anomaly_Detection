@@ -85,13 +85,26 @@ class Mlflow(TrainerCallback):
 
         mlflow.set_tracking_uri("file:" + backend_store_uri)
         self.__experiment = mlflow.set_experiment(experiment_name)
-        self.__run = mlflow.active_run() or mlflow.start_run(
-            run_id=None if self.__prev_run_id is None else self.__prev_run_id,
-            run_name=run_name,
-            tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
-            description=instance.config.Mlflow.get("description", None),
-            log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
-        )
+
+        try:
+            run = mlflow.get_run(self.__prev_run_id)
+            self.__run = mlflow.start_run(
+                run.info.run_id,
+                None,
+                run_name,
+                tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
+                description=instance.config.Mlflow.get("description", None),
+                log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
+            )
+        except mlflow.exceptions.MlflowException:
+            self.__run = mlflow.start_run(
+                None,
+                None,
+                run_name,
+                tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
+                description=instance.config.Mlflow.get("description", None),
+                log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
+            )
 
         model_arch: None | str = instance.config.pop("Model_arch", None)
         if model_arch is not None:

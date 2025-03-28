@@ -31,10 +31,6 @@ DEFAULT_CONFIG_PATH: Dict[str, pathlib.Path] = {
 
 
 def main(args: argparse.Namespace) -> None:
-    # init dist environment
-    # if config["Global"]["distributed"]:
-    #     dist.init_parallel_env()
-    #
     config: DotDict = ConfigReader(args.config).config
 
     train_dataloader = build_dataloader(copy.deepcopy(config), "train")
