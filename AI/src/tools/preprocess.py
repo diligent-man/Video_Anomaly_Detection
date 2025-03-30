@@ -130,7 +130,7 @@ def stage_three(args: Namespace, ds_name: str) -> None:
         [
             multiple_replace(str(Path(obj.replace(save_root, ""))), {".pth": "", ".pt": ""})
             for obj in glob.glob(f"{save_root}/**", recursive=True, include_hidden=True)
-            if Path(obj).suffix in (".pt", ".pth")
+            if Path(obj).suffix.endswith((".pt", ".pth"))
          ]
     )
 
