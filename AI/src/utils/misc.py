@@ -1,15 +1,17 @@
 import os
+import re
 import sys
 import warnings
 import platform
 from importlib import metadata
+from typing import Tuple, Dict, Any, List
 
 import torch
 import torchaudio
+from matplotlib import pyplot as plt
 
 from . import DotDict, ANSIColor
-from typing import Tuple, Dict, Any, List
-from matplotlib import pyplot as plt
+
 
 plt.switch_backend("tkagg")
 
@@ -20,21 +22,23 @@ __all__ = [
     "visualize_lr",
     "inspect_ffmpeg",
     "check_version",
-    "make_border"
+    "make_border",
+    "multiple_replace"
 ]
 
 
-# Manually call the _init_dll_path method to ensure that the system path is searched for FFMPEG.
-# Calling torchaudio._extension.utils._init_dll_path does not work because it is initializing the torchadio module prematurely or something.
-# See: https://github.com/pytorch/audio/issues/3789
+"""
+Manually call the _init_dll_path method to ensure that the system path is searched for FFMPEG.
+Calling torchaudio._extension.utils._init_dll_path does not work because
+it is initializing the torchadio module prematurely or something.
+
+See: https://github.com/pytorch/audio/issues/3789
+"""
 if sys.platform == "win32":
     print("Initializing DLL path for Windows")
     for path in os.environ.get("Path", "").split(";"):
         if os.path.exists(path):
-            try:
-                os.add_dll_directory(path)
-            except Exception:
-                pass
+            os.add_dll_directory(path)
 
 
 def inspect_ffmpeg() -> None:
@@ -99,7 +103,8 @@ def get_amp_cfg(config: DotDict) -> Tuple[Dict[str, Any], None | torch.GradScale
     use_amp: bool = config.Global.get("use_amp", False)
 
     if use_amp:
-        amp_dtype: torch.dtype = torch.float16 # if device == "cuda" else torch.bfloat16  # cpu also use torch.float16 ???
+        # if device == "cuda" else torch.bfloat16  # cpu also use torch.float16 ???
+        amp_dtype: torch.dtype = torch.float16
 
         # Currently use default arg for GradScaler
         if device == "cuda":
@@ -168,7 +173,7 @@ def check_version(
             current = metadata.version(current)  # get version string from package name
         except metadata.PackageNotFoundError as e:
             if hard:
-                raise ModuleNotFoundError(emojis(f"WARNING ⚠️ {current} package is required but not installed")) from e
+                raise ModuleNotFoundError(f"WARNING ⚠️ {current} package is required but not installed") from e
             else:
                 return False
 
@@ -196,8 +201,15 @@ def make_border(headline: str) -> Tuple[str, str]:
     top: str = f"{ANSIColor().CYAN}{headline}{ANSIColor().RESET}"
     bottom: str = f"{ANSIColor().CYAN}{'-' * len(headline)}{ANSIColor().RESET}\n\n"
     return top, bottom
+
+
+def multiple_replace(string: str, ref_dict: Dict[str, str]) -> str:
+    ref_keys: List[str] = sorted(ref_dict, key=len, reverse=True)
+    pattern: re.Pattern = re.compile("|".join([re.escape(k) for k in ref_keys]), flags=re.DOTALL)
+    string = pattern.sub(lambda x: ref_dict[x.group(0)], string)
+    return string
+
+
 ########################################################################################################################
-
-
 TORCH_2_4 = check_version(torch.__version__, "2.4.0")
 MACOS, LINUX, WINDOWS = (platform.system() == x for x in ["Darwin", "Linux", "Windows"])  # environment booleans

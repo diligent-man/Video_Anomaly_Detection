@@ -21,7 +21,7 @@ class VideoPreprocessor(object):
     __filters: Dict[str, Dict[str, Any]] = {
         "fps": {"fps": 15, "round": "up"},
         "scale": {"w": 320, "h": 320, "sws_flags": "neighbor"},
-        "crop": {"out_w": 224, "out_h": 224, "exact": 1, "keep_aspect": 1},
+        # "crop": {"out_w": 224, "out_h": 224, "exact": 1, "keep_aspect": 1},
     }
 
     def __init__(self,
@@ -84,7 +84,7 @@ class VideoPreprocessor(object):
         Stage one includes:
             a/ Resampling video with specified fps
             b/ Rescale frame
-            c/ Central crop frame
+            c/ Central crop frame (temporarily disabled)
             d/ Save video stream as output
         """
         if not os.path.exists(self.__spath):
@@ -101,13 +101,14 @@ class VideoPreprocessor(object):
                 for filter_name, kwargs in self.__filters.items():
                     stream = stream.filter(filter_name, **kwargs)
 
-                stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="error")
+                stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="verbose")
                 stream = stream.overwrite_output()
-
                 stream.run_async() if run_async else stream.run()
-            except Exception as e:
-                print(f"File: {self.__fpath} get")
-                print(f"{e}\n")
+            except ffmpeg.Error as e:
+                print(f"File: {self.__fpath} get {e}\n so ignore it")
+
+                if os.path.exists(self.__spath):
+                    os.remove(self.__spath)
 
     def stage_two(self,
                   del_prev_result: bool = False
@@ -119,12 +120,14 @@ class VideoPreprocessor(object):
             c/ Save video stream as .pt file
          and
         """
-        extension: str = pathlib.Path(self.spath).name.split(".")[-1]
-        if not os.path.isfile(self.spath.replace(extension, "pt")):
+        ext: str = pathlib.Path(self.__spath).suffix
+        if not os.path.isfile(self.__spath.replace(ext, ".pt")) and os.path.exists(self.__spath):
             video: torch.Tensor = v2(self.__spath, device=self.__device)  # [T,H,W,C] in cpu device
 
             total_frames: int = video.shape[0]
-            seg_start_idx: torch.Tensor = torch.linspace(0, total_frames, self.__num_segments).clamp(0, total_frames).int()
+            seg_start_idx: torch.Tensor = torch.linspace(
+                0, total_frames, self.__num_segments
+            ).clamp(0, total_frames).int()
 
             save_tensor: None | torch.Tensor = None
             if not self.__is_labeled:
@@ -146,7 +149,7 @@ class VideoPreprocessor(object):
             else:
                 save_tensor = video
 
-            torch.save(save_tensor, self.spath.replace(extension, "pt"))
+            torch.save(save_tensor, self.__spath.replace(ext, ".pt"))
             torch.serialization.add_safe_globals([save_tensor])
 
             if del_prev_result:

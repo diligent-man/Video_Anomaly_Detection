@@ -3,7 +3,6 @@ import pathlib
 from typing import Tuple, Dict, Callable
 
 import torch
-import torchaudio
 
 
 def v1(path: str, output_format: str = "TCHW") -> torch.Tensor:
@@ -136,8 +135,6 @@ def v5(path: str) -> torch.Tensor:
     """
     Create pseudo-tensor for dev stage
     """
-    stream_reader: torchaudio.io.StreamReader = torchaudio.io.StreamReader(path)
-
     T = torch.randint(low=10, high=50, size=(1,)).item()
     pseudo_tensor: torch.Tensor = torch.rand(1, 3, T, 224, 224)
     return pseudo_tensor

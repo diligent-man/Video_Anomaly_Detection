@@ -1,16 +1,25 @@
-import os.path
+import os
+
 from typing import Dict, Any
 from collections import defaultdict
+
+
 import numpy as np
 import seaborn as sns
+
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
+
 
 from .ANSIColor import ANSIColor
 from ..data.dataset import VideoFolderDataset
 
-# Define the public functions available for import
-__all__ = ["prompt_dataset_statistics", "plot_dataset_statistics"]
+
+__all__ = [
+    "prompt_dataset_statistics",
+    "plot_dataset_statistics"
+]
+
 
 def prompt_dataset_statistics(stats: Dict[str, Any]) -> str:
     """
@@ -49,6 +58,7 @@ Average duration: {avg_duration:.2f} seconds
 {'-' * (84 + len("DATASET STATISTICS"))}
 """
     return prompt
+
 
 def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
     """
@@ -92,12 +102,16 @@ def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
 
     # Plot the filtered data
     draw_bar_chart(list(filtered_class_names),
-               list(filtered_class_counts),
-               "Videos per Class",
-               "", "Number of Videos",
-               {"rotation": 45, "ha": "right"}, None,
-               None, {"bottom": 0, "top": max(filtered_class_counts) * 1.2} if filtered_class_counts else {"bottom": 0, "top": 1},
-               **kwargs
+                   list(filtered_class_counts),
+                   "Videos per Class",
+                   "",
+                   "Number of Videos",
+                   {"rotation": 45, "ha": "right"},
+                   None,
+                   None,
+                   {"bottom": 0, "top": max(filtered_class_counts) * 1.2} if filtered_class_counts else
+                   {"bottom": 0, "top": 1},
+                   **kwargs
                )
 
     # 2. Compare the number of anomaly and normal videos
@@ -106,9 +120,12 @@ def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
 
     draw_bar_chart(["Anomalies", "Normal"], [anomaly_count, normal_count],
                    "Anomaly vs Normal videos",
-                   None, None,
-                   {"rotation": 0, "ha": "center"}, None,
-                   None,  {"bottom": 0, "top": max([anomaly_count, normal_count]) * 1.2},
+                   None,
+                   None,
+                   {"rotation": 0, "ha": "center"},
+                   None,
+                   None,
+                   {"bottom": 0, "top": max([anomaly_count, normal_count]) * 1.2},
                    True,
                    width=0.5,  # Chỉ áp dụng cho biểu đồ này
                    **kwargs

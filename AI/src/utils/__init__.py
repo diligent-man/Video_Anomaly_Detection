@@ -37,7 +37,8 @@ from .misc import (
     visualize_lr,
     get_services,
     inspect_ffmpeg,
-    make_border
+    make_border,
+    multiple_replace
 )
 
 __all__ = [
@@ -68,5 +69,6 @@ __all__ = [
     "visualize_lr",
     "get_services",
     "inspect_ffmpeg",
-    "make_border"
+    "make_border",
+    "multiple_replace"
 ]
