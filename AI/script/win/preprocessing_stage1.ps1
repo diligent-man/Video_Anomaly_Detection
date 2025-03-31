@@ -2,13 +2,13 @@
 # How to use: Copy and paste to py-env-enabled terminal
 py ../../src/tools/preprocess.py `
     --device both `
-    --processes 32 `
-    --batch_size 32 `
-    --root "D:\Dataset\VAD\filtered\UCF" `
-    --cpu_ratio 0.7 `
+    --processes 18 `
+    --batch_size 18 `
+    --root "D:\Dataset\VAD\filtered\UBI-FIGHT" `
+    --cpu_ratio 0.4 `
     --save_root "../preprocessed" `
-    --wait_time 30 `
-    --run_async false `
+    --wait_time 15 `
+    --run_async true `
     --fn_name stage_one
 
 # Error notes

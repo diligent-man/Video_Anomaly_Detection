@@ -3,6 +3,7 @@ MLflow Logging service. Adopted and modified from Ultralytics, Huggingface src c
 """
 import os
 import pathlib
+import warnings
 from subprocess import Popen
 from typing import Dict, Any
 
@@ -60,9 +61,6 @@ class Mlflow(TrainerCallback):
             password = os.getenv("MLFLOW_TRACKING_PASSWORD")
         else:
             os.environ["MLFLOW_TRACKING_PASSWORD"] = password
-
-        if remote_tracking_uri is not None:
-            assert ping_server(remote_tracking_uri, auth=(username, password)) == 200, ConnectionError
 
         self.__save_dir = save_dir
         self.__prev_run_id = prev_run_id
@@ -140,6 +138,12 @@ Cmd: 'mlflow server --backend-store-uri {"file:" + backend_store_uri}'
         :param instance: Trainer instance
         :return: Initialize local mlflow run
         """
+        try:
+            ping_server(self.__remote_tracking_uri, auth=(self.__username, self.__password))
+            print("Successfully connect to remote tracking server")
+        except ConnectionError:
+            warnings.warn("Fail to connect to remote tracking server")
+
         if not self.__initialized:
             self.setup(instance)
 

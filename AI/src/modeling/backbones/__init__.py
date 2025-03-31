@@ -1,4 +1,3 @@
-from pprint import pformat
 from functools import partial
 from typing import (
     Dict,
@@ -65,7 +64,8 @@ def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial
     # device_maps: List[None | Dict[str, str]] = [device_map.get_dict() for device_map in device_maps
     #                                             if isinstance(device_map, DotDict)]
     # if offloading:
-    #     assert len(device_maps) == len(names), ValueError(f"Provided device_map must be fully specified for all backbones")
+    #     assert len(device_maps) == len(names),
+    #     ValueError(f"Provided device_map must be fully specified for all backbones")
 
     for i, name in enumerate(names):
         assert name in NET_DEFAULT_CONFIG.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
@@ -74,7 +74,9 @@ def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial
         model_args: Dict[str, Any] = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
 
         trainable_layers: int | List[str] = model_args.pop("trainable_layers", [])
-        assert isinstance(trainable_layers, (int, list)), ValueError("Freeze args must be a number or list of str layer to freeze")
+        assert isinstance(trainable_layers, (int, list)), ValueError(
+            "Freeze args must be a number or list of str layer to freeze"
+        )
 
         if model_args.get("weights", None) is None:
             model_args["weights"] = NET_DEFAULT_CONFIG[name]["weights"]
@@ -85,7 +87,7 @@ def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial
             concrete_args=NET_DEFAULT_CONFIG[name].get("concrete_args")
         )
 
-        model, num_layers = freeze_layer(model, trainable_layers)
+        model, num_layers, trainable_layer_names = freeze_layer(model, trainable_layers)
         model.train()
 
         if compile_model:
@@ -109,9 +111,8 @@ def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial
         msg = f"""Backbone {i}:
     Name: {name}
     Num layers: {num_layers}
-"""
-        msg += f"\tNum freeze layers: {trainable_layers}\n" if isinstance(trainable_layers, int) else \
-            f"\tFreeze layers:\n" + pformat(trainable_layers, indent=8)
+    Num freeze layers: {num_layers - len(trainable_layer_names)}
+    Trainable layers:\n\t\t""" + "\n\t\t".join(trainable_layer_names)
         print(msg)
     print(bottom)
     return (

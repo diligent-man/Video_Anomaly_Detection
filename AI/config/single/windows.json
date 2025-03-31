@@ -35,10 +35,10 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "D:\\Dataset\\VAD\\out\\IITB (Copy)\\unlabeled",
+                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
                 "loader": "v4",
                 "transform": {
-                    "ToDtype": {"dtype": "float32", "scale": true},
+                    "ToDtype": {"dtype": "float32", "scale": true}
 //                    "Permute_1": {"dims": [0, 2, 1, 3, 4]},
 //                    "ColorJitter": {"brightness":  0.75, "contrast": 0.5, "saturation": 0.5, "hue": 0.25},
 //                    "RandomGrayscale": {"p": 0.5},
@@ -70,7 +70,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "D:\\Dataset\\VAD\\out\\IITB (Copy)\\unlabeled",
+                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -158,7 +158,7 @@
     "optim":
     {
         "lr": {"name": "Adam", "lr": 1e-6, "amsgrad": true},
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  12, "num_warmup_steps": 12},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  4, "num_warmup_steps": 4},
         "regularizer": {}
     },
 

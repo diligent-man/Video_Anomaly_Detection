@@ -21,7 +21,7 @@ class VideoPreprocessor(object):
     __filters: Dict[str, Dict[str, Any]] = {
         "fps": {"fps": 15, "round": "up"},
         "scale": {"w": 320, "h": 320, "sws_flags": "neighbor"},
-        # "crop": {"out_w": 224, "out_h": 224, "exact": 1, "keep_aspect": 1},
+        "crop": {"out_w": 224, "out_h": 224, "exact": 1, "keep_aspect": 1},
     }
 
     def __init__(self,
@@ -101,7 +101,7 @@ class VideoPreprocessor(object):
                 for filter_name, kwargs in self.__filters.items():
                     stream = stream.filter(filter_name, **kwargs)
 
-                stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="verbose")
+                stream = stream.output(self.__spath, pix_fmt="rgb24", loglevel="error")
                 stream = stream.overwrite_output()
                 stream.run_async() if run_async else stream.run()
             except ffmpeg.Error as e:
@@ -121,12 +121,14 @@ class VideoPreprocessor(object):
          and
         """
         ext: str = pathlib.Path(self.__spath).suffix
-        if not os.path.isfile(self.__spath.replace(ext, ".pt")) and os.path.exists(self.__spath):
+        if not os.path.isfile(self.__spath.replace(ext, ".pt")):
             video: torch.Tensor = v2(self.__spath, device=self.__device)  # [T,H,W,C] in cpu device
 
             total_frames: int = video.shape[0]
+
+            # Add one to step due to API make it minus 1
             seg_start_idx: torch.Tensor = torch.linspace(
-                0, total_frames, self.__num_segments
+                0, total_frames, self.__num_segments+1
             ).clamp(0, total_frames).int()
 
             save_tensor: None | torch.Tensor = None

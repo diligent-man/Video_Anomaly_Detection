@@ -34,8 +34,9 @@ def load_weights(weights: str | WeightsEnum,
 
 def freeze_layer(model: Module | GraphModule,
                  trainable_layers: int | List[str]
-                 ) -> Tuple[Union[Module, GraphModule], int]:
+                 ) -> Tuple[Union[Module, GraphModule], int, List[str]]:
     total_layers: int = len(list(model.parameters()))
+    trainable_layer_names: List[str] = []
 
     if isinstance(trainable_layers, int):
         trainable_layers = total_layers if trainable_layers == -1 else trainable_layers
@@ -47,4 +48,7 @@ def freeze_layer(model: Module | GraphModule,
         else:
             if para_name not in trainable_layers:
                 para.requires_grad = False
-    return model, total_layers
+
+        if para.requires_grad:
+            trainable_layer_names.append(para_name)
+    return model, total_layers, trainable_layer_names
