@@ -1,4 +1,5 @@
 # TODO: Optimize checking process
+import copy
 import os
 import pathlib
 
@@ -48,10 +49,34 @@ class ConfigReader(object):
         self._flatten_service_config()
         print(bottom)
 
+    @staticmethod
+    def _check_single_arch(arch: Dict[str, Any]) -> None:
+        """
+        This method is still error-prone
+        """
+        _arch_to_check: Dict[str, Set[str]] = {
+            "optional": {"transform", "postprocessing", "pretrained"},
+            "compulsory": {"backbone", "neck", "head"}
+        }
+
+        assert _arch_to_check["compulsory"].issubset(set(arch.keys())), ValueError(
+            f"Obligatory arch is missing. Only has {arch}")
+
+        arch_to_check: List[str] = [*_arch_to_check["compulsory"], *_arch_to_check["optional"]]
+
+        for field in arch.keys():
+            assert field in arch_to_check, ValueError(f"Architecture field must be in {arch}. Get '{field}' instead.")
+
+            if field in _arch_to_check["compulsory"]:
+                assert arch[field].get("name", None) is not None, ValueError(f"{field} name is None")
+                print(f"\t{ANSIColor().CYAN}{field}{ANSIColor().RESET}: {arch[field]['name']}")
+            else:
+                print(f"\t{ANSIColor().CYAN}{field}{ANSIColor().RESET}: {arch[field]}")
+        print()
+
     def _structure_check(self):
         print("Config structure sanity check")
-        config: Dict[str, Any] = self.__config.get_dict()
-        arch_to_check: Dict[str, Set[str]] = {"optional": {"transform", "postprocessing"}, "compulsory": {"backbone", "neck", "head"}}
+        config: Dict[str, Any] = copy.deepcopy(self.__config).get_dict()
 
         # Fields check
         for field in config.keys():
@@ -89,17 +114,23 @@ class ConfigReader(object):
         print()
 
         # architecture check
-        arch: Set[str] = set(config["Architecture"].keys())
-        assert arch_to_check["compulsory"].issubset(arch), ValueError(f"Obligatory arch is missing. Only has {arch}")
-
-        arch_to_check: List[str] = [*arch_to_check["compulsory"], *arch_to_check["optional"]]
-
         print(f"Model config")
-        for i in arch:
-            assert i in arch_to_check, ValueError(f"Architecture must be in {arch}. Get '{i}' instead.")
-            assert config["Architecture"][i].get("name") is not None, ValueError(f"{i} name is None")
-            print(f"\t{ANSIColor().CYAN}{i}{ANSIColor().RESET}: {config['Architecture'][i].get('name')}")
-        print()
+        algorithm = config["Architecture"].pop("algorithm", None)
+        assert algorithm in ["single", "distillation"], ValueError("Currently support single/ distillation model training ")
+
+        print(f"{ANSIColor().CYAN}Training algorithm{ANSIColor().RESET}: {algorithm}")
+        if algorithm == "single":
+            self._check_single_arch(config["Architecture"])
+        else:
+            models: Dict[str, Dict] = config["Architecture"].pop("models", {})
+            students: List[Dict[str, Any]] = [v for k, v in models.items() if k.startswith("student")]
+            teachers: List[Dict[str, Any]] = [v for k, v in models.items() if k.startswith("teacher")]
+
+            for student in students:
+                self._check_single_arch(student)
+
+            for teacher in teachers:
+                self._check_single_arch(teacher)
 
         # services check
         services: None | List[Dict[str, Any]] = config["Services"]
@@ -174,6 +205,7 @@ class ConfigReader(object):
             for service_config in service_configs:
                 name: str = service_config.get("name")
                 self.__config[name.capitalize()] = service_config
+
 
     @property
     def config(self):

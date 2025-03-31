@@ -49,5 +49,5 @@ class MILRankingLoss(Module):
         if self.__sparsity_constraint:
             loss += torch.sum(anomaly_preds, dim=1) * self.__sparsity_weight
 
-        loss = torch.sum(loss).mean(0) if self.__reduction == "mean" else torch.sum(loss)
+        loss = torch.mean(loss, dim=0) if self.__reduction == "mean" else torch.sum(loss)
         return loss
