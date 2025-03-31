@@ -15,7 +15,7 @@ POSTPROCESSINGS: Dict[str, Any] = {
 
 
 def build_postprocessing(config: DotDict) -> None | torch.nn.Module:
-    config: DotDict = config.Architecture.get("postprocessing", DotDict({}))
+    config: DotDict = config.get("postprocessing", DotDict({}))
     name: None | str = config.pop("name", None)
 
     if name is None:

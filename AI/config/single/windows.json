@@ -35,7 +35,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
+                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\unlabeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype": {"dtype": "float32", "scale": true}
@@ -70,7 +70,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
+                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\unlabeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -206,7 +206,7 @@
             "init_server_on_run": true,
             "username": "root",
             "password": "Root123!",
-            "remote_tracking_uri": "http://113.23.3.195:5000"
+            "remote_tracking_uri": "http://42.119.174.56:5000"
         },
 
         {

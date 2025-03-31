@@ -50,9 +50,9 @@ def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial
         "out_channels": []
     }
 
-    names: None | List[str] = config.Architecture.backbone.pop("name", None)
-    compile_model: bool = config.Architecture.backbone.pop("compile", False)
-    out_proj: Dict[str, Any] = config.Architecture.backbone.pop("out_proj", DotDict({})).get_dict()
+    names: None | List[str] = config.backbone.pop("name", None)
+    compile_model: bool = config.backbone.pop("compile", False)
+    out_proj: Dict[str, Any] = config.backbone.pop("out_proj", DotDict({})).get_dict()
 
     assert isinstance(names, list), ValueError(
         f"Name for feat extractor backbone must be string list. Get '{type(names)}'")
@@ -71,7 +71,7 @@ def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial
         assert name in NET_DEFAULT_CONFIG.keys(), ValueError(f"Provided backbone is unavailable. Get '{name}'")
 
         build_result["name"].append(name)
-        model_args: Dict[str, Any] = config.Architecture.backbone.pop(f"{name}_args", DotDict({})).get_dict()
+        model_args: Dict[str, Any] = config.backbone.pop(f"{name}_args", DotDict({})).get_dict()
 
         trainable_layers: int | List[str] = model_args.pop("trainable_layers", [])
         assert isinstance(trainable_layers, (int, list)), ValueError(
@@ -125,7 +125,7 @@ def build_backbone(config: DotDict) -> Tuple[ModuleList, List[str], List[partial
 
 
 def build_reduce(name: str, config: DotDict) -> partial:
-    reduce_config: Dict[str, Any] = config.Architecture.backbone.pop(f"{name}_reduce", DotDict({})).get_dict()
+    reduce_config: Dict[str, Any] = config.backbone.pop(f"{name}_reduce", DotDict({})).get_dict()
     if name in NET_2D:
         reduce_name = reduce_config.pop("name", DEFAULT_2D_REDUCE)
         assert reduce_name in NET_2D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")

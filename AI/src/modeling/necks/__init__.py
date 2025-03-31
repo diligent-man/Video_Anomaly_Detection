@@ -15,9 +15,9 @@ NECKS = {
 
 
 def build_neck(config: DotDict) -> Tuple[Module, int]:
-    name = config.Architecture.neck.pop("name")
+    name = config.neck.pop("name")
     assert name in NECKS.keys(), ValueError(f"Provided neck is unavailable. Get '{name}'")
 
-    neck: Module = NECKS[name](**config.Architecture.neck.get_dict())
+    neck: Module = NECKS[name](**config.neck.get_dict())
     out_channels: int = neck.out_channels
     return neck, out_channels
