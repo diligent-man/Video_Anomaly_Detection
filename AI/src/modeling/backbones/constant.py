@@ -1,12 +1,13 @@
 from typing import Dict, Any
 
 import torch
+from torch.nn import Module
 
-from .CLIP import clip_vision, CLIP_Weights
 from .S3D import s3d, S3D_Weights
+from .CLIP import clip_vision, CLIP_Weights
 from .InceptionI3D import inception_i3d, InceptionI3D_Weights
 
-from ..nn import MiddleSelector
+from ..nn import VectReducer
 
 
 __all__ = [
@@ -15,6 +16,7 @@ __all__ = [
     "NET_2D_REDUCE", "NET_3D_REDUCE",
     "DEFAULT_2D_REDUCE", "DEFAULT_3D_REDUCE"
 ]
+
 
 NET_DEFAULT_CONFIG: Dict[str, Dict[str, Any]] = \
     {
@@ -66,17 +68,38 @@ NET_DEFAULT_CONFIG: Dict[str, Dict[str, Any]] = \
 NET_2D = {"clip_vit/b16", "clip_vit/b32", "clip_vit/l14", "clip_vit/l14_336"}
 NET_3D = {"rgb_i3d", "s3d"}
 
-DEFAULT_2D_REDUCE = "max"
-DEFAULT_3D_REDUCE = "max"
+DEFAULT_2D_REDUCE = "mean"
+DEFAULT_3D_REDUCE = "mean"
 
-NET_2D_REDUCE: Dict[str, Any] = {
-    "max": torch.nn.MaxPool1d,
-    "mid": MiddleSelector,
+
+NET_2D_REDUCE: Dict[str, Module] = {
+    "mean": torch.nn.AvgPool1d,
+
+    "max_l1": VectReducer("max_l1"),
+    "min_l1": VectReducer("min_l1"),
+
+    "max_l2": VectReducer("max_l2"),
+    "min_l2": VectReducer("min_l2"),
+
+    "max_inf": VectReducer("max_inf"),
+    "min_inf": VectReducer("min_inf"),
+
+    "max_-inf": VectReducer("max_-inf"),
+    "min_-inf": VectReducer("min_-inf"),
 }
 
-NET_3D_REDUCE: Dict[str, Any] = {
-    "max": torch.nn.MaxPool3d,
-    "avg": torch.nn.AvgPool3d,
-    "fractional_max": torch.nn.FractionalMaxPool3d,
-    "lp": torch.nn.LPPool3d,
+NET_3D_REDUCE: Dict[str, Module] = {
+    "mean": torch.nn.AvgPool3d,
+
+    "max_l1": VectReducer("max_l1"),
+    "min_l1": VectReducer("min_l1"),
+
+    "max_l2": VectReducer("max_l2"),
+    "min_l2": VectReducer("min_l2"),
+
+    "max_inf": VectReducer("max_inf"),
+    "min_inf": VectReducer("min_inf"),
+
+    "max_-inf": VectReducer("max_-inf"),
+    "min_-inf": VectReducer("min_-inf"),
 }

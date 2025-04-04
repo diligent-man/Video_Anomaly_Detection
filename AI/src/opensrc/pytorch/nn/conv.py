@@ -1,4 +1,6 @@
-from torch.nn import (
+from typing import Dict
+from torch.nn.modules import (
+    Module,
     Conv1d,
     Conv2d,
     Conv3d,
@@ -13,7 +15,11 @@ from torch.nn import (
     LazyConvTranspose3d
 )
 
-available_conv = {
+
+__all__ = ["avail_conv"]
+
+
+avail_conv: Dict[str, Module] = {
     "Conv1d": Conv1d,
     "Conv2d": Conv2d,
     "Conv3d": Conv3d,

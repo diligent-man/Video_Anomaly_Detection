@@ -128,11 +128,17 @@ def build_reduce(name: str, config: DotDict) -> partial:
     reduce_config: Dict[str, Any] = config.backbone.pop(f"{name}_reduce", DotDict({})).get_dict()
     if name in NET_2D:
         reduce_name = reduce_config.pop("name", DEFAULT_2D_REDUCE)
-        assert reduce_name in NET_2D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
+
+        if reduce_name is not None:
+            assert reduce_name in NET_2D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
+
         reduce: Module = NET_2D_REDUCE[reduce_name]
     else:
-        reduce_name = reduce_config.get("name", DEFAULT_3D_REDUCE)
-        assert reduce_name in NET_3D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
+        reduce_name = reduce_config.pop("name", DEFAULT_3D_REDUCE)
+
+        if reduce_name is not None:
+            assert reduce_name in NET_3D_REDUCE, ValueError(f"Provided reduce method is not supported, Get '{reduce_name}'")
+
         reduce: Module = NET_3D_REDUCE[reduce_name]
     reduce: partial = partial(reduce, **reduce_config)
     return reduce

@@ -32,7 +32,7 @@ class TemporalAggregation(Module):
         self._num_backbones: int = num_backbones
         self._num_heads: int = num_heads
         self._embed_dim: List[int] = embed_dim
-        self._content_qkv: ModuleList = ModuleList([QKV(self._embed_dim[i], bias) for i in range(self._num_backbones)])
+        self.content_qkv: ModuleList = ModuleList([QKV(self._embed_dim[i], bias) for i in range(self._num_backbones)])
 
         if relative_attention:
             assert int(sum(self._embed_dim) // len(self._embed_dim)) == self._embed_dim[0], \
@@ -44,7 +44,7 @@ class TemporalAggregation(Module):
             if max_relative_position == 0:
                 max_relative_position = embed_dim
 
-            self._relative_pe = RelativePE(self._embed_dim, max_relative_position, bias)
+            self.relative_pe = RelativePE(self._embed_dim, max_relative_position, bias)
         else:
             self.register_parameter("_relative_pe", None)
 
@@ -72,10 +72,10 @@ class TemporalAggregation(Module):
         q, k, v = [transform_multihead(x, self._num_heads) for x in [q, k, v]]
         next_k = transform_multihead(next_k, self._num_heads) if next_k is not None else next_k
 
-        if self._relative_pe is not None:
+        if self.relative_pe is not None:
             # rel_q, rel_k: [attn_span, embed_dim],
             # rel_pos_idx: [seq_len, seq_len]
-            rel_q, rel_k, c2p_rel_pos, p2c_rel_pos = self._relative_pe(seq_len)
+            rel_q, rel_k, c2p_rel_pos, p2c_rel_pos = self.relative_pe(seq_len)
             rel_q, rel_k = transform_multihead(rel_q, self._num_heads), transform_multihead(rel_k, self._num_heads)
 
             # [batch_size, num_heads, seq_len, head_dim] x [batch_size, num_heads, seq_len, head_dim]
@@ -113,13 +113,13 @@ class TemporalAggregation(Module):
         output: Tensor | None = None
         if self._num_backbones == 1:
             x = x.squeeze(dim=0)
-            q, k, v = self._content_qkv[0](x)  # [batch_size, seq_len, hidden_dim]
+            q, k, v = self.content_qkv[0](x)  # [batch_size, seq_len, hidden_dim]
             output = self._compute_hidden_state(q, k, v)
         else:
             hidden_state: None | Tensor = None
             cache: Dict[str, Tensor | List[Tensor]] = {}
             for i in range(self._num_backbones):
-                q, k, v = self._content_qkv[i](x[i])  # [batch_size, seq_len, hidden_dim]
+                q, k, v = self.content_qkv[i](x[i])  # [batch_size, seq_len, hidden_dim]
                 current_backbone = [q, k, v]
 
                 if i == 0:

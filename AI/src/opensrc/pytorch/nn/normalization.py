@@ -1,5 +1,9 @@
+from typing import Dict
+
 # batchnorm
-from torch.nn import (
+from torch.nn.modules import Module
+
+from torch.nn.modules import (
     BatchNorm1d,
     LazyBatchNorm1d,
     BatchNorm2d,
@@ -10,7 +14,7 @@ from torch.nn import (
 )
 
 # instancenorm
-from torch.nn import (
+from torch.nn.modules import (
     InstanceNorm1d,
     InstanceNorm2d,
     InstanceNorm3d,
@@ -20,7 +24,7 @@ from torch.nn import (
 )
 
 # normalization
-from torch.nn import (
+from torch.nn.modules import (
     LocalResponseNorm,
     CrossMapLRN2d,
     LayerNorm,
@@ -28,7 +32,10 @@ from torch.nn import (
 )
 
 
-available_normalization = {
+__all__ = ["avail_norm"]
+
+
+avail_norm: Dict[str, Module] = {
     # batchnorm
     "BatchNorm1d": BatchNorm1d,
     "LazyBatchNorm1d": LazyBatchNorm1d,

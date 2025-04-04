@@ -1,11 +1,17 @@
-from torch.nn import (
+from typing import Dict, Type
+from torch.nn.modules import (
+    Module,
     Bilinear,
     Identity,
     LazyLinear,
     Linear,
 )
 
-available_linear = {
+
+__all__ = ["avail_linear"]
+
+
+avail_linear: Dict[str, Type[Module]] = {
     "Bilinear": Bilinear,
     "Identity": Identity,
     "LazyLinear": LazyLinear,

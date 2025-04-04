@@ -2,11 +2,11 @@
 
     "global":
     {
-//        "save_dir": "/home/trong/Downloads/training_results/",
+        "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
         "project_name": "AIP391",
-//        "experiment_name": "run",
-//        "technique": "single",
-//        "mode": "train",
+        "experiment_name": "run",
+        "technique": "distillation",
+        "mode": "train",
         "exist_ok": true,
         "sep": "_",
 
@@ -16,14 +16,14 @@
 
         // Resume training
         "resume": false,
-        "resume_ckpt": "D:\\Local\\Source\\Python\\semester_9\\AIP391\\Video_anomaly_detection\\AI\\results\\AIP391\\single\\train\\run1\\checkpoint\\best_epoch4.pt",
+        "resume_ckpt": "",
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
         "seed": 12345,
         "device": "cuda",
 
-        "inspect_model_arch": true,
+        "inspect_model_arch": false,
         "inspect_depth": 7,
         "dummy_input_shape": [1, 32, 3, 13, 224, 224]
     },
@@ -35,7 +35,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
+                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/unlabeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype": {"dtype": "float32", "scale": true}
@@ -54,15 +54,15 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 3,
+                "batch_size": 4,
                 "shuffle": true,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 4,
                 "prefetch_factor": 2,
                 "persistent_workers": false,
-                "multiprocessing_context": "spawn"
+                "multiprocessing_context": "fork"
             },
-            "forward_strategy": "v1"
+            "forward_strategy": "v2"
         },
         /////////////////////////////////////////////////////////
         "val":
@@ -70,7 +70,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
+                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/unlabeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -85,15 +85,15 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 3,
+                "batch_size": 4,
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
-                "num_workers": 4,
+                "num_workers": 3,
                 "prefetch_factor": 2,
                 "persistent_workers": false,
-                "multiprocessing_context": "spawn"
+                "multiprocessing_context": "fork"
             },
-            "forward_strategy": "v1"
+            "forward_strategy": "v2"
         }
 
         /////////////////////////////////////////////////////////
@@ -112,20 +112,21 @@
                 "backbone":
                 {
                     "name": ["rgb_i3d"],
-                    "rgb_i3d_args": {"trainable_layers": 10},
+
+                    "rgb_i3d_reduce": {"name":  "max_l2"},
+
                     "compile": false,
                     "out_proj":
                     {
-                        "hidden_dim": [512, 512],
-                        "hidden_activation": "ReLU",
+                        "hid_dim": [512, 512],
+                        "hid_act": "ReLU",
 
                         "out_channels": 512,
-                        "out_activation": null,
+                        "out_act": null,
 
                         "dropout": 0.5,
                         "layer_order": "fc->drop->act"
                     }
-
                 },
 
                 "neck":
@@ -140,12 +141,11 @@
                 {
                     "name":"SimpleClassifier",
 
-                    "hidden_dim": [512, 32],
-                    "hidden_activation": "ReLU",
-                    "hidden_activation_args": {},
+                    "hid_dim": [512, 32],
+                    "hid_act": "ReLU",
 
                     "out_channels": 1,
-                    "out_activation": "Sigmoid",
+//                    "out_act": "Sigmoid",
 
                     "dropout": 0.5,
                     "layer_order": "fc->drop->act"
@@ -153,25 +153,19 @@
             },
             "teacher":
             {
-                "pretrained": null,
+                "pretrained": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/run/ckpt/best_epoch1_step12.pt",
                 "backbone":
                 {
-        //            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
-        //            "name": ["rgb_i3d", "s3d"],
                     "name": ["rgb_i3d"],
-
-                    "rgb_i3d_args": {"trainable_layers": 10},
-                    "s3d_args": {"trainable_layers": 10},
-                    "clip_vit/b16_args": {"trainable_layers": 10},
-
+//                    "rgb_i3d_reduce": {"name":  "max_l2"},
                     "compile": false,
                     "out_proj":
                     {
-                        "hidden_dim": [512, 512],
-                        "hidden_activation": "ReLU",
+                        "hid_dim": [512, 512],
+                        "hid_act": "ReLU",
 
                         "out_channels": 512,
-                        "out_activation": null,
+                        "out_act": null,
 
                         "dropout": 0.5,
                         "layer_order": "fc->drop->act"
@@ -191,25 +185,31 @@
                 {
                     "name":"SimpleClassifier",
 
-                    "hidden_dim": [512, 32],
-                    "hidden_activation": "ReLU",
-                    "hidden_activation_args": {},
+                    "hid_dim": [512, 32],
+                    "hid_act": "ReLU",
 
                     "out_channels": 1,
-                    "out_activation": "Sigmoid",
+                    "out_act": "Sigmoid",
 
                     "dropout": 0.5,
                     "layer_order": "fc->drop->act"
+                },
+
+                "postprocessing":
+                {
+                    "name": "PseudoLabelRefiner",
+                    "pad_style": "mean_ema",
+                    "kernel_size": 5
                 }
             }
         }
-//        "postprocessing": {}
+
     },
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-6, "amsgrad": true},
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  4, "num_warmup_steps": 4},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.001, "amsgrad": true},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  13, "num_warmup_steps": 13, "T_mult": 1},
         "regularizer": {}
     },
 
@@ -228,11 +228,19 @@
 
     "loss":
     {
-        "name": "MILRankingLoss",
-        "margin": 1,
-        "sparsity_constraint": true,
-        "smoothness_constraint": true,
-        "reduction": "mean"
+        "name": "CombinedLoss",
+        "loss_config_lst":
+        [
+            {
+                "name": "DistillBCEWithLogitsLoss",
+                "reduction": "mean",
+
+                "combined_weight": 1,
+                "key": "preds",
+                "model_idx_pairs": [[0, 0]]
+            }
+        ]
+
     },
 
     "services": [
@@ -252,11 +260,12 @@
         {
             "name": "Mlflow",
             "apply": true,
-            "prev_run_id": "9d5cb84c211f4aeabeecc129d026af48",
+            "push_to_remote": false,
+            "prev_run_id": null,
             "init_server_on_run": true,
             "username": "root",
             "password": "Root123!",
-            "remote_tracking_uri": "http://113.23.3.195:5000"
+            "remote_tracking_uri": "http://42.119.174.56:5000"
         },
 
         {

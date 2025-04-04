@@ -4,8 +4,8 @@ python3 ../../src/tools/preprocess.py\
     --device cpu \
     --processes 12 \
     --batch_size 12 \
-    --root /home/trong/Downloads/Dataset/VAD/UCF/ \
+    --root /home/trong/Downloads/Dataset/VAD/train_test_split/test/IITB \
     --cpu_ratio 0.5 \
-    --save_root out \
+    --save_root ./ \
     --del_prev_result true \
     --fn_name stage_two

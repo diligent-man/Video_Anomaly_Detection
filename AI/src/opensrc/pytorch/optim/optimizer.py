@@ -1,4 +1,7 @@
+from typing import Dict
+
 from torch.optim import (
+    Optimizer,
     Adam,
     AdamW,
     NAdam,
@@ -14,7 +17,11 @@ from torch.optim import (
     SGD
 )
 
-available_optimizers = {
+
+__all__ = ["avail_optim"]
+
+
+avail_optim: Dict[str, Optimizer] = {
     "Adam": Adam,
     "AdamW": AdamW,
     "NAdam": NAdam,
@@ -22,7 +29,7 @@ available_optimizers = {
     "Adagrad": Adagrad,
     "Adamax": Adamax,
     "RAdam": RAdam,
-    "SparseAdam":SparseAdam,
+    "SparseAdam": SparseAdam,
     "RMSprop": RMSprop,
     "Rprop": Rprop,
     "ASGD": ASGD,

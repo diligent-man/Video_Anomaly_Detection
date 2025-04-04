@@ -1,4 +1,6 @@
+from typing import Dict
 from torch.nn.modules import (
+    Module,
     L1Loss,
     NLLLoss,
     KLDivLoss,
@@ -21,7 +23,11 @@ from torch.nn.modules import (
     GaussianNLLLoss
 )
 
-available_loss = {
+
+__all__ = ["avail_loss"]
+
+
+avail_loss: Dict[str, Module] = {
     "L1Loss": L1Loss,
     "NLLLoss": NLLLoss,
     "KLDivLoss": KLDivLoss,

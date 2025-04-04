@@ -1,21 +1,36 @@
-from .loss import available_loss
-from .conv import available_conv
-from .linear import available_linear
-from .dropout import available_dropout
-from .flatten import available_flatten
-from .pooling import available_pooling
-from .activation import available_activation
-from .normalization import available_normalization
+from typing import Dict
 
-__all__ = ["available_loss", "available_layer"]
+from torch.nn import Module
+
+from .loss import avail_loss
+from .conv import avail_conv
+from .linear import avail_linear
+from .dropout import avail_dropout
+from .flatten import avail_flatten
+from .pooling import avail_pooling
+from .activation import avail_act
+from .normalization import avail_norm
 
 
-available_layer = {
-    **available_conv,
-    **available_linear,
-    **available_dropout,
-    **available_flatten,
-    **available_pooling,
-    **available_activation,
-    **available_normalization
+__all__ = [
+    "avail_loss",
+    "avail_conv",
+    "avail_linear",
+    "avail_dropout",
+    "avail_flatten",
+    "avail_pooling",
+    "avail_act",
+    "avail_norm",
+    "avail_layer"
+]
+
+
+avail_layer: Dict[str, Module] = {
+    **avail_conv,
+    **avail_linear,
+    **avail_dropout,
+    **avail_flatten,
+    **avail_pooling,
+    **avail_act,
+    **avail_norm
 }

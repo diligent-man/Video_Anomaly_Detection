@@ -1,4 +1,6 @@
-from torch.nn import (
+from typing import Dict
+from torch.nn.modules import (
+    Module,
     # Non-linear Activations (weighted sum, nonlinearity)
     ELU,
     Hardshrink,
@@ -34,7 +36,11 @@ from torch.nn import (
     AdaptiveLogSoftmaxWithLoss
 )
 
-available_activation = {
+
+__all__ = ["avail_act"]
+
+
+avail_act: Dict[str, Module] = {
     "ELU": ELU,
     "Hardshrink": Hardshrink,
     "Hardsigmoid": Hardsigmoid,
@@ -67,5 +73,3 @@ available_activation = {
     "LogSoftmax": LogSoftmax,
     "AdaptiveLogSoftmaxWithLoss": AdaptiveLogSoftmaxWithLoss
 }
-
-

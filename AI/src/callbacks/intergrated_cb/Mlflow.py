@@ -37,6 +37,7 @@ class Mlflow(TrainerCallback):
     __init_server_on_run: bool
     __username: str
     __password: str
+    __push_to_remote: bool
     __remote_tracking_uri: str
 
     __backend_store_uri: str
@@ -50,7 +51,8 @@ class Mlflow(TrainerCallback):
                  *,
                  username: str = None,
                  password: str = None,
-                 remote_tracking_uri: str = None
+                 push_to_remote: False,
+                 remote_tracking_uri: str = None,
                  ) -> None:
         if username is None:
             username = os.getenv("MLFLOW_TRACKING_USERNAME")
@@ -67,6 +69,7 @@ class Mlflow(TrainerCallback):
         self.__init_server_on_run = init_server_on_run
         self.__username = username
         self.__password = password
+        self.__push_to_remote = push_to_remote
         self.__remote_tracking_uri = remote_tracking_uri
 
     def setup(self, instance: Trainer) -> None:
@@ -86,24 +89,19 @@ class Mlflow(TrainerCallback):
         self.__experiment = mlflow.set_experiment(experiment_name)
 
         try:
-            run = mlflow.get_run(self.__prev_run_id)
-            self.__run = mlflow.start_run(
-                run.info.run_id,
-                None,
-                run_name,
-                tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
-                description=instance.config.Mlflow.get("description", None),
-                log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
-            )
-        except mlflow.exceptions.MlflowException:
-            self.__run = mlflow.start_run(
-                None,
-                None,
-                run_name,
-                tags=None if instance.config.Mlflow.get("tags", None) is None else instance.config.Mlflow.tags.get_dict(),
-                description=instance.config.Mlflow.get("description", None),
-                log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
-            )
+            run_id = mlflow.get_run(self.__prev_run_id).info.run_id
+        except TypeError:
+            run_id = None
+
+        self.__run = mlflow.start_run(
+            run_id,
+            None,
+            run_name,
+            tags=None if instance.config.Mlflow.get("tags",
+                                                    None) is None else instance.config.Mlflow.tags.get_dict(),
+            description=instance.config.Mlflow.get("description", None),
+            log_system_metrics=instance.config.Mlflow.get("log_system_metrics", True)
+        )
 
         model_arch: None | str = instance.config.pop("Model_arch", None)
         if model_arch is not None:
@@ -138,12 +136,6 @@ Cmd: 'mlflow server --backend-store-uri {"file:" + backend_store_uri}'
         :param instance: Trainer instance
         :return: Initialize local mlflow run
         """
-        try:
-            ping_server(self.__remote_tracking_uri, auth=(self.__username, self.__password))
-            print("Successfully connect to remote tracking server")
-        except ConnectionError:
-            warnings.warn("Fail to connect to remote tracking server")
-
         if not self.__initialized:
             self.setup(instance)
 
@@ -163,19 +155,26 @@ Cmd: 'mlflow server --backend-store-uri {"file:" + backend_store_uri}'
         batch_output: Dict[str, Any] = instance.state.batch_output.as_metrics()
         mlflow.log_metrics(batch_output, step=instance.state.batch_output.step)
 
-    def on_train_end(self, instance: Trainer) -> None:
         mlflow.log_artifacts(
             instance.config.Global.ckpt_path,
             "ckpt"
         )
 
-        if self.__remote_tracking_uri is not None:
+    def on_train_end(self, instance: Trainer) -> None:
+        if self.__remote_tracking_uri is not None and self.__push_to_remote:
+            try:
+                ping_server(self.__remote_tracking_uri, auth=(self.__username, self.__password))
+                print("Successfully connect to remote tracking server")
+            except ConnectionError:
+                warnings.warn("Fail to connect to remote tracking server")
+
             copy_run(
                 self.__run.info.run_id,
                 self.__experiment.name,
                 mlflow.get_tracking_uri(),
                 self.__remote_tracking_uri
             )
+
         if self.__init_server_on_run:
             self.__proc.kill()
 

@@ -1,21 +1,24 @@
-from typing import Tuple
+from typing import Tuple, List, Iterator
 
-import torch
+from torch import Tensor
+from torch.nn import Module, Parameter
 from torch.optim.optimizer import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
+
 
 from .optimizer import OPTIMIZERS
 from .lr_scheduler import SCHEDULERS
 from .regularizer import REGULARIZERS
 
-from ..utils import DotDict, ANSIColor, make_border
+from ..utils import DotDict, make_border
+from ..modeling.architectures import VADDistillationModel
 
 
 __all__ = ["build_optimizer", "OPTIMIZERS", "SCHEDULERS"]
 
 
 def build_optimizer(config: DotDict,
-                    model: torch.nn.Module
+                    model: Module
                     ) -> Tuple[Optimizer, None | LRScheduler]:
     top, bottom = make_border("Build optim")
     print(top)
@@ -24,7 +27,13 @@ def build_optimizer(config: DotDict,
     name: None | str = lr_config.pop("name", None)
     assert name in OPTIMIZERS.keys(), ValueError(f"Invalid optimizer. Get '{name}'")
 
-    optim: Optimizer = OPTIMIZERS[name](model.parameters(), **lr_config.get_dict())
+    if isinstance(model, VADDistillationModel):
+        params: List[Tensor] = []
+        for student in model.models["student"]:
+            params += list(student.parameters())
+    else:
+        params: Iterator[Parameter] = model.parameters()
+    optim: Optimizer = OPTIMIZERS[name](params, **lr_config.get_dict())
 
     # step 2: build regularization
     reg: None = None

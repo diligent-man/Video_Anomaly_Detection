@@ -1,9 +1,13 @@
 from typing import Tuple
 
+
 import torch
+
 from torch import Tensor
-from torch.nn import Module
+from torch.nn import Module, Embedding
+
 from multimethod import multimethod
+
 
 from .QKV import QKV
 
@@ -24,15 +28,16 @@ class RelativePE(Module):
 
         self._embed_dim: int = embed_dim
         self._max_rel_pos: int = max_rel_pos
-        self._bias: bool = bias
         self._device: torch.device = device
-        self._qkv: QKV = QKV(self._embed_dim, self._bias, **factory_kwargs)
+
+        self.bias: bool = bias
+        self.qkv: QKV = QKV(self._embed_dim, self.bias, **factory_kwargs)
 
         # Shared rel pos embeddings
-        self._rel_pos_embed: torch.nn.Embedding = torch.nn.Embedding(2 * self._max_rel_pos, embed_dim, **factory_kwargs)
+        self.rel_pos_embed: Embedding = Embedding(2 * self._max_rel_pos, embed_dim, **factory_kwargs)
 
     @multimethod
-    def _compute_attn_span(self, query: Tensor, key: Tensor) -> torch.Tensor:
+    def _compute_attn_span(self, query: Tensor, key: Tensor) -> Tensor:
         """
         :param query: [batch, seq_len, q_hidden_dim]
         :param key: [batch, seq_len, k_hidden_dim]
@@ -58,7 +63,7 @@ class RelativePE(Module):
         Pk is range from (0, key_size), The relative positions from query to key is Rp->k = Pq - Pk.
         This method assumes for self-attn case
         """
-        device = self._rel_pos_embed.weight.device
+        device = self.rel_pos_embed.weight.device
 
         rel_pos: Tensor = torch.arange(seq_len, dtype=torch.long, device=device)  # [seq_len, ]
         rel_pos = rel_pos.reshape((-1, 1)) - rel_pos.reshape((1, -1))  # [seq_len, seq_len]
@@ -111,13 +116,13 @@ class RelativePE(Module):
         p2c_rel_pos: Tensor = self._get_rel_pos_idx(seq_len, attn_span, "p2c").unsqueeze(0)
 
         # Clone() reason: https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html#torch.nn.Embedding
-        if self._rel_pos_embed.max_norm is None:
-            rel_embeds: Tensor = self._rel_pos_embed.weight[self._max_rel_pos - attn_span:
+        if self.rel_pos_embed.max_norm is None:
+            rel_embeds: Tensor = self.rel_pos_embed.weight[self._max_rel_pos - attn_span:
                                                             self._max_rel_pos + attn_span, :]
         else:
-            rel_embeds: Tensor = self._rel_pos_embed.weight[self._max_rel_pos - attn_span:
+            rel_embeds: Tensor = self.rel_pos_embed.weight[self._max_rel_pos - attn_span:
                                                             self._max_rel_pos + attn_span, :].clone()
         # [seq_len, embed_dim] -> [1, seq_len, embed_dim]
         rel_embeds = rel_embeds.unsqueeze(0)
-        rel_q, rel_k, _ = self._qkv(rel_embeds)
+        rel_q, rel_k, _ = self.qkv(rel_embeds)
         return rel_q, rel_k, c2p_rel_pos, p2c_rel_pos

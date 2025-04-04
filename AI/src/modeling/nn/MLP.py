@@ -1,15 +1,18 @@
 import copy
 import collections
-
 from typing import List, Tuple, Dict, Any
 
 import torch
+from torch.nn import Module, Sequential, Dropout
 
-from ...opensrc.pytorch import available_layer
+from ...opensrc.pytorch import avail_act
+from .regularization import avail_regularizers
+
+
 __all__ = ["MLP"]
 
 
-class MLP(torch.nn.Module):
+class MLP(Module):
     """
     Multi-layer perceptron with alternate pattern as follows:
         a/ fc -> act -> drop
@@ -20,18 +23,20 @@ class MLP(torch.nn.Module):
         hidden_layer  --> dropout --> activation --  + output_activation (if have)
               ↑----------------------------------|
     """
-    __hidden_layers: torch.nn.Sequential
-    __out_activation: torch.nn.Module | None
-    __layers: torch.nn.Sequential
+    __hidden_layers: Sequential
+    __out_activation: Module | None
+    layers: Sequential
 
     def __init__(self,
                  in_channels: int,
                  out_channels: int,
-                 hidden_dim: List[int] | Tuple[int] | int,
-                 hidden_activation: str = None,
-                 hidden_activation_args: Dict[str, Any] = None,
-                 out_activation: str = None,
-                 out_activation_args: Dict[str, Any] = None,
+                 hid_dim: List[int] | Tuple[int] | int,
+                 hid_act: str = None,
+                 hid_act_args: Dict[str, Any] = None,
+                 out_act: str = None,
+                 out_act_args: Dict[str, Any] = None,
+                 regularize: str = None,
+                 regularize_args: Dict[str, Any] = None,
                  bias: bool = True,
                  dropout: float = None,
                  layer_order: str = "fc->drop->act",
@@ -41,33 +46,37 @@ class MLP(torch.nn.Module):
         super(MLP, self).__init__()
         factory_kwargs = {"device": device, "dtype": dtype}
 
-        if hidden_activation is not None:
-            hidden_activation_args: Dict[str, Any] = dict() if hidden_activation_args is None else hidden_activation_args
-            hidden_activation: torch.nn.Module = self._init_activation(hidden_activation, **hidden_activation_args)
+        for act in (hid_act, out_act):
+            if act is not None:
+                assert act in avail_act.keys(), ValueError("Provided activation is currentl unavailable")
 
-        if out_activation is not None:
-            out_activation_args: Dict[str, Any] = dict() if out_activation_args is None else out_activation_args
-            out_activation: torch.nn.Module = self._init_activation(out_activation, **out_activation_args)
+        if hid_dim is not None:
+            hid_act_args: Dict[str, Any] = dict() if hid_act_args is None else hid_act_args
+            hid_act: Module = self._init_act(hid_act, **hid_act_args)
 
-        dropout = torch.nn.Dropout(dropout) if dropout is not None and dropout > 0 else None
+        if out_act is not None:
+            out_act_args: Dict[str, Any] = dict() if out_act_args is None else out_act_args
+            out_act: Module = self._init_act(out_act, **out_act_args)
+
+        dropout = Dropout(dropout) if dropout is not None and dropout > 0 else None
 
         self._in_channels: int = in_channels
         self._out_channels: int = out_channels
-        self._layers = self.__make_layers(
+        self.layers = self.__make_layers(
             self._in_channels,
-            hidden_dim,
+            hid_dim,
             self._out_channels,
             bias,
             dropout,
-            hidden_activation,
-            out_activation,
+            hid_act,
+            out_act,
             layer_order,
             **factory_kwargs
         )
 
-    @property
-    def layers(self) -> torch.nn.Sequential:
-        return self.__layers
+        if regularize is not None:
+            assert regularize in avail_regularizers.keys(), ValueError("Provided regularizer is currentl unavailable")
+            self.layers: Module = avail_regularizers[regularize](self.layers, **regularize_args)
 
     @property
     def in_channels(self) -> int:
@@ -78,24 +87,24 @@ class MLP(torch.nn.Module):
         return self._out_channels
 
     @staticmethod
-    def _init_activation(activation: str, **kwargs) -> torch.nn.Module:
-        if activation is None or activation not in available_layer.keys():
+    def _init_act(activation: str, **kwargs) -> Module:
+        if activation is None or activation not in avail_act.keys():
             print(f"Apply default activation function: {torch.nn.ReLU.__name__}")
             return torch.nn.ReLU(**kwargs)
         else:
-            return available_layer[activation](**kwargs)
+            return avail_act[activation](**kwargs)
 
     @staticmethod
     def __make_layers(input_dim: int,
                       hidden_dim: List[int] | Tuple[int] | int,
                       output_dim: int,
                       bias: bool,
-                      dropout: torch.nn.Module | None,
-                      hidden_activation: torch.nn.Module | None,
-                      out_activation: torch.nn.Module | None,
+                      dropout: Module | None,
+                      hidden_activation: Module | None,
+                      out_activation: Module | None,
                       layer_order: str,
                       **kwargs
-                      ) -> torch.nn.Sequential:
+                      ) -> Sequential:
         if isinstance(hidden_dim, int):
             hidden_dim: List[int] = [input_dim, hidden_dim, output_dim]
         else:
@@ -125,8 +134,10 @@ class MLP(torch.nn.Module):
 
         if out_activation is not None:
             hidden_layers[f"out_act"] = out_activation
-        return torch.nn.Sequential(collections.OrderedDict(hidden_layers))
+
+        hidden_layers: Sequential = torch.nn.Sequential(collections.OrderedDict(hidden_layers))
+        return hidden_layers
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self._layers(x)
+        x = self.layers(x)
         return x

@@ -52,8 +52,12 @@ class VideoPreprocessor(object):
         return self.__spath
 
     @property
-    def is_label(self) -> bool:
+    def is_labeled(self) -> bool:
         return self.__is_labeled
+
+    @is_labeled.setter
+    def is_labeled(self, value: bool) -> None:
+        self.__is_labeled = value
 
     def _is_labeled(self, ds_name: str) -> bool:
         flag: bool = False

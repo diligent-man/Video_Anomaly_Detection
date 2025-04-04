@@ -1,5 +1,6 @@
 import os
 import shutil
+import warnings
 
 from glob import glob
 from pathlib import Path
@@ -16,6 +17,7 @@ from sklearn.model_selection import train_test_split
 __all__ = [
     "unlabeled_to_train_val",
     "labeled_to_test",
+    "labeled_to_train_val",
     "labeled_to_train_val_test"
 ]
 
@@ -24,14 +26,12 @@ def unlabeled_to_train_val(ds_paths: List[str],
                            train_ratios: Dict[str, float],
                            spath: str,
                            counter: Dict[str, int],
-                           seed: int = 12345
+                           seed: int = 12345,
+                           overwrite_prev_log: bool = True
                            ) -> None:
     """
     Split and move unlabeled data to train & val in save path. All files are in pytorch save format
     """
-    os.makedirs(os.path.join(spath, "train"), exist_ok=True)
-    os.makedirs(os.path.join(spath, "val"), exist_ok=True)
-
     ds_cond: str = "unlabeled"
     ds_paths: List[str] = [os.path.join(path, ds_cond) for path in ds_paths if _ds_filter(path, ds_cond)]
 
@@ -40,9 +40,10 @@ def unlabeled_to_train_val(ds_paths: List[str],
         ds_name: str = Path(ds_path).parent.name
         prompt = f"Dataset name: {ds_name}\n"
 
-        if os.path.exists(os.path.join(spath, f"{ds_name}_log.txt")):
-            os.remove(os.path.join(spath, f"{ds_name}_log.txt"))
-        log_writer = open(os.path.join(spath, f"{ds_cond}_{ds_name}_log.txt"), mode="w")
+        log_writer = open(
+            os.path.join(spath, f"{ds_cond}_{ds_name}_log.txt"),
+            mode="w" if overwrite_prev_log else "a"
+        )
 
         for ds_type in ("anomaly", "normal"):
             obj_lst: List[str] = [
@@ -51,24 +52,32 @@ def unlabeled_to_train_val(ds_paths: List[str],
             ]
 
             if ds_type == "anomaly":
-                cls_names: List[str] = [Path(path).parent.name for path in obj_lst]
-                (
-                    train, val,
-                    train_cls_names, val_cls_names
-                ) = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed, cls_names)
+                if len(obj_lst) >= 2:
+                    cls_names: List[str] = [Path(path).parent.name for path in obj_lst]
+                    (
+                        train, val,
+                        train_cls_names, val_cls_names
+                    ) = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed, cls_names)
 
-                for obj_lst, ds_phase, cls_names in zip(
-                        (train, val),
-                        ("train", "val"),
-                        (train_cls_names, val_cls_names)
-                ):
-                    _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, None, cls_names, log_writer)
-                    sample_traker = _track_sample(sample_traker, f"{ds_phase}_{ds_type}", len(obj_lst))
+                    for obj_lst, ds_phase, cls_names in zip(
+                            (train, val),
+                            ("train", "val"),
+                            (train_cls_names, val_cls_names)
+                    ):
+                        _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, None, cls_names, log_writer)
+                        sample_traker = _track_sample(sample_traker, f"{ds_phase}_{ds_type}", len(obj_lst))
+                else:
+                    train, val = [], []
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
             else:
-                train, val = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed)
-                for obj_lst, ds_phase in zip((train, val), ("train", "val"),):
-                    _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, log_writer=log_writer)
-                    sample_traker = _track_sample(sample_traker, f"{ds_phase}_{ds_type}", len(obj_lst))
+                if len(obj_lst) >= 2:
+                    train, val = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed)
+                    for obj_lst, ds_phase in zip((train, val), ("train", "val"),):
+                        _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, log_writer=log_writer)
+                        sample_traker = _track_sample(sample_traker, f"{ds_phase}_{ds_type}", len(obj_lst))
+                else:
+                    train, val = [], []
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
 
             sample_traker[ds_type] += len(train) + len(val)
             prompt += f"""\tTotal {ds_type} datapoints: {sample_traker[ds_type]}
@@ -85,7 +94,8 @@ def labeled_to_train_val_test(ds_paths: List[str],
                               train_ratios: Dict[str, float],
                               spath: str,
                               counter: Dict[str, int],
-                              seed: int = 12345
+                              seed: int = 12345,
+                              overwrite_prev_log: bool = True
                               ) -> None:
     """
     Split and move labeled data to train/ val/ test in save path
@@ -105,9 +115,10 @@ def labeled_to_train_val_test(ds_paths: List[str],
             names=dst_label.columns
         )
 
-        if os.path.exists(os.path.join(spath, f"{ds_name}_log.txt")):
-            os.remove(os.path.join(spath, f"{ds_name}_log.txt"))
-        log_writer = open(os.path.join(spath, f"{ds_cond}_{ds_name}_log.txt"), mode="w")
+        log_writer = open(
+            os.path.join(spath, f"{ds_cond}_{ds_name}_log.txt"),
+            mode="w" if overwrite_prev_log else "a"
+        )
 
         for ds_type in ("anomaly", "normal"):
             obj_lst: List[str] = [
@@ -116,18 +127,29 @@ def labeled_to_train_val_test(ds_paths: List[str],
             ]
 
             if ds_type == "anomaly":
-                cls_names: List[str] = [Path(path).parent.name for path in obj_lst]
-                (
-                    train, test,
-                    train_cls_names, test_cls_names
-                ) = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed, cls_names)
+                if len(obj_lst) >= 2:
+                    cls_names: List[str] = [Path(path).parent.name for path in obj_lst]
+                    (
+                        train, test,
+                        train_cls_names, test_cls_names
+                    ) = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed, cls_names)
+                else:
+                    train, test = [], []
+                    train_cls_names = None
+                    test_cls_names = None
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
 
-                (
-                    train, val,
-                    train_cls_names, val_cls_names
-                ) = _split_train_val(train, ds_type, train_ratios[ds_name], seed, train_cls_names)
+                if len(train) >= 2:
+                    (
+                        train, val,
+                        train_cls_names, val_cls_names
+                    ) = _split_train_val(train, ds_type, train_ratios[ds_name], seed, train_cls_names)
+                else:
+                    train, val = [], []
+                    val_cls_names = None
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
 
-                for obj_lst, ds_phase, class_names in zip(
+                for obj_lst, ds_phase, cls_names in zip(
                         (train, val, test),
                         ("train", "val", "test"),
                         (train_cls_names, val_cls_names, test_cls_names)
@@ -135,8 +157,17 @@ def labeled_to_train_val_test(ds_paths: List[str],
                     _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, src_label, cls_names, log_writer)
                     sample_traker = _track_sample(sample_traker, f"{ds_phase}_{ds_type}", len(obj_lst))
             else:
-                train, test = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed)
-                train, val = _split_train_val(train, ds_type, train_ratios[ds_name], seed)
+                if len(obj_lst) >= 2:
+                    train, test = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed)
+                else:
+                    train, test = [], []
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
+
+                if len(train) >= 2:
+                    train, val = _split_train_val(train, ds_type, train_ratios[ds_name], seed)
+                else:
+                    train, val = [], []
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
 
                 for obj_lst, ds_phase in zip((train, val, test), ("train", "val", "test")):
                     _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, src_label, None, log_writer)
@@ -158,10 +189,80 @@ def labeled_to_train_val_test(ds_paths: List[str],
     return None
 
 
+def labeled_to_train_val(ds_paths: List[str],
+                         train_ratios: Dict[str, float],
+                         spath: str,
+                         counter: Dict[str, int],
+                         seed: int = 12345,
+                         overwrite_prev_log: bool = True
+                         ) -> None:
+    """
+    Split and move labeled data to train/ val/ test in save path
+    """
+    ds_cond: str = "labeled"
+    ds_paths: List[str] = [os.path.join(path, ds_cond) for path in ds_paths if ds_cond in os.listdir(path)]
+
+    for ds_path in ds_paths:
+        ds_name: str = Path(ds_path).parent.name
+        prompt = f"Dataset name: {ds_name}\n"
+        sample_traker: Dict[str, int] = defaultdict(int)
+
+        log_writer = open(
+            os.path.join(spath, f"{ds_cond}_{ds_name}_log.txt"),
+            mode="w" if overwrite_prev_log else "a"
+        )
+
+        for ds_type in ("anomaly", "normal"):
+            obj_lst: List[str] = [
+                obj for obj in glob(os.path.join(ds_path, ds_type, "**"), recursive=True)
+                if obj.endswith((".pt", ".pth"))
+            ]
+
+            if ds_type == "anomaly":
+                if len(obj_lst) >= 2:
+                    cls_names: List[str] = [Path(path).parent.name for path in obj_lst]
+                    (
+                        train, val,
+                        train_cls_names, val_cls_names
+                    ) = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed, cls_names)
+
+                    for obj_lst, ds_phase, class_names in zip(
+                            (train, val),
+                            ("train", "val"),
+                            (train_cls_names, val_cls_names)
+                    ):
+                        _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, None, cls_names, log_writer)
+                        sample_traker = _track_sample(sample_traker, f"{ds_phase}_{ds_type}", len(obj_lst))
+                else:
+                    train, val = [], []
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
+            else:
+                if len(obj_lst) >= 2:
+                    train, val = _split_train_val(obj_lst, ds_type, train_ratios[ds_name], seed)
+
+                    for obj_lst, ds_phase in zip((train, val), ("train", "val")):
+                        _move_obj(obj_lst, spath, ds_phase, ds_name, ds_type, counter, None, None, log_writer)
+                        sample_traker = _track_sample(sample_traker, f"{ds_phase}_{ds_type}", len(obj_lst))
+                else:
+                    train, val = [], []
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
+
+            sample_traker[ds_type] += len(train) + len(val)
+            prompt += f"""\tTotal {ds_type} datapoints: {sample_traker[ds_type]}
+        Train: {sample_traker[f"train_{ds_type}"]}
+        Val: {sample_traker[f"val_{ds_type}"]}
+"""
+        log_writer.close()
+        print(prompt)
+        print()
+    return None
+
+
 def labeled_to_test(ds_paths: List[str],
                     spath: str,
                     counter: Dict[str, int],
-                    seed: int = 12345
+                    seed: int = 12345,
+                    overwrite_prev_log: bool = True
                     ) -> None:
     ds_cond: str = "labeled"
     dst_label = _get_label(spath)
@@ -178,9 +279,10 @@ def labeled_to_test(ds_paths: List[str],
             names=dst_label.columns
         )
 
-        if os.path.exists(os.path.join(spath, f"{ds_name}_log.txt")):
-            os.remove(os.path.join(spath, f"{ds_name}_log.txt"))
-        log_writer = open(os.path.join(spath, f"{ds_cond}_{ds_name}_log.txt"), mode="w")
+        log_writer = open(
+            os.path.join(spath, f"{ds_cond}_{ds_name}_log.txt"),
+            mode="w" if overwrite_prev_log else "a"
+        )
 
         for ds_type in ("anomaly", "normal"):
             obj_lst: List[str] = [
@@ -189,14 +291,24 @@ def labeled_to_test(ds_paths: List[str],
             ]
 
             if ds_type == "anomaly":
-                cls_names: List[str] = [Path(path).parent.name for path in obj_lst]
-                (
-                    train, test,
-                    train_cls_names, test_cls_names
-                ) = _split_train_val(obj_lst, ds_type, 0.5, seed, cls_names)
-                test_cls_names: List[str] = [*train_cls_names, *test_cls_names]
+                if len(obj_lst) >= 2:
+                    cls_names: List[str] = [Path(path).parent.name for path in obj_lst]
+                    (
+                        train, test,
+                        train_cls_names, test_cls_names
+                    ) = _split_train_val(obj_lst, ds_type, 0.5, seed, cls_names)
+                    test_cls_names: List[str] = [*train_cls_names, *test_cls_names]
+                else:
+                    train, test = [], []
+                    test_cls_names: None = None
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
             else:
-                train, test = _split_train_val(obj_lst, ds_type, .5, seed)
+                if len(obj_lst) >= 2:
+                    train, test = _split_train_val(obj_lst, ds_type, .5, seed)
+                else:
+                    train, test = [], []
+                    warnings.warn(f"Number of datapoint in {ds_name}-{ds_type} should be greater than 2")
+
                 test_cls_names: None = None
 
             test: List[str] = [*train, *test]
@@ -211,7 +323,6 @@ def labeled_to_test(ds_paths: List[str],
         dst_label = dst_label.sort_values(by=dst_label.columns[0])
         dst_label.to_csv(os.path.join(spath, "test", "label.csv"), index=False, header=False)
         log_writer.close()
-
         print(prompt)
         print()
     return None
@@ -337,15 +448,15 @@ def _move_obj(obj_lst: List[str],
         if not os.path.exists(save_path):
             os.makedirs(save_path, exist_ok=True)
 
+        if log_writer is not None:
+            ds_name_idx: int = str(obj).split(os.sep).index(ds_name)
+
+            log_writer.write(
+                f"{f'{os.sep}'.join(str(obj).split(os.sep)[ds_name_idx + 1:])}, "
+                f"{os.path.join(save_path.replace(spath, ''), save_name)}\n"
+            )
+
         if not os.path.exists(os.path.join(save_path, save_name)):
-            if log_writer is not None:
-                ds_name_idx: int = str(obj).split(os.sep).index(ds_name)
-
-                log_writer.write(
-                    f"{f'{os.sep}'.join(str(obj).split(os.sep)[ds_name_idx+1:])}, "
-                    f"{os.path.join(save_path.replace(spath, ''), save_name)}\n"
-                )
-
             shutil.copy(
                 obj,
                 os.path.join(save_path, save_name)

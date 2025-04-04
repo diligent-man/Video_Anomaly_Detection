@@ -1,4 +1,7 @@
+from typing import Dict
+
 from torch.optim.lr_scheduler import (
+    LRScheduler,
     ChainedScheduler,
     ConstantLR,
     CosineAnnealingLR,
@@ -15,7 +18,11 @@ from torch.optim.lr_scheduler import (
     StepLR
 )
 
-available_lr_scheduler = {
+
+__all__ = ["avail_scheduler"]
+
+
+avail_scheduler: Dict[str, LRScheduler] = {
     "LambdaLR": LambdaLR,
     "MultiplicativeLR": MultiplicativeLR,
     "StepLR": StepLR,

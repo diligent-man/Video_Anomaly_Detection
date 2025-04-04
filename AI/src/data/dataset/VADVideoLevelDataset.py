@@ -1,5 +1,5 @@
 import os
-from typing import Tuple
+from typing import Tuple, List
 
 import torch
 from torch import Tensor
@@ -52,7 +52,7 @@ class VADVideoLevelDataset(Dataset):
 
         anomaly, _ = self.anomaly_ds.__getitem__(anomaly_idx)
         normal, _ = self.normal_ds.__getitem__(normal_idx)
-        return torch.vstack((anomaly, normal)), torch.tensor(1, )
+        return torch.vstack((anomaly, normal)), torch.tensor([1, 0])
 
     def __repr__(self) -> str:
         head = "Dataset " + self.__class__.__name__ + " includes:"

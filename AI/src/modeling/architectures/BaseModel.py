@@ -1,5 +1,4 @@
 import gc
-from copy import deepcopy
 from functools import partial
 from typing import List, Tuple, Any
 
@@ -24,7 +23,6 @@ __all__ = ["BaseModel"]
 class BaseModel(Module):
     def __init__(self, config: DotDict) -> None:
         super(BaseModel, self).__init__()
-        config = config.Architecture
 
         # build transform,
         # if "Transform" not in config or config["Transform"] is None:
@@ -36,8 +34,11 @@ class BaseModel(Module):
         #     in_channels = self.transform.out_channels
 
         # backbone, neck, head need to be configured
+        return_extracted_feats = config.backbone.pop("return_extracted_feats", False)
+        return_projected_feats = config.backbone.pop("return_extracted_feats", False)
         backbones, names, reduce, out_proj, out_channels = build_backbone(config)
 
+        return_neck_out = config.neck.pop("return_neck_out", False)
         config.neck["in_channels"] = out_channels
         neck, out_channels = build_neck(config)
 
@@ -55,9 +56,9 @@ class BaseModel(Module):
         self.head: Module = head
         self.postprocessing: None | Module = postprocessing
 
-        self.__return_extracted_feats = config.backbone.pop("return", False)
-        self.__return_projected_feats = config.neck.pop("return", False)
-        self.__return_neck_out = config.neck.pop("return", False)
+        self.__return_extracted_feats = return_extracted_feats
+        self.__return_projected_feats = return_projected_feats
+        self.__return_neck_out = return_neck_out
         self.__return_dict = config.pop("return_dict", True)
 
     def forward(self, x: Tensor) -> BaseModelOutput | Tuple:

@@ -1,5 +1,6 @@
-from typing import Dict, Callable
+from typing import Dict
 from torch.optim import (
+    Optimizer,
     Adafactor,
     Adadelta,
     Adagrad,
@@ -9,7 +10,6 @@ from torch.optim import (
     ASGD,
     LBFGS,
     NAdam,
-    Optimizer,
     RAdam,
     RMSprop,
     Rprop,
@@ -18,7 +18,7 @@ from torch.optim import (
 )
 
 
-OPTIMIZERS: Dict[str, Callable] = {
+OPTIMIZERS: Dict[str, Optimizer] = {
     "Adafactor": Adafactor,
     "Adadelta": Adadelta,
     "Adagrad": Adagrad,

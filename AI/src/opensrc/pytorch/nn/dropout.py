@@ -1,4 +1,6 @@
-from torch.nn import (
+from typing import Dict, Type
+from torch.nn.modules import (
+    Module,
     Dropout,
     Dropout1d,
     Dropout2d,
@@ -7,7 +9,11 @@ from torch.nn import (
     FeatureAlphaDropout
 )
 
-available_dropout = {
+
+__all__ = ["avail_dropout"]
+
+
+avail_dropout: Dict[str, Type[Module]] = {
     "Dropout": Dropout,
     "Dropout1d": Dropout1d,
     "Dropout2d": Dropout2d,

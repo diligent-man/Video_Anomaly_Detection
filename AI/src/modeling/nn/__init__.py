@@ -1,11 +1,9 @@
-from .functional import middle_selector
-
 from .MLP import MLP
-from .MiddleSelector import MiddleSelector
+from .VectNorm import VectNorm
+from .VectReducer import VectReducer
 
 __all__ = [
-    "middle_selector",
-
     "MLP",
-    "MiddleSelector"
+    "VectNorm",
+    "VectReducer"
 ]

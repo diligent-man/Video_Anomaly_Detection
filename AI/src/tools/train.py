@@ -6,7 +6,7 @@ import pathlib
 import argparse
 import warnings
 from typing import Dict
-sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
+sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "../../"))
 
 
 import torch
@@ -25,7 +25,7 @@ warnings.filterwarnings("once")
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 DEFAULT_CONFIG_PATH: Dict[str, pathlib.Path] = {
-    "linux": pathlib.Path("../../config/single/linux.json"),
+    "linux": pathlib.Path("../../config/distillation/linux.json"),
     "win32": pathlib.Path("../../config/single/windows.json")
 }
 
@@ -37,7 +37,6 @@ def main(args: argparse.Namespace) -> None:
     val_dataloader = build_dataloader(copy.deepcopy(config), "val")
 
     model: torch.nn.Module = build_model(copy.deepcopy(config))
-
     optim, scheduler = build_optimizer(copy.deepcopy(config), model)
 
     loss: LossWrapper = LossWrapper(copy.deepcopy(config))

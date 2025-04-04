@@ -3,13 +3,13 @@
     {
         "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
         "project_name": "AIP391",
-        "experiment_name": "run",
+        "experiment_name": "sutani_baseline",
         "technique": "single",
         "mode": "train",
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 1,
+        "epochs": 100,
         "eval_strategy": "epoch",
         "eval_steps": 7,
 
@@ -35,18 +35,17 @@
             {
                 "name": "VADVideoLevelDataset",
 //                "root": "/home/trong/Downloads/Dataset/VAD/preprocessed/UCF/unlabeled",
-                "root": "/home/trong/Downloads/Dataset/VAD/preprocessed/IITB/unlabeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype": {"dtype": "float32", "scale": true},
-//                    "Permute_1": {"dims": [0, 2, 1, 3, 4]},
-//                    "ColorJitter": {"brightness":  0.75, "contrast": 0.5, "saturation": 0.5, "hue": 0.25},
-//                    "RandomGrayscale": {"p": 0.5},
-//                    "GaussianBlur": {"kernel_size": [3, 3], "sigma": [0.5, 2]},
-//                    "Permute_2": {"dims": [0, 2, 1, 3, 4]},
-//                    "RandomResizedCrop_1": {"size": [224, 224], "scale": [0.75, 1], "interpolation":"NEAREST", "antialias": true},
-//                    "RandomResizedCrop_2": {"size": [224, 224], "scale": [1, 1.25], "interpolation":"BICUBIC", "antialias": true},
-//                    "RandomRotation": {"degrees": [-90, 90], "interpolation": "NEAREST", "expand": false}
+                    "Permute_1": {"dims": [0, 2, 1, 3, 4]},
+                    "ColorJitter": {"brightness":  0.75, "contrast": 0.5, "saturation": 0.5, "hue": 0.25},
+                    "RandomGrayscale": {"p": 0.5},
+                    "GaussianBlur": {"kernel_size": [3, 3], "sigma": [0.5, 2]},
+                    "Permute_2": {"dims": [0, 2, 1, 3, 4]},
+                    "RandomResizedCrop_1": {"size": [224, 224], "scale": [0.75, 1], "interpolation":"NEAREST", "antialias": true},
+                    "RandomResizedCrop_2": {"size": [224, 224], "scale": [1, 1.25], "interpolation":"BICUBIC", "antialias": true},
+                    "RandomRotation": {"degrees": [-90, 90], "interpolation": "NEAREST", "expand": false}
                 },
                 "target_transform": {}
             },
@@ -103,6 +102,11 @@
         "backbone":
         {
             "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+
+            "rgb_i3d_reduce": {"name":  "max"},
+            "s3d_reduce": {"name":  "max"},
+            "clip_vit/b16_reduce": {"name":  "max"},
+
             "compile": false,
             "out_proj":
             {
@@ -135,9 +139,6 @@
             "out_channels": 1,
             "out_act": "Sigmoid",
 
-            "regularize": "L2",
-            "regularize_args": {"weight_decay": 0.001},
-
             "dropout": 0.5,
             "layer_order": "fc->drop->act"
         }
@@ -145,7 +146,7 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-5, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.001, "amsgrad": true},
         // Warm up 10% of epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  173, "num_warmup_steps": 1730, "T_mult": 2},
         "regularizer": {}

@@ -10,7 +10,7 @@ import signal
 from pathlib import Path
 from subprocess import Popen
 from argparse import Namespace, ArgumentParser
-sys.path.append(os.path.join(os.path.dirname(os.getcwd()), ".."))
+sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "../../"))
 
 
 from AI.src.utils.mlflow_export_import import copy_run

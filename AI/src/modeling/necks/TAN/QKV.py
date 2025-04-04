@@ -1,6 +1,9 @@
 from typing import Tuple
 
 import torch
+from torch import Tensor
+from torch.nn import Parameter
+
 
 __all__ = ["QKV"]
 
@@ -16,30 +19,29 @@ class QKV(torch.nn.Module):
         factory_kwargs = {"device": device, "dtype": dtype}
 
         self._embed_dim: int = embed_dim
-
-        self._w = torch.nn.Parameter(torch.empty((3 * embed_dim, embed_dim), **factory_kwargs))
-        self._b = torch.nn.Parameter(torch.empty(3 * embed_dim, **factory_kwargs)) \
-            if bias else self.register_parameter("_b", None)
+        self.weight = Parameter(torch.empty((3 * embed_dim, embed_dim), **factory_kwargs))
+        self.bias = Parameter(torch.empty(3 * embed_dim, **factory_kwargs)) \
+            if bias else self.register_parameter("bias", None)
 
         self._reset_parameters()
 
     def _reset_parameters(self) -> None:
-        torch.nn.init.xavier_uniform_(self._w)
+        torch.nn.init.xavier_uniform_(self.weight)
 
-        if self._b is not None:
-            torch.nn.init.constant_(self._b, 0)
+        if self.bias is not None:
+            torch.nn.init.constant_(self.bias, 0)
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(self, x: Tensor) -> Tuple[Tensor, Tensor, Tensor]:
         """
         :param x: Shape (seq_len, hidden_dim) or (batch, seq_len, hidden_dim)
         :return:
         """
         x = x.unsqueeze(0) if x.dim() == 2 else x
 
-        x = x @ self._w.T
+        x = x @ self.weight.T
 
-        if self._b is not None:
-            x += self._b
+        if self.bias is not None:
+            x += self.bias
 
         q, k, v = x.chunk(3, dim=-1)
         return q, k, v

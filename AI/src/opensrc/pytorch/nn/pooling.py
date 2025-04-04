@@ -1,4 +1,6 @@
-from torch.nn import (
+from typing import Dict
+from torch.nn.modules import (
+    Module,
     AvgPool1d,
     AvgPool2d,
     AvgPool3d,
@@ -19,7 +21,11 @@ from torch.nn import (
     AdaptiveAvgPool3d
 )
 
-available_pooling = {
+
+__all__ = ["avail_pooling"]
+
+
+avail_pooling: Dict[str, Module] = {
     "AvgPool1d": AvgPool1d,
     "AvgPool2d": AvgPool2d,
     "AvgPool3d": AvgPool3d,
