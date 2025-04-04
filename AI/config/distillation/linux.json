@@ -1,0 +1,270 @@
+{
+
+    "global":
+    {
+//        "save_dir": "/home/trong/Downloads/training_results/",
+        "project_name": "AIP391",
+//        "experiment_name": "run",
+//        "technique": "single",
+//        "mode": "train",
+        "exist_ok": true,
+        "sep": "_",
+
+        "epochs": 1,
+        "eval_strategy": "epoch",
+        "eval_steps": 3,
+
+        // Resume training
+        "resume": false,
+        "resume_ckpt": "D:\\Local\\Source\\Python\\semester_9\\AIP391\\Video_anomaly_detection\\AI\\results\\AIP391\\single\\train\\run1\\checkpoint\\best_epoch4.pt",
+
+        // GradScaled is automatically init when use_amp=True
+        "use_amp": true,
+        "seed": 12345,
+        "device": "cuda",
+
+        "inspect_model_arch": true,
+        "inspect_depth": 7,
+        "dummy_input_shape": [1, 32, 3, 13, 224, 224]
+    },
+
+    "data":
+    {
+        "train":
+        {
+            "dataset":
+            {
+                "name": "VADVideoLevelDataset",
+                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
+                "loader": "v4",
+                "transform": {
+                    "ToDtype": {"dtype": "float32", "scale": true}
+//                    "Permute_1": {"dims": [0, 2, 1, 3, 4]},
+//                    "ColorJitter": {"brightness":  0.75, "contrast": 0.5, "saturation": 0.5, "hue": 0.25},
+//                    "RandomGrayscale": {"p": 0.5},
+//                    "GaussianBlur": {"kernel_size": [3, 3], "sigma": [0.5, 2]},
+//                    "Permute_2": {"dims": [0, 2, 1, 3, 4]},
+//                    "RandomResizedCrop_1": {"size": [224, 224], "scale": [0.75, 1], "interpolation":"NEAREST", "antialias": true},
+//                    "RandomResizedCrop_2": {"size": [224, 224], "scale": [1, 1.25], "interpolation":"BICUBIC", "antialias": true},
+//                    "RandomRotation": {"degrees": [-90, 90], "interpolation": "NEAREST", "expand": false}
+                },
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "VADVideoLevelDataLoader",
+                "batch_size": 3,
+                "shuffle": true,
+                "method": 1,  // sampled by min datasource
+                "num_workers": 4,
+                "prefetch_factor": 2,
+                "persistent_workers": false,
+                "multiprocessing_context": "spawn"
+            },
+            "forward_strategy": "v1"
+        },
+        /////////////////////////////////////////////////////////
+        "val":
+        {
+            "dataset":
+            {
+                "name": "VADVideoLevelDataset",
+                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\labeled",
+                "loader": "v4",
+                "transform": {
+                    "ToDtype":
+                    {
+                        "dtype": "float32",
+                        "scale": true
+                    }
+                },
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "VADVideoLevelDataLoader",
+                "batch_size": 3,
+                "shuffle": false,
+                "method": 1,  // sampled by min datasource
+                "num_workers": 4,
+                "prefetch_factor": 2,
+                "persistent_workers": false,
+                "multiprocessing_context": "spawn"
+            },
+            "forward_strategy": "v1"
+        }
+
+        /////////////////////////////////////////////////////////
+//        "test": {
+//            "dataset":{},
+//            "dataloader":{}
+//        }
+    },
+
+    "architecture":
+    {
+        "algorithm": "distillation",
+        "models": {
+            "student":
+            {
+                "backbone":
+                {
+                    "name": ["rgb_i3d"],
+                    "rgb_i3d_args": {"trainable_layers": 10},
+                    "compile": false,
+                    "out_proj":
+                    {
+                        "hidden_dim": [512, 512],
+                        "hidden_activation": "ReLU",
+
+                        "out_channels": 512,
+                        "out_activation": null,
+
+                        "dropout": 0.5,
+                        "layer_order": "fc->drop->act"
+                    }
+
+                },
+
+                "neck":
+                {
+                    "name":"TAN",
+                    "num_backbones": 1,
+                    "num_heads": 8,
+                    "relative_attention": true
+                },
+
+                "head":
+                {
+                    "name":"SimpleClassifier",
+
+                    "hidden_dim": [512, 32],
+                    "hidden_activation": "ReLU",
+                    "hidden_activation_args": {},
+
+                    "out_channels": 1,
+                    "out_activation": "Sigmoid",
+
+                    "dropout": 0.5,
+                    "layer_order": "fc->drop->act"
+                }
+            },
+            "teacher":
+            {
+                "pretrained": null,
+                "backbone":
+                {
+        //            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+        //            "name": ["rgb_i3d", "s3d"],
+                    "name": ["rgb_i3d"],
+
+                    "rgb_i3d_args": {"trainable_layers": 10},
+                    "s3d_args": {"trainable_layers": 10},
+                    "clip_vit/b16_args": {"trainable_layers": 10},
+
+                    "compile": false,
+                    "out_proj":
+                    {
+                        "hidden_dim": [512, 512],
+                        "hidden_activation": "ReLU",
+
+                        "out_channels": 512,
+                        "out_activation": null,
+
+                        "dropout": 0.5,
+                        "layer_order": "fc->drop->act"
+                    }
+
+                },
+
+                "neck":
+                {
+                    "name":"TAN",
+                    "num_backbones": 1,
+                    "num_heads": 8,
+                    "relative_attention": true
+                },
+
+                "head":
+                {
+                    "name":"SimpleClassifier",
+
+                    "hidden_dim": [512, 32],
+                    "hidden_activation": "ReLU",
+                    "hidden_activation_args": {},
+
+                    "out_channels": 1,
+                    "out_activation": "Sigmoid",
+
+                    "dropout": 0.5,
+                    "layer_order": "fc->drop->act"
+                }
+            }
+        }
+//        "postprocessing": {}
+    },
+
+    "optim":
+    {
+        "lr": {"name": "Adam", "lr": 1e-6, "amsgrad": true},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  4, "num_warmup_steps": 4},
+        "regularizer": {}
+    },
+
+    "metric":
+    {
+        "in_train": false,
+        "in_val": false,
+        "in_test": false,
+        "metrics": [
+            {"name": "BinaryAUPRC"},
+            {"name": "BinaryPrecision"},
+            {"name": "BinaryRecall"},
+            {"name": "BinaryConfusionMatrix", "normalize": null}
+        ]
+    },
+
+    "loss":
+    {
+        "name": "MILRankingLoss",
+        "margin": 1,
+        "sparsity_constraint": true,
+        "smoothness_constraint": true,
+        "reduction": "mean"
+    },
+
+    "services": [
+        {
+            "name": "Checkpointer",
+            "apply": true,
+
+            "mode": "min",
+            "monitor": "val_loss",
+            "save_freq": 1,
+            "save_best_only": false,
+            "save_weights_only": true,
+            "save_total_limit": 3,
+            "include_config": true
+        },
+
+        {
+            "name": "Mlflow",
+            "apply": true,
+            "prev_run_id": "9d5cb84c211f4aeabeecc129d026af48",
+            "init_server_on_run": true,
+            "username": "root",
+            "password": "Root123!",
+            "remote_tracking_uri": "http://113.23.3.195:5000"
+        },
+
+        {
+            "name": "Earlystopper",
+            "mode": "min",
+            "monitor": "val_loss",
+            "patience": 5,
+            "apply": true
+        }
+    ]
+}

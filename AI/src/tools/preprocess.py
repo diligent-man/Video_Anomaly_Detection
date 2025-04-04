@@ -94,12 +94,16 @@ def stage_two(args: Namespace, dl: DataLoader, ds_name: str) -> None:
             ), *(fpaths, devices))
         )
 
+        if args.include_labeled:
+            for preprocessor in preprocessors:
+                preprocessor.is_labeled = False
+
         # Due to insufficient RAM
         is_labeled_processors: List[VideoPreprocessor] = [
-            preprocessor for preprocessor in preprocessors if preprocessor.is_label
+            preprocessor for preprocessor in preprocessors if preprocessor.is_labeled
         ]
         not_is_labeled_processors: List[VideoPreprocessor] = [
-            preprocessor for preprocessor in preprocessors if not preprocessor.is_label
+            preprocessor for preprocessor in preprocessors if not preprocessor.is_labeled
         ]
 
         if len(is_labeled_processors) > 0:
@@ -228,6 +232,11 @@ if __name__ == "__main__":
 
     # Take effect from stage 2
     argument_parser.add_argument("--del_prev_result",
+                                 default=False,
+                                 type=lambda x: (str(x).lower() == "true"),
+                                 help="Delete previous stage result")
+
+    argument_parser.add_argument("--include_labeled",
                                  default=False,
                                  type=lambda x: (str(x).lower() == "true"),
                                  help="Delete previous stage result")
