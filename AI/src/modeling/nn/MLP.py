@@ -1,9 +1,10 @@
-import copy
-import collections
+from copy import deepcopy
+from collections import OrderedDict
 from typing import List, Tuple, Dict, Any
 
 import torch
-from torch.nn import Module, Sequential, Dropout
+from torch import Tensor
+from torch.nn import Module, Sequential, Dropout, ReLU
 
 from ...opensrc.pytorch import avail_act
 from .regularization import avail_regularizers
@@ -23,8 +24,6 @@ class MLP(Module):
         hidden_layer  --> dropout --> activation --  + output_activation (if have)
               ↑----------------------------------|
     """
-    __hidden_layers: Sequential
-    __out_activation: Module | None
     layers: Sequential
 
     def __init__(self,
@@ -48,7 +47,7 @@ class MLP(Module):
 
         for act in (hid_act, out_act):
             if act is not None:
-                assert act in avail_act.keys(), ValueError("Provided activation is currentl unavailable")
+                assert act in avail_act.keys(), ValueError("Provided activation is currently unavailable")
 
         if hid_dim is not None:
             hid_act_args: Dict[str, Any] = dict() if hid_act_args is None else hid_act_args
@@ -75,7 +74,7 @@ class MLP(Module):
         )
 
         if regularize is not None:
-            assert regularize in avail_regularizers.keys(), ValueError("Provided regularizer is currentl unavailable")
+            assert regularize in avail_regularizers.keys(), ValueError("Provided regularizer is currently unavailable")
             self.layers: Module = avail_regularizers[regularize](self.layers, **regularize_args)
 
     @property
@@ -89,8 +88,8 @@ class MLP(Module):
     @staticmethod
     def _init_act(activation: str, **kwargs) -> Module:
         if activation is None or activation not in avail_act.keys():
-            print(f"Apply default activation function: {torch.nn.ReLU.__name__}")
-            return torch.nn.ReLU(**kwargs)
+            print(f"Apply default activation function: {ReLU.__name__}")
+            return ReLU(**kwargs)
         else:
             return avail_act[activation](**kwargs)
 
@@ -119,25 +118,25 @@ class MLP(Module):
                 hidden_layers[f"fc{i}"] = fc_layer
 
                 if dropout is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"dropout{i}"] = copy.deepcopy(dropout)
+                    hidden_layers[f"dropout{i}"] = deepcopy(dropout)
 
                 if hidden_activation is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"act{i}"] = copy.deepcopy(hidden_activation)
+                    hidden_layers[f"act{i}"] = deepcopy(hidden_activation)
             elif layer_order == "fc->act->drop":
                 hidden_layers[f"fc{i}"] = fc_layer
 
                 if hidden_activation is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"act{i}"] = copy.deepcopy(hidden_activation)
+                    hidden_layers[f"act{i}"] = deepcopy(hidden_activation)
 
                 if dropout is not None and i < len(hidden_dim) - 1:
-                    hidden_layers[f"dropout{i}"] = copy.deepcopy(dropout)
+                    hidden_layers[f"dropout{i}"] = deepcopy(dropout)
 
         if out_activation is not None:
             hidden_layers[f"out_act"] = out_activation
 
-        hidden_layers: Sequential = torch.nn.Sequential(collections.OrderedDict(hidden_layers))
+        hidden_layers: Sequential = Sequential(OrderedDict(hidden_layers))
         return hidden_layers
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: Tensor) -> Tensor:
         x = self.layers(x)
         return x

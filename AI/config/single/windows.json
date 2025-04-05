@@ -14,9 +14,8 @@
         "eval_strategy": "epoch",
         "eval_steps": 3,
 
-        // Resume training
         "resume": false,
-        "resume_ckpt": "D:\\Local\\Source\\Python\\semester_9\\AIP391\\Video_anomaly_detection\\AI\\results\\AIP391\\single\\train\\run1\\checkpoint\\best_epoch4.pt",
+        "resume_ckpt": ",
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
@@ -35,7 +34,6 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-//                "root": "D:\\Dataset\\VAD\\preprocessed\\IITB\\unlabeled",
                 "root": "D:\\Dataset\\VAD\\preprocessed\\UCF\\unlabeled",
                 "loader": "v4",
                 "transform": {
@@ -56,7 +54,7 @@
             {
                 "name": "VADVideoLevelDataLoader",
                 "batch_size": 4,
-                "shuffle": true,
+                "shuffle": false,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 4,
                 "prefetch_factor": 2,
@@ -65,7 +63,7 @@
             },
             "forward_strategy": "v1"
         },
-        /////////////////////////////////////////////////////////
+
         "val":
         {
             "dataset":
@@ -96,12 +94,6 @@
             },
             "forward_strategy": "v1"
         }
-
-        /////////////////////////////////////////////////////////
-//        "test": {
-//            "dataset":{},
-//            "dataloader":{}
-//        }
     },
 
     "architecture":
@@ -205,9 +197,10 @@
             "apply": true,
             "prev_run_id": null,
             "init_server_on_run": true,
-            "username": "root",
-            "password": "Root123!",
-            "remote_tracking_uri": "http://42.119.174.56:5000"
+            "username": "",
+            "password": "",
+            "push_to_remote": false,
+            "remote_tracking_uri": ""
         },
 
         {

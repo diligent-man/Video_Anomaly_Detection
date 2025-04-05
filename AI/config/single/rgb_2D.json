@@ -3,26 +3,24 @@
     {
         "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
         "project_name": "AIP391",
-        "experiment_name": "run",
+        "experiment_name": "input_2d",
         "technique": "single",
         "mode": "train",
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 1,
+        "epochs": 15,
         "eval_strategy": "epoch",
-        "eval_steps": 7,
 
         "resume": false,
-        "resume_ckpt": "",
+        "resume_ckpt": null,
 
-        // GradScaled is automatically init when use_amp=True
         "use_amp": true,
         "seed": 12345,
         "device": "cuda",
 
         "inspect_model_arch": true,
-        "inspect_depth": 5,
+        "inspect_depth": 7,
         "dummy_input_shape": [1, 32, 3, 30, 224, 224]
 
     },
@@ -34,18 +32,16 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/unlabeled",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/train",
                 "loader": "v4",
                 "transform": {
                     "ToDtype": {"dtype": "float32", "scale": true},
+                    "RandomResizedCrop_1": {"size": [224, 224], "scale": [0.75, 1], "interpolation":"NEAREST", "antialias": true},
+                    "RandomRotation": {"degrees": [-90, 90], "interpolation": "NEAREST", "expand": false},
 //                    "Permute_1": {"dims": [0, 2, 1, 3, 4]},
 //                    "ColorJitter": {"brightness":  0.75, "contrast": 0.5, "saturation": 0.5, "hue": 0.25},
-//                    "RandomGrayscale": {"p": 0.5},
 //                    "GaussianBlur": {"kernel_size": [3, 3], "sigma": [0.5, 2]},
-//                    "Permute_2": {"dims": [0, 2, 1, 3, 4]},
-//                    "RandomResizedCrop_1": {"size": [224, 224], "scale": [0.75, 1], "interpolation":"NEAREST", "antialias": true},
-//                    "RandomResizedCrop_2": {"size": [224, 224], "scale": [1, 1.25], "interpolation":"BICUBIC", "antialias": true},
-//                    "RandomRotation": {"degrees": [-90, 90], "interpolation": "NEAREST", "expand": false}
+//                    "Permute_2": {"dims": [0, 2, 1, 3, 4]}
                 },
                 "target_transform": {}
             },
@@ -55,9 +51,9 @@
                 "name": "VADVideoLevelDataLoader",
                 "batch_size": 4,
                 "shuffle": false,
-                "method": 1,  // sampled by min datasource
-                "num_workers": 4,
-                "prefetch_factor": 2,
+                "method": 2,  // sampled by min datasource
+                "num_workers": 8,
+                "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
@@ -69,7 +65,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/unlabeled",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/val",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -86,7 +82,7 @@
                 "name": "VADVideoLevelDataLoader",
                 "batch_size": 4,
                 "shuffle": false,
-                "method": 1,  // sampled by min datasource
+                "method": 2,  // sampled by min datasource
                 "num_workers": 3,
                 "prefetch_factor": 2,
                 "persistent_workers": false,
@@ -101,18 +97,13 @@
         "algorithm": "single",
         "backbone":
         {
-//            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
-//            "name": ["clip_vit/b16"],
-            "name": ["rgb_i3d"],
+            "name": ["clip_vit/b16"],
+            "clip_vit/b16_reduce": {"name":  "max_l2"},
 
-            "rgb_i3d_reduce": {"name":  "max_l2"},
-            "s3d_reduce": {"name":  "mean"},
-            "clip_vit/b16_reduce": {"name": "max_l2"},
-
-            "compile": false,
+            "compile": true,
             "out_proj":
             {
-                "hid_dim": [512, 512],
+                "hid_dim": [512],
                 "hid_act": "ReLU",
 
                 "out_channels": 512,
@@ -148,9 +139,9 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.001, "amsgrad": true},
-        // Warm up 10% of epochs
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  13, "num_warmup_steps": 13, "T_mult": 1},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.00001, "amsgrad": true},
+        // Warm up 10% of 50 epochs
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}
     },
 
@@ -185,7 +176,7 @@
             "save_freq": 1,
             "save_best_only": false,
             "save_weights_only": true,
-            "save_total_limit": 20,
+            "save_total_limit": 10,
             "include_config": true
         },
 
@@ -193,18 +184,18 @@
             "name": "Mlflow",
             "apply": true,
             "prev_run_id": null,
-            "init_server_on_run": true,
-            "username": "root",
-            "password": "Root123!",
+            "init_server_on_run": false,
+            "username": "",
+            "password": "",
             "push_to_remote": false,
-            "remote_tracking_uri": "http://42.116.36.4:5000"
+            "remote_tracking_uri": ""
         },
 
         {
             "name": "Earlystopper",
             "mode": "min",
             "monitor": "val_loss",
-            "patience": 30,
+            "patience": 5,
             "apply": true
         }
     ]

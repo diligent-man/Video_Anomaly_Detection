@@ -1,17 +1,24 @@
 from torch.nn import Module
 
+
+from .ModelOutput import (
+    BaseModelOutput,
+    VADDistillModelOutput
+)
+
 from ...utils import DotDict
 from .BaseModel import BaseModel
-from .BaseModelOutput import BaseModelOutput
 from .VADDistillationModel import VADDistillationModel
+
 
 __all__ = [
     "build_model",
 
     "BaseModel",
-    "VADDistillationModel",
+    "BaseModelOutput",
 
-    "BaseModelOutput"
+    "VADDistillationModel",
+    "VADDistillModelOutput"
 ]
 
 
@@ -21,5 +28,4 @@ def build_model(config: DotDict) -> Module:
         arch = BaseModel(config.Architecture)
     else:
         arch = VADDistillationModel(config)
-    # exit()
     return arch

@@ -59,7 +59,7 @@ Has aux logits: {self.__has_aux}""")
             if isinstance(targets, Tensor):
                 targets = [targets]
 
-        inputs: List[Union[Tensor,BaseModelOutput]] = to_float32(inputs)
+        inputs: List[Union[Tensor, BaseModelOutput]] = to_float32(inputs)
         is_tensor: bool = isinstance(inputs[0], Tensor)
         if self.__has_aux:
             # aux logits (GoogleLeNet, InceptionV3)
@@ -78,16 +78,3 @@ Has aux logits: {self.__has_aux}""")
                     inputs, targets if targets is not None else (None,)
                 ) if targets is not None else self.__loss(inputs)
         return batch_loss
-
-
-"""
-Student
-    fS: student feat (before logits)
-    
-Teacher
-    fT: teacher feat (before logits)
-
-xi: training sample
-xj: another random sample
-=> Push fS(xi) & fT(si) closer, while push fS(xi) & fT(xj) far away
-"""

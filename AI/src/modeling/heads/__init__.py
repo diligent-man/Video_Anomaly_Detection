@@ -1,8 +1,12 @@
+from typing import Tuple
+
 from torch.nn import Module
+
 from ...utils import DotDict
 from .SimpleClassifier import SimpleClassifier
+from .HeadOutput import SimpleClassifierOutput
 
-__all__ = ["build_head"]
+__all__ = ["build_head", "SimpleClassifierOutput"]
 
 
 heads = {
@@ -10,10 +14,10 @@ heads = {
 }
 
 
-def build_head(config: DotDict) -> Module:
+def build_head(config: DotDict) -> Tuple[Module, bool]:
     name = config.head.pop("name")
     assert name in heads.keys(), ValueError(f"Provided head is unavailable. Get '{name}'")
 
-    in_channels = config.head.pop("in_channels")
-    head: Module = heads[name](in_channels, **config.head.get_dict())
-    return head
+    return_logits: bool = config.head.get("return_logits", False)
+    head: Module = heads[name](**config.head.get_dict())
+    return head, return_logits

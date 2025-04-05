@@ -18,9 +18,7 @@ from ..losses import LossWrapper
 from ..data.model import BatchOutput
 from ..modeling.architectures import BaseModelOutput
 
-from ..utils.saving import save_video
 from ..utils.runner_utils.trainer import find_initial_total
-
 
 
 __all__ = ["FORWARD_STRATEGIES"]
@@ -52,17 +50,6 @@ def v1(instance: Union[Trainer],
         instance.callback("on_step_begin")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             anomaly, normal = torch.chunk(inps, 2, 1)
-
-            # if instance.state.phase == "train":
-            #     _ = [
-            #         save_video(
-            #             255 * anomaly[i, ...].permute(0, 2, 3, 4, 1).reshape(-1, 224, 224, 3),
-            #             "/home/trong/Downloads/tmp",
-            #             15,
-            #             f"out_video_phase_{instance.state.phase}_epoch_{instance.state.epoch}_step_{instance.state.step}_{i}"
-            #         )
-            #         for i in range(anomaly.shape[0])
-            #     ]
 
             anomaly_preds: Tensor = instance.model(anomaly.to(device)).preds  # (B, S)
             normal_preds: Tensor = instance.model(normal.to(device)).preds  # (B, S)

@@ -106,6 +106,20 @@
     "architecture":
     {
         "algorithm": "distillation",
+        "soft_label_threshold": 0.8,
+        "feat_preprocessing": {
+            "name": "MLP",
+
+            // Must be compatible with neck's hid_dim output
+            "in_channels": 512,
+
+            "hid_dim": [512],
+            "hid_act": "ReLU",
+
+            "out_channels": 512,
+            "layer_order": "fc->drop->act"
+        },
+
         "models": {
             "student":
             {
@@ -122,7 +136,6 @@
                         "hid_act": "ReLU",
 
                         "out_channels": 512,
-                        "out_act": null,
 
                         "dropout": 0.5,
                         "layer_order": "fc->drop->act"
@@ -134,7 +147,8 @@
                     "name":"TAN",
                     "num_backbones": 1,
                     "num_heads": 8,
-                    "relative_attention": true
+                    "relative_attention": true,
+                    "return_neck_out": true
                 },
 
                 "head":
@@ -145,7 +159,6 @@
                     "hid_act": "ReLU",
 
                     "out_channels": 1,
-//                    "out_act": "Sigmoid",
 
                     "dropout": 0.5,
                     "layer_order": "fc->drop->act"
@@ -178,7 +191,8 @@
                     "name":"TAN",
                     "num_backbones": 1,
                     "num_heads": 8,
-                    "relative_attention": true
+                    "relative_attention": true,
+                    "return_neck_out": true
                 },
 
                 "head":
