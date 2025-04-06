@@ -1,7 +1,6 @@
 import dataclasses
-from typing import Optional, List
 
-import torch
+from torch import Tensor
 from transformers.modeling_outputs import ModelOutput
 
 
@@ -12,5 +11,5 @@ __all__ = [
 
 @dataclasses.dataclass
 class SimpleClassifierOutput(ModelOutput):
-    preds: torch.Tensor = None
-    logits: torch.Tensor = None
+    preds: Tensor = None
+    logits: Tensor = None

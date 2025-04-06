@@ -11,7 +11,7 @@ from .MILRankingLoss import MILRankingLoss
 
 from ..opensrc.pytorch import avail_loss
 from ..utils import DotDict, make_border, to_float32
-from ..modeling.architectures import BaseModelOutput
+from ..modeling.architectures import ModelOutput
 
 
 __all__ = ["LossWrapper"]
@@ -47,8 +47,8 @@ Has aux logits: {self.__has_aux}""")
         return self.__name
 
     def compute_batch_loss(self,
-                           inputs: Union[Tensor, Iterable[Tensor], List[BaseModelOutput]],
-                           targets: Union[Tensor, Iterable[Tensor], List[BaseModelOutput]] = None,
+                           inputs: Union[Tensor, Iterable[Tensor], List[ModelOutput]],
+                           targets: Union[Tensor, Iterable[Tensor], List[ModelOutput]] = None,
                            aux_logits_weight: float = 0.3,
                            ) -> torch.Tensor:
         is_list: bool = isinstance(inputs, list)
@@ -59,7 +59,7 @@ Has aux logits: {self.__has_aux}""")
             if isinstance(targets, Tensor):
                 targets = [targets]
 
-        inputs: List[Union[Tensor, BaseModelOutput]] = to_float32(inputs)
+        inputs: List[Union[Tensor, ModelOutput]] = to_float32(inputs)
         is_tensor: bool = isinstance(inputs[0], Tensor)
         if self.__has_aux:
             # aux logits (GoogleLeNet, InceptionV3)

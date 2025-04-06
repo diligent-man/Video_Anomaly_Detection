@@ -9,7 +9,7 @@
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 15,
+        "epochs": 10,  // trained 10 epochs
         "eval_strategy": "epoch",
 
         "resume": false,
@@ -52,8 +52,8 @@
                 "batch_size": 4,
                 "shuffle": false,
                 "method": 2,  // sampled by min datasource
-                "num_workers": 8,
-                "prefetch_factor": 1,
+                "num_workers": 4,
+                "prefetch_factor": 2,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
@@ -140,7 +140,7 @@
     "optim":
     {
         "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.00001, "amsgrad": true},
-        // Warm up 10% of 50 epochs
+        // Warm up 5 epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}
     },

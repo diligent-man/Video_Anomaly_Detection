@@ -21,9 +21,7 @@ class SimpleClassifier(Module):
 
         if out_act is not None:
             assert out_act in avail_act.keys(), ValueError("Specified output activation function is unavailable")
-            print(out_act, avail_act[out_act](**out_act_args))
             self.out_act: Module = avail_act[out_act](**out_act_args)
-
         else:
             self.out_act: None = out_act
 

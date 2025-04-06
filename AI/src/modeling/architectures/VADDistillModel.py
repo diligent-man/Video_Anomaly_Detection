@@ -1,8 +1,7 @@
-import gc
-import os.path
+import os
 import warnings
-from typing import Dict, Any, List
 from collections import defaultdict
+from typing import Dict, Any, List, Tuple, Callable
 
 import torch
 from torch import Tensor
@@ -13,10 +12,10 @@ from ...utils import DotDict, freeze_layer
 from . import BaseModel, BaseModelOutput, VADDistillModelOutput
 
 
-__all__ = ["VADDistillationModel"]
+__all__ = ["VADDistillModel"]
 
 
-class VADDistillationModel(Module):
+class VADDistillModel(Module):
     """
     Build model from the idea of offline distillation. Code logic is adopted from PaddleOCR
     """
@@ -26,7 +25,7 @@ class VADDistillationModel(Module):
     }
 
     def __init__(self, config: DotDict) -> None:
-        super(VADDistillationModel, self).__init__()
+        super(VADDistillModel, self).__init__()
 
         self.__config = config.Architecture
         self.__soft_label_threshold = self.__config.pop("soft_label_threshold", 0.5)
@@ -52,6 +51,9 @@ class VADDistillationModel(Module):
         return feat_preprocessing
 
     def _build_student_teacher(self) -> Dict[str, List[Module]]:
+        """
+        :return: Build student and teacher with specified config in respective manner
+        """
         models: Dict[str, List[Module]] = defaultdict(list)
 
         for model_type in self.__config.models.get_dict():
@@ -81,38 +83,58 @@ class VADDistillationModel(Module):
                 models["teacher"].append(model)
         return models
 
-    def forward(self, anomaly: Tensor, normal: Tensor, device="cpu") -> Dict[str, List[BaseModelOutput]]:
+    def _forward_student(self, anomaly: Tensor, normal: Tensor, model: Module) -> VADDistillModelOutput:
+        # Outs includes: logits & feats
+        anomaly_outs: BaseModelOutput = model(anomaly)
+        normal_outs: BaseModelOutput = model(normal)
+
+        soft_preds: Tensor = torch.cat((anomaly_outs.logits, normal_outs.logits), dim=1)  # (B,2*S)
+
+        feats: Tensor = torch.cat((anomaly_outs.neck_outs, normal_outs.neck_outs), dim=1)  # (B,2*S,Hid_dim)
+        feats = self.feat_preprocessing.to(feats.device)(feats)
+
+        outs: VADDistillModelOutput = VADDistillModelOutput(soft_preds=soft_preds, student_feats=feats)
+        return outs
+
+    def _forward_teacher(self, anomaly: Tensor, normal: Tensor, model: Module) -> VADDistillModelOutput:
+        # Outs includes: feats, logits, preds
+        anomaly_outs: BaseModelOutput = model(anomaly)
+        normal_outs: BaseModelOutput = model(normal)
+
+        feats: Tensor = torch.cat((anomaly_outs.neck_outs, normal_outs.neck_outs), dim=1)  # (B,2*S,Hid_dim)
+        feats = self.feat_preprocessing.to(feats.device)(feats)
+
+        hard_preds: Tensor = torch.cat((anomaly_outs.preds, normal_outs.preds), dim=1)
+        hard_preds = torch.where(hard_preds >= self.__soft_label_threshold, 1., 0.)  # (B,2*S)
+
+        soft_preds: Tensor = torch.cat((anomaly_outs.logits, normal_outs.logits), dim=1)  # (B,2*S)
+
+        outs: VADDistillModelOutput = VADDistillModelOutput(
+            soft_preds=soft_preds, hard_preds=hard_preds, teacher_feats=feats
+        )
+        return outs
+
+    def forward(self, anomaly: Tensor, normal: Tensor, device: str)\
+            -> Tuple[List[VADDistillModelOutput], List[VADDistillModelOutput]]:
         """
         :param anomaly: list of input tensors in the format of Shape (S,C,T,H,W) or (B,S,C,T,H,W)
         :param normal:                                  //
         :param device: computing device
         :return: BaseModelOutput obj
+
+        Student's out:
+            neck_outs: shape (B,S,Hid_dim)
+            logits (soft labels): shape (B,S)
+
+        Teacher's out:
+            neck_outs: shape (B,S,Hid_dim)
+            logits (soft labels): shape (B,S)
+            prob (hard labels): shape (B,S)
         """
         outs: Dict[str, List[VADDistillModelOutput]] = defaultdict(list)
 
         for model_type in ["student", "teacher"]:
             for model in self.models[model_type]:
-                for inp in (anomaly, normal):
-                    model_out: BaseModelOutput = model(inp.to(device))
-
-                    # Soft labels
-                    soft_labels: Tensor = model_out.preds
-
-                    # Hard labels
-                    hard_labels: Tensor = torch.nn.Sigmoid()(model_out.preds)
-                    hard_labels = torch.where(hard_labels >= self.__soft_label_threshold, 1., 0.)
-
-                    feats: Tensor = model_out.neck_outs
-                    if self.feat_preprocessing is not None:
-                        feats = self.feat_preprocessing.to(device)(feats)
-
-
-                    print(feats.shape)
-                    exit()
-
-                    # model_out.preds = torch.where(model_out.preds >= self.__soft_label_threshold, 1., 0.)
-                    outs[model_type].append(model_out)  # currently placed on cuda
-        self.feat_preprocessing.to("cpu")
-        gc.collect()
-        torch.cuda.empty_cache()
-        return outs
+                fn: Callable = getattr(self, f"_forward_{model_type}")
+                outs[model_type].append(fn(anomaly.to(device), normal.to(device), model))
+        return outs["student"], outs["teacher"]

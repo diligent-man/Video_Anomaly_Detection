@@ -36,21 +36,13 @@ class DistillBCEWithLogitsLoss(DistillationLoss):
         :param teacher_outs:                                   //
         :return:
         """
-        return_loss: None | Tensor = None
-
+        loss: None | Tensor = None
         for i, idx_pair in enumerate(self._model_idx_pairs):
-            loss = self.__loss(
-                student_outs[idx_pair[0]][self._key],
-                teacher_outs[idx_pair[1]][self._key]
-            )
-
-            if return_loss is None:
-                return_loss = loss
-            else:
-                return_loss = torch.vstack((return_loss, loss))
+            result = self.__loss(student_outs[idx_pair[0]][self._key], teacher_outs[idx_pair[1]][self._key])
+            loss = result if loss is None else torch.vstack((loss, result))
 
         if self.__reduction == "mean":
-            return_loss: Tensor = torch.mean(return_loss, 0)
+            loss: Tensor = torch.mean(loss, 0)
         elif self.__reduction == "sum":
-            return_loss: Tensor = torch.sum(return_loss, 0)
-        return return_loss
+            loss: Tensor = torch.sum(loss, 0)
+        return loss

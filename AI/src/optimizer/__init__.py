@@ -11,7 +11,7 @@ from .lr_scheduler import SCHEDULERS
 from .regularizer import REGULARIZERS
 
 from ..utils import DotDict, make_border
-from ..modeling.architectures import VADDistillationModel
+from ..modeling.architectures import VADDistillModel
 
 
 __all__ = ["build_optimizer", "OPTIMIZERS", "SCHEDULERS"]

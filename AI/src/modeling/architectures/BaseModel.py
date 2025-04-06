@@ -78,7 +78,6 @@ class BaseModel(Module):
         device = x.device
         extracted_feats: None | List[Tensor] = None
         projected_feats: None | Tensor = None
-        logits: None | Tensor = None
 
         # Feed backbone
         for i in range(len(self.backbones)):
@@ -113,7 +112,7 @@ class BaseModel(Module):
             extracted_feats=extracted_feats if self.__return_extracted_feats else None,
             projected_feats=projected_feats if self.__return_projected_feats else None,
             neck_outs=neck_outs if self.__return_neck_out else None,
-            logits=logits if self.__return_logits else None,
+            logits=head_outs.logits,
             preds=head_outs.preds
         )
 

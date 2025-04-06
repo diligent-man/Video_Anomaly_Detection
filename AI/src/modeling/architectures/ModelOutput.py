@@ -6,6 +6,7 @@ from transformers.modeling_outputs import ModelOutput
 
 
 __all__ = [
+    "ModelOutput",
     "BaseModelOutput",
     "VADDistillModelOutput"
 ]
@@ -24,7 +25,5 @@ class BaseModelOutput(ModelOutput):
 class VADDistillModelOutput(ModelOutput):
     soft_preds: Tensor = None
     hard_preds: Tensor = None
-    teacher_pos_feats: Optional[Tensor] = None
-    teacher_neg_feats: Optional[Tensor] = None
-    student_pos_feats: Optional[Tensor] = None
-    student_neg_feats: Optional[Tensor] = None
+    teacher_feats: Optional[Tensor] = None
+    student_feats: Optional[Tensor] = None

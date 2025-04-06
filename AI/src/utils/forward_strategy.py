@@ -123,10 +123,10 @@ def v2(instance: Union[Trainer],
         instance.callback("on_step_begin")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             anomaly, normal = torch.chunk(inps, 2, 1)
-            outs: Dict[str, List[BaseModelOutput]] = instance.model(anomaly, normal, device)
+            student_outs, teach_outs = instance.model(anomaly, normal, device)
 
             if loss is not None:
-                batch_loss: Tensor = loss.compute_batch_loss(outs["student"], outs["teacher"])
+                batch_loss: Tensor = loss.compute_batch_loss(student_outs, teach_outs)
 
         # Exits the context manager before backward
         if phase == "train":
