@@ -28,7 +28,7 @@ warnings.filterwarnings("once")
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 DEFAULT_CONFIG_PATH: Dict[str, pathlib.Path] = {
-    "linux": pathlib.Path("../../config/distillation/linux.json"),
+    "linux": pathlib.Path("../../config/single/linux.json"),
     "win32": pathlib.Path("../../config/single/windows.json")
 }
 
