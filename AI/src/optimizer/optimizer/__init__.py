@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Type
 from torch.optim import (
     Optimizer,
     Adafactor,
@@ -18,7 +18,7 @@ from torch.optim import (
 )
 
 
-OPTIMIZERS: Dict[str, Optimizer] = {
+OPTIMIZERS: Dict[str, Type[Optimizer]] = {
     "Adafactor": Adafactor,
     "Adadelta": Adadelta,
     "Adagrad": Adagrad,

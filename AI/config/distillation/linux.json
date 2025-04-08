@@ -57,13 +57,13 @@
                 "shuffle": true,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 4,
-                "prefetch_factor": 2,
+                "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
             "forward_strategy": "v2"
         },
-        /////////////////////////////////////////////////////////
+
         "val":
         {
             "dataset":
@@ -95,17 +95,12 @@
             "forward_strategy": "v2"
         }
 
-        /////////////////////////////////////////////////////////
-//        "test": {
-//            "dataset":{},
-//            "dataloader":{}
-//        }
     },
 
     "architecture":
     {
         "algorithm": "distillation",
-        "soft_label_threshold": 0.8,
+        "soft_label_threshold": 0.9,
         "feat_preprocessing": {
             "name": "MLP",
 
@@ -126,6 +121,7 @@
                 {
                     "name": ["clip_vit/b16"],
                     "clip_vit/b16_reduce": {"name":  "max_l2"},
+
                     "compile": true,
                     "out_proj":
                     {
@@ -144,6 +140,7 @@
                     "name":"TAN",
                     "num_backbones": 1,
                     "num_heads": 8,
+                    "max_relative_position": 10,
                     "relative_attention": true,
                     "return_neck_out": true
                 },
@@ -190,6 +187,7 @@
                     "name":"TAN",
                     "num_backbones": 1,
                     "num_heads": 8,
+                    "max_relative_position": 10,
                     "relative_attention": true,
                     "return_neck_out": true
                 },
@@ -217,7 +215,6 @@
                 }
             }
         }
-
     },
 
     "optim":
@@ -252,9 +249,21 @@
                 "combined_weight": 1,
                 "key": "soft_preds",
                 "model_idx_pairs": [[0, 0]]
+            },
+
+            {
+                "name": "DistillInfoNCE",
+                "reduction": "mean",
+                "temperature": 10,
+                "negative_mode": "unpaired",
+
+
+                "pred_key": "hard_preds",
+                "feat_key": "feats",
+                "combined_weight": 0.75,
+                "model_idx_pairs": [[0, 0]]
             }
         ]
-
     },
 
     "services": [

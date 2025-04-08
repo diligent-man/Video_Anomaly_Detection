@@ -92,9 +92,7 @@ class VADDistillModel(Module):
 
         feats: Tensor = torch.cat((anomaly_outs.neck_outs, normal_outs.neck_outs), dim=1)  # (B,2*S,Hid_dim)
         feats = self.feat_preprocessing.to(feats.device)(feats)
-
-        outs: VADDistillModelOutput = VADDistillModelOutput(soft_preds=soft_preds, student_feats=feats)
-        return outs
+        return VADDistillModelOutput(soft_preds=soft_preds, feats=feats)
 
     def _forward_teacher(self, anomaly: Tensor, normal: Tensor, model: Module) -> VADDistillModelOutput:
         # Outs includes: feats, logits, preds
@@ -108,11 +106,7 @@ class VADDistillModel(Module):
         hard_preds = torch.where(hard_preds >= self.__soft_label_threshold, 1., 0.)  # (B,2*S)
 
         soft_preds: Tensor = torch.cat((anomaly_outs.logits, normal_outs.logits), dim=1)  # (B,2*S)
-
-        outs: VADDistillModelOutput = VADDistillModelOutput(
-            soft_preds=soft_preds, hard_preds=hard_preds, teacher_feats=feats
-        )
-        return outs
+        return VADDistillModelOutput(soft_preds=soft_preds, hard_preds=hard_preds, feats=feats)
 
     def forward(self, anomaly: Tensor, normal: Tensor, device: str)\
             -> Tuple[List[VADDistillModelOutput], List[VADDistillModelOutput]]:

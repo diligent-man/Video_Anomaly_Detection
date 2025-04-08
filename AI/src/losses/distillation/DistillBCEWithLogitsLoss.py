@@ -5,7 +5,7 @@ from torch import Tensor
 from torch.nn import BCEWithLogitsLoss
 
 from .DistillationLoss import DistillationLoss
-from ...modeling.architectures import BaseModelOutput
+from ...modeling.architectures import VADDistillModelOutput
 
 
 __all__ = ["DistillBCEWithLogitsLoss"]
@@ -24,21 +24,22 @@ class DistillBCEWithLogitsLoss(DistillationLoss):
                  pos_weight: Optional[Tensor] = None,
                  name="BCELoss",
                  ) -> None:
+        assert reduction in ["none", "mean", "sum", None], ValueError
         super(DistillBCEWithLogitsLoss, self).__init__(key, model_idx_pairs)
         self.__name = name
 
         self.__reduction: str = reduction
         self.__loss = BCEWithLogitsLoss(weight, reduction="mean", pos_weight=pos_weight)
 
-    def forward(self, student_outs: List[BaseModelOutput], teacher_outs: List[BaseModelOutput]) -> Tensor:
+    def forward(self, student_outs: List[VADDistillModelOutput], teacher_outs: List[VADDistillModelOutput]) -> Tensor:
         """
-        :param student_outs: BaseModelOutput that contains preds attr as model output with shape (B, S)
-        :param teacher_outs:                                   //
-        :return:
+        :param student_outs: VADDistillModelOutput that contains soft_preds (B, S)
+        :param teacher_outs:                        //
+        :return: computed loss
         """
         loss: None | Tensor = None
-        for i, idx_pair in enumerate(self._model_idx_pairs):
-            result = self.__loss(student_outs[idx_pair[0]][self._key], teacher_outs[idx_pair[1]][self._key])
+        for i, pair_idx in enumerate(self._model_idx_pairs):
+            result = self.__loss(student_outs[pair_idx[0]][self._key], teacher_outs[pair_idx[1]][self._key])
             loss = result if loss is None else torch.vstack((loss, result))
 
         if self.__reduction == "mean":

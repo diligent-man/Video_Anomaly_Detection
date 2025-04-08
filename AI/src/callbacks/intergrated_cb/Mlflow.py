@@ -155,12 +155,12 @@ Cmd: 'mlflow server --backend-store-uri {"file:" + backend_store_uri}'
         batch_output: Dict[str, Any] = instance.state.batch_output.as_metrics()
         mlflow.log_metrics(batch_output, step=instance.state.batch_output.step)
 
+    def on_train_end(self, instance: Trainer) -> None:
         mlflow.log_artifacts(
             instance.config.Global.ckpt_path,
             "ckpt"
         )
 
-    def on_train_end(self, instance: Trainer) -> None:
         if self.__remote_tracking_uri is not None and self.__push_to_remote:
             try:
                 ping_server(self.__remote_tracking_uri, auth=(self.__username, self.__password))

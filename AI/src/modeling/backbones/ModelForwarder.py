@@ -1,3 +1,4 @@
+import warnings
 from typing import Dict, Any
 from functools import partial
 
@@ -56,7 +57,7 @@ class ModelForwarder(object):
                     batch: Tensor = x[i, ...].permute(0, 2, 1, 3, 4).reshape(-1, C, H, W)
                     batch: Tensor = _resolve_backbone_output(self._model(batch))
                     batch_cache = batch if batch_cache is None else torch.cat((batch_cache, batch), dim=0)
-                except torch.OutOfMemoryError:
+                except torch.OutOfMemoryError as e:
                     snippet_cache: None | Tensor = None
                     for j in range(S):
                         snippet: Tensor = x[i, j, ...].permute(1, 0, 2, 3)
@@ -86,7 +87,7 @@ class ModelForwarder(object):
             # (B,S,C,T,H,W) -> (B*S,T,C,H,W)
             tmp: Tensor = x.view(-1, C, T, H, W)
             x: Tensor = _resolve_backbone_output(self._model(tmp))
-        except torch.OutOfMemoryError:
+        except torch.OutOfMemoryError as e:
             cache: None | Tensor = None
             for i in range(B):
                 tmp: Tensor = x[i, ...]

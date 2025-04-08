@@ -5,7 +5,7 @@ from torch import Tensor
 from torch.nn import Module
 
 from .distillation import avail_dl_loss
-from ..modeling.architectures import BaseModelOutput
+from ..modeling.architectures import VADDistillModelOutput
 
 
 __all__ = ["CombinedLoss"]
@@ -36,7 +36,7 @@ class CombinedLoss(Module):
             self.__loss_lst.append(loss)
             self.__combined_weight_lst.append(combined_weight)
 
-    def forward(self, student_outs: List[BaseModelOutput], teacher_outs: List[BaseModelOutput]):
+    def forward(self, student_outs: List[VADDistillModelOutput], teacher_outs: List[VADDistillModelOutput]):
         return_loss: None | Tensor = None
 
         for i, loss_fn in enumerate(self.__loss_lst):

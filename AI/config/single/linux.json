@@ -22,7 +22,7 @@
         "device": "cuda",
 
         "inspect_model_arch": true,
-        "inspect_depth": 5,
+        "inspect_depth": 7,
         "dummy_input_shape": [1, 32, 3, 30, 224, 224]
 
     },
@@ -57,7 +57,7 @@
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 4,
-                "prefetch_factor": 2,
+                "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
@@ -87,8 +87,8 @@
                 "batch_size": 4,
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
-                "num_workers": 3,
-                "prefetch_factor": 2,
+                "num_workers": 1,
+                "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
@@ -109,10 +109,10 @@
             "s3d_reduce": {"name":  "mean"},
             "clip_vit/b16_reduce": {"name": "max_l2"},
 
-            "compile": false,
+            "compile": true,
             "out_proj":
             {
-                "hid_dim": [512, 512],
+                "hid_dim": [512],
                 "hid_act": "ReLU",
 
                 "out_channels": 512,
@@ -148,7 +148,7 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.001, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.00001, "amsgrad": true},
         // Warm up 10% of epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  13, "num_warmup_steps": 13, "T_mult": 1},
         "regularizer": {}
@@ -193,7 +193,7 @@
             "name": "Mlflow",
             "apply": true,
             "prev_run_id": null,
-            "init_server_on_run": true,
+            "init_server_on_run": false,
             "username": "root",
             "password": "Root123!",
             "push_to_remote": false,
