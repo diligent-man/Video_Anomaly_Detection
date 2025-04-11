@@ -47,11 +47,15 @@ class VADFrameLevelDataset(VisionDataset):
         self.__root: str = root
         self.__loader: Callable = functools.partial(loader, **loader_args)
         self.__annotation_fname: str = annotation
-        self.__annotation: pd.DataFrame = pd.read_csv(os.path.join(root, annotation))
+        self.__annotation: pd.DataFrame = pd.read_csv(
+            os.path.join(root, annotation),
+            header=None,
+            names=["path","start1","end1","start2","end2"]
+        )
         self.__return_device: str = return_device
 
     @staticmethod
-    def extra_repr() -> str:
+    def extra_repr(*_) -> str:
         return ""
 
     def __len__(self) -> int:

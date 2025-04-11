@@ -312,7 +312,7 @@ def labeled_to_test(ds_paths: List[str],
                 test_cls_names: None = None
 
             test: List[str] = [*train, *test]
-            _move_obj(obj_lst, spath, "test", ds_name, ds_type, counter, src_label, test_cls_names, log_writer)
+            _move_obj(test, spath, "test", ds_name, ds_type, counter, src_label, test_cls_names, log_writer)
             sample_traker = _track_sample(sample_traker, f"test_{ds_type}", len(test))
 
             sample_traker[ds_type] += len(test)
@@ -363,13 +363,17 @@ def _rename_label(label_fpath: str, old_fname: str, new_fname: str, ext: str) ->
     :param label_fpath: fpath in label file
     :param old_fname: obj name in src
     :param new_fname: obj name in dst
-    :param ext: src obj extension (after run stage 3 in preprocessing -> ".pt")
+    :param ext: src obj extension (after run stage 2 in preprocessing -> ".pt")
     :return: renamed fpath in label
     """
     old_fname: str = old_fname.replace(ext, "")
     label_fname: str = _get_fname(label_fpath)
 
     if label_fname == old_fname:
+        print("label fpath", label_fpath)
+        print("old fname", old_fname)
+        print("new fname", new_fname)
+        print()
         label_fpath: str = os.path.join(Path(label_fpath).parent, new_fname)
     return label_fpath
 
@@ -461,6 +465,9 @@ def _move_obj(obj_lst: List[str],
                 obj,
                 os.path.join(save_path, save_name)
             )
+
+        print(save_path)
+        print(save_name)
 
         if label is not None:
             if ds_phase == "test":
