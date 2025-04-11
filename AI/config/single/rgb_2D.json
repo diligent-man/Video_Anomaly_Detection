@@ -9,11 +9,11 @@
         "exist_ok": true,
         "sep": "_",
 
-        "epochs": 20,
+        "epochs": 13,
         "eval_strategy": "epoch",
 
-        "resume": false,
-        "resume_ckpt": null,
+        "resume": true,
+        "resume_ckpt": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/input_2d/ckpt/best_epoch7_step1581.pt",
 
         "use_amp": true,
         "seed": 12345,
@@ -136,9 +136,9 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.00001, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-5, "amsgrad": true},
         // Warm up 5 epochs
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 2},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}
     },
 
@@ -180,7 +180,7 @@
         {
             "name": "Mlflow",
             "apply": true,
-            "prev_run_id": null,
+            "prev_run_id": "22d98f9da1ec478c8ebff673474dc70c",
             "init_server_on_run": false,
             "username": "",
             "password": "",

@@ -3,7 +3,7 @@
     {
         "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
         "project_name": "AIP391",
-        "experiment_name": "input_3d",
+        "experiment_name": "input_mixed",
         "technique": "single",
         "mode": "train",
         "exist_ok": true,
@@ -13,7 +13,7 @@
         "eval_strategy": "epoch",
 
         "resume": false,
-        "resume_ckpt": null,
+        "resume_ckpt": "",
 
         "use_amp": true,
         "seed": 12345,
@@ -138,9 +138,9 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 5e-5, "weight_decay": 0.00001, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 5e-5, "weight_decay": 1e-5, "amsgrad": true},
         // Warm up 5 epochs
-        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 2},
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}
     },
 

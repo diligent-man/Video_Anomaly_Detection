@@ -13,8 +13,6 @@ from matplotlib import pyplot as plt
 from . import DotDict, ANSIColor
 
 
-plt.switch_backend("tkagg")
-
 
 __all__ = [
     "get_amp_cfg",
@@ -63,6 +61,8 @@ def visualize_lr(optimizer: torch.optim.Optimizer,
                  epochs: int = 10,
                  dataloader_len: int = 10
                  ) -> None:
+    plt.switch_backend("tkagg")
+    
     lr = []
     if mode == "update_per_epoch":
         for epoch in range(epochs):
