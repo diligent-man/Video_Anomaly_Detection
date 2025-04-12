@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/.idea/PaddleOCR-main.iml" filepath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/.idea/PaddleOCR-main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Video_anomaly_detection.iml" filepath="$PROJECT_DIR$/.idea/Video_anomaly_detection.iml" />
     </modules>
   </component>

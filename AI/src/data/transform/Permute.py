@@ -1,3 +1,4 @@
+import gc
 from typing import Tuple
 
 import torch
@@ -11,7 +12,7 @@ class Permute(Transform):
     """
     Permutes the dimensions of a video.
     """
-    def __init__(self, dims: Tuple[int]):
+    def __init__(self, dims: Tuple[int], device="cpu", clear_cuda_mem: bool = True):
         """
         :param dims (Tuple[int]): The desired ordering of dimensions.
         """
@@ -21,10 +22,17 @@ class Permute(Transform):
 
         super().__init__()
         self._dims = dims
+        self._device = device
+        self._clear_cuda_mem = clear_cuda_mem
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
             x (torch.Tensor): video tensor whose dimensions are to be permuted.
         """
-        return x.permute(*self._dims)
+        x = x.to(self._device).permute(*self._dims)
+
+        if self._clear_cuda_mem:
+            gc.collect()
+            torch.cuda.empty_cache()
+        return x

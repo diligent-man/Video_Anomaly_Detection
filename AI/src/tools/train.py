@@ -21,17 +21,19 @@ from AI.src.metrics import MetricWrapper
 from AI.src.runner import Trainer
 from AI.src.utils import DotDict, ConfigReader
 
+torch.set_num_threads(64)
+torch.set_num_interop_threads(64)
+
 warnings.filterwarnings("once")
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 DEFAULT_CONFIG_PATH: Dict[str, pathlib.Path] = {
-    "linux": pathlib.Path("../../config/distillation/linux.json"),
+    "linux": pathlib.Path("../../config/single/linux.json"),
     "win32": pathlib.Path("../../config/single/windows.json")
 }
 
 
 def main(args: argparse.Namespace) -> None:
-    print(args.config)
     config: DotDict = ConfigReader(args.config).config
 
     train_dataloader = build_dataloader(copy.deepcopy(config), "train")

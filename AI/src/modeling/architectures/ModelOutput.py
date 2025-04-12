@@ -25,5 +25,4 @@ class BaseModelOutput(ModelOutput):
 class VADDistillModelOutput(ModelOutput):
     soft_preds: Tensor = None
     hard_preds: Tensor = None
-    teacher_feats: Optional[Tensor] = None
-    student_feats: Optional[Tensor] = None
+    feats: Optional[Tensor] = None

@@ -1,4 +1,4 @@
-from typing import Dict, Any, Callable, Union, List
+from typing import Dict, Any, Callable, Union
 
 
 import torch
@@ -16,8 +16,6 @@ from .DotDict import DotDict
 from ..runner import Trainer
 from ..losses import LossWrapper
 from ..data.model import BatchOutput
-from ..modeling.architectures import BaseModelOutput
-
 from ..utils.runner_utils.trainer import find_initial_total
 
 
@@ -82,7 +80,6 @@ def v1(instance: Union[Trainer],
             "lr": lr,
             "loss": batch_loss.item() if batch_loss is not None else batch_loss,
         }
-
         instance.state.batch_output = BatchOutput(**batch_output)
         instance.callback(f"on_step_end")
 
@@ -123,10 +120,10 @@ def v2(instance: Union[Trainer],
         instance.callback("on_step_begin")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             anomaly, normal = torch.chunk(inps, 2, 1)
-            student_outs, teach_outs = instance.model(anomaly, normal, device)
+            student_outs, teacher_outs = instance.model(anomaly, normal, device)
 
             if loss is not None:
-                batch_loss: Tensor = loss.compute_batch_loss(student_outs, teach_outs)
+                batch_loss: Tensor = loss.compute_batch_loss(student_outs, teacher_outs)
 
         # Exits the context manager before backward
         if phase == "train":

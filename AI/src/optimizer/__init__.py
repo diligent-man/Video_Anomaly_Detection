@@ -1,6 +1,5 @@
 from typing import Tuple, List, Iterator
 
-from torch import Tensor
 from torch.nn import Module, Parameter
 from torch.optim.optimizer import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
@@ -27,15 +26,15 @@ def build_optimizer(config: DotDict,
     name: None | str = lr_config.pop("name", None)
     assert name in OPTIMIZERS.keys(), ValueError(f"Invalid optimizer. Get '{name}'")
 
-    if isinstance(model, VADDistillationModel):
-        params: List[Tensor] = []
+    if isinstance(model, VADDistillModel):
+        params: List[Iterator[Parameter]] = []
         for student in model.models["student"]:
             params += list(student.parameters())
     else:
         params: Iterator[Parameter] = model.parameters()
     optim: Optimizer = OPTIMIZERS[name](params, **lr_config.get_dict())
 
-    # step 2: build regularization
+    # step 2: build regularization (dev later)
     reg: None = None
     # regularizer_config = config.Optim.pop("regularizer", DotDict({}))
     # name = regularizer_config.pop("name", None)

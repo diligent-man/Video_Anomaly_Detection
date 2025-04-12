@@ -1,4 +1,11 @@
+"""
+Author: https://github.com/RElbers/info-nce-pytorch
+Ref: https://lilianweng.github.io/posts/2021-05-31-contrastive/#infonce
+     https://leimao.github.io/article/Noise-Contrastive-Estimation/
+"""
+from torch import Tensor
 from torch.nn import Module
+
 from ..modeling.nn.functional import info_nce
 
 
@@ -7,6 +14,7 @@ __all__ = ['InfoNCE']
 
 class InfoNCE(Module):
     """
+
     Calculates the InfoNCE loss for self-supervised learning.
     This contrastive loss enforces the embeddings of similar (positive) samples to be close
         and those of different (negative) samples to be distant.
@@ -28,12 +36,7 @@ class InfoNCE(Module):
             If 'unpaired', then the set of negative keys are all unrelated to any positive key.
 
     Input shape:
-        query: (N, D) Tensor with query samples (e.g. embeddings of the input).
-        positive_key: (N, D) Tensor with positive samples (e.g. embeddings of augmented input).
-        negative_keys (optional): Tensor with negative samples (e.g. embeddings of other inputs)
-            If negative_mode = 'paired', then negative_keys is a (N, M, D) Tensor.
-            If negative_mode = 'unpaired', then negative_keys is a (M, D) Tensor.
-            If None, then the negative keys for a sample are the positive keys for the other samples.
+
 
     Returns:
          Value of the InfoNCE Loss.
@@ -44,12 +47,55 @@ class InfoNCE(Module):
                  negative_mode: str = "unpaired"
                  ) -> None:
         super(InfoNCE, self).__init__()
-        self.__temperature = temperature
-        self.__reduction = reduction
-        self.__negative_mode = negative_mode
+        self.temperature = temperature
+        self.reduction = reduction
+        self.negative_mode = negative_mode
 
-    def forward(self, query, positive_key, negative_keys=None):
-        return info_nce(query, positive_key, negative_keys,
-                        temperature=self.temperature,
-                        reduction=self.reduction,
-                        negative_mode=self.negative_mode)
+    @staticmethod
+    def _check_input_dim(query: Tensor, positive_key: Tensor, negative_keys: Tensor, negative_mode: str) -> None:
+        if query.dim() != 2:
+            raise ValueError('<query> must have 2 dimensions.')
+
+        if positive_key.dim() != 2:
+            raise ValueError('<positive_key> must have 2 dimensions.')
+
+        if negative_keys is not None:
+            if negative_mode == 'unpaired' and negative_keys.dim() != 2:
+                raise ValueError("<negative_keys> must have 2 dimensions if <negative_mode> == 'unpaired'.")
+
+            if negative_mode == 'paired' and negative_keys.dim() != 3:
+                raise ValueError("<negative_keys> must have 3 dimensions if <negative_mode> == 'paired'.")
+
+    @staticmethod
+    def _check_embed_dim(query: Tensor, positive_key: Tensor, negative_keys: Tensor) -> None:
+        if query.shape[-1] != positive_key.shape[-1]:
+            raise ValueError('Vectors of <query> and <positive_key> should have the same number of components.')
+
+        if negative_keys is not None:
+            if query.shape[-1] != negative_keys.shape[-1]:
+                raise ValueError('Vectors of <query> and <negative_keys> should have the same number of components.')
+
+    @staticmethod
+    def _check_num_samples(query: Tensor, positive_key: Tensor, negative_keys: Tensor, negative_mode: str) -> None:
+        if len(query) != len(positive_key):
+            raise ValueError('<query> and <positive_key> must must have the same number of samples.')
+
+        if negative_keys is not None:
+            if negative_mode == 'paired' and len(query) != len(negative_keys):
+                raise ValueError(
+                    "If negative_mode == 'paired', then <negative_keys> must have the same number of samples as <query>.")
+
+    def forward(self, query: Tensor, positive_key: Tensor, negative_keys: Tensor = None) -> Tensor:
+        """
+        :param query: (N, D) Tensor with query samples (e.g. embeddings of the input).
+        :param positive_key: (N, D) Tensor with positive samples (e.g. embeddings of augmented input).
+        :param negative_keys: (optional) Tensor with negative samples (e.g. embeddings of other inputs)
+            If negative_mode = 'paired', then negative_keys is a (N, M, D) Tensor.
+            If negative_mode = 'unpaired', then negative_keys is a (M, D) Tensor.
+            If None, then the negative keys for a sample are the positive keys for the other samples.
+        :return: computed loss
+        """
+        self._check_input_dim(query, positive_key, negative_keys, self.negative_mode)
+        self._check_embed_dim(query, positive_key, negative_keys)
+        self._check_num_samples(query, positive_key, negative_keys, self.negative_mode)
+        return info_nce(query, positive_key, negative_keys, self.temperature, self.reduction, self.negative_mode)
