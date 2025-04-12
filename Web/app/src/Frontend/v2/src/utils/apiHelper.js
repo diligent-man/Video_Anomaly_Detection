@@ -42,6 +42,7 @@ const apiHelper = {
     try {
       const response = await api.post(url, formData, {
         ...config,
+        timeout: 300000, // 5 phút timeout cho upload file lớn
         headers: { "Content-Type": "multipart/form-data", ...config.headers },
       });
       return response.data;

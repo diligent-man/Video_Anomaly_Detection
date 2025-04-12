@@ -1,25 +1,16 @@
-# Frontend Dockerfile for Vite
-FROM node:18-alpine as build
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies first (for better caching)
-COPY package.json package-lock.json* ./
-RUN npm ci
+# Copy package.json và package-lock.json trước để tận dụng cache
+COPY package*.json ./
+RUN npm install
 
-# Copy the rest of the application code
+# Copy các file khác
 COPY . .
 
-# Build the application
-RUN npm run build
-
-# Use nginx to serve the built application
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
+# Mở cổng 80 cho Vite dev server
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+# Chạy Vite dev server với host 0.0.0.0 để có thể truy cập từ bên ngoài container
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "80"]

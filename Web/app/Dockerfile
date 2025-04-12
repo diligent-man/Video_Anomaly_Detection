@@ -3,6 +3,15 @@ FROM python:3.11.10
 RUN adduser nonroot
 RUN apt-get update && apt-get install -y curl && apt-get clean
 
+RUN apt-get update && apt-get install -y \
+    curl \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    libgl1-mesa-glx \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir /home/app/ && chown -R nonroot:nonroot /home/app
 RUN mkdir -p /var/log/app && chown -R nonroot:nonroot /var/log/app
 

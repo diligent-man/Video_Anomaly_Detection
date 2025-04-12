@@ -72,52 +72,64 @@ async def upload_video(file: UploadFile = File(...)):
     """
     Upload video, tính toán anomaly scores và tạo plot animation
     """
-    CHUNK_SIZE = 1024*1024  # 1MB chunks
-    video_path = VIDEO_DIR / file.filename
-    scores_file = get_scores_path(file.filename)
-    plot_file = get_plot_path(file.filename)
-    
-    # Get current date and time for upload_date
-    upload_date = datetime.now().isoformat()
-    
-    result = {
-        "filename": file.filename,
-        "video_path": str(video_path),
-        "upload_date": upload_date
-    }
-    
-    # Lưu video
-    with open(video_path, "wb") as buffer:
-        while chunk := await file.read(CHUNK_SIZE):
-            buffer.write(chunk)
-    
-    # Tính toán scores nếu chưa có
-    if not scores_file.exists():
-        _, total_frames, _ = get_video_info(video_path)
-        scores_file_path = run_vad_model(video_path, total_frames)
-        result["scores_path"] = str(scores_file_path)
-        result["status"] = "processed"
+    try:
+        CHUNK_SIZE = 1024*1024  # 1MB chunks
+        video_path = VIDEO_DIR / file.filename
+        scores_file = get_scores_path(file.filename)
+        plot_file = get_plot_path(file.filename)
         
-        # Đọc scores vừa tạo để tạo plot
-        scores = np.load(scores_file).tolist()
-    else:
-        # Nếu scores đã tồn tại
-        result["scores_path"] = str(scores_file)
-        result["status"] = "existing"
-        scores = np.load(scores_file).tolist()
-    
-    # Tạo plot animation nếu chưa có hoặc cần tạo lại
-    if not plot_file.exists() or result["status"] == "processed":
-        plot_path = generate_plot(file.filename, scores)
-        if plot_path:
-            result["plot_path"] = plot_path
+        # Get current date and time for upload_date
+        upload_date = datetime.now().isoformat()
+        
+        result = {
+            "filename": file.filename,
+            "video_path": str(video_path),
+            "upload_date": upload_date
+        }
+        
+        # Lưu video
+        with open(video_path, "wb") as buffer:
+            while chunk := await file.read(CHUNK_SIZE):
+                buffer.write(chunk)
+        
+        # Tính toán scores nếu chưa có
+        if not scores_file.exists():
+            _, total_frames, _ = get_video_info(video_path)
+            scores_file_path = run_vad_model(video_path, total_frames)
+            result["scores_path"] = str(scores_file_path)
+            result["status"] = "processed"
+            
+            # Đọc scores vừa tạo để tạo plot
+            scores = np.load(scores_file).tolist()
         else:
-            result["plot_status"] = "failed"
-    else:
-        result["plot_path"] = str(plot_file)
-        result["plot_status"] = "existing"
+            # Nếu scores đã tồn tại
+            result["scores_path"] = str(scores_file)
+            result["status"] = "existing"
+            scores = np.load(scores_file).tolist()
+        
+        # Tạo plot animation nếu chưa có hoặc cần tạo lại
+        if not plot_file.exists() or result["status"] == "processed":
+            plot_path = generate_plot(file.filename, scores)
+            if plot_path:
+                result["plot_path"] = plot_path
+            else:
+                result["plot_status"] = "failed"
+        else:
+            result["plot_path"] = str(plot_file)
+            result["plot_status"] = "existing"
+        
+        # Thêm CORS header vào response
+        response = JSONResponse(content=result)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
     
-    return result
+    except Exception as e:
+        print(f"Error in upload_video: {str(e)}")
+        return JSONResponse(
+            status_code=500, 
+            content={"message": f"Error uploading video: {str(e)}"}, 
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
 
 @router.get("/get_video/{video_name}")
 async def get_video(video_name: str):

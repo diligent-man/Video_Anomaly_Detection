@@ -10,6 +10,7 @@ services:
       - "8000:8000"
     volumes:
       - ./logs:/var/log/app
+      - ./uploads:/home/app/uploads  # Thêm volume cho uploads
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

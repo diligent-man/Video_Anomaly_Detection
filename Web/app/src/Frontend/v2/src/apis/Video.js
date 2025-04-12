@@ -102,20 +102,13 @@ export async function getVideoApi(videoName) {
  */
 export async function getAllVideosApi() {
   try {
-    const response = await fetch(`${baseUrl}${apiUrls.GetAllVideos}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server responded with ${response.status}: ${errorText}`);
-    }
-    
-    const data = await response.json();
+    const response = await apiHelper.get(apiUrls.GetAllVideos);
     
     // Make sure we return an array of videos
-    if (data && data.videos && Array.isArray(data.videos)) {
-      return data.videos;
+    if (response && response.videos && Array.isArray(response.videos)) {
+      return response.videos;
     } else {
-      console.error("Unexpected API response format:", data);
+      console.error("Unexpected API response format:", response);
       return [];
     }
   } catch (error) {
