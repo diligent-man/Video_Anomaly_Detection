@@ -26,16 +26,16 @@ def main() -> None:
     #     overwrite_prev_log=True
     # )
 
-    labeled_to_test(
-        [
-            # "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/IITB/",
-            # "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/UBI-FIGHT/",
-            "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/UCF/",
-        ],
-        deepcopy(spath),
-        counter,
-        overwrite_prev_log=False
-    )
+    # labeled_to_test(
+    #     [
+    #         "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/IITB/",
+    #         "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/UBI-FIGHT/",
+    #         "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/UCF/",
+    #     ],
+    #     deepcopy(spath),
+    #     counter,
+    #     overwrite_prev_log=False
+    # )
 
     # labeled_to_train_val(
     #     [

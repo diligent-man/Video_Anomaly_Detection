@@ -149,8 +149,8 @@ def plot_dataset_statistics(dataset: VideoFolderDataset, **kwargs) -> None:
                    **kwargs
                    )
 
-########################################################################################################################
 
+########################################################################################################################
 def draw_bar_chart(x: Any, y: Any, title: str,
                    xlabel: str = None, ylabel: str = None,
                    xticks: dict = None, yticks: dict = None,
@@ -195,7 +195,6 @@ def draw_bar_chart(x: Any, y: Any, title: str,
     else:
         colors = ["#c2c2c2"] * len(y)  # Xám thay vì đen (#808080 là màu xám trung bình)
 
-
     ax = sns.barplot(x=x, y=y, palette=colors, legend=False, width=width)
 
     if force_y_int:
@@ -218,7 +217,6 @@ def draw_bar_chart(x: Any, y: Any, title: str,
             label.set_color("green")
         elif label.get_text() == "900+":
             label.set_color("red")
-
 
     plt.yticks([])  # Remove Y-axis labels as required
 

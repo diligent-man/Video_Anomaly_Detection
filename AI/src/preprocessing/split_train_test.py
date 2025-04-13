@@ -370,10 +370,6 @@ def _rename_label(label_fpath: str, old_fname: str, new_fname: str, ext: str) ->
     label_fname: str = _get_fname(label_fpath)
 
     if label_fname == old_fname:
-        print("label fpath", label_fpath)
-        print("old fname", old_fname)
-        print("new fname", new_fname)
-        print()
         label_fpath: str = os.path.join(Path(label_fpath).parent, new_fname)
     return label_fpath
 
@@ -465,9 +461,6 @@ def _move_obj(obj_lst: List[str],
                 obj,
                 os.path.join(save_path, save_name)
             )
-
-        print(save_path)
-        print(save_name)
 
         if label is not None:
             if ds_phase == "test":
