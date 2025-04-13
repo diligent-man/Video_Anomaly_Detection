@@ -14,7 +14,7 @@
         "eval_steps": 7,
 
         "resume": false,
-        "resume_ckpt": "",
+        "resume_ckpt": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/input_2d/ckpt/best_epoch13_step2937.pt",
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
@@ -34,7 +34,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/unlabeled",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/train",
                 "loader": "v4",
                 "transform": {
                     "ToDtype": {"dtype": "float32", "scale": true},
@@ -66,7 +66,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/unlabeled",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/val",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -90,6 +90,36 @@
                 "multiprocessing_context": "fork"
             },
             "forward_strategy": "v1"
+        },
+        "test":
+        {
+            "dataset":
+            {
+                "name": "VADFrameLevelDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/test",
+                "annotation": "label.csv",
+                "loader": "v4",
+                "transform": {
+                    "ToDtype":
+                    {
+                        "dtype": "float32",
+                        "scale": true
+                    }
+                },
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "DefaultDataLoader",
+                "batch_size": 1,
+                "shuffle": false,
+                "num_workers": 8,
+                "prefetch_factor": 1,
+                "persistent_workers": false,
+                "multiprocessing_context": "fork"
+            },
+            "forward_strategy": "v3",
         }
     },
 
@@ -98,9 +128,8 @@
         "algorithm": "single",
         "backbone":
         {
-            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
-//            "name": ["clip_vit/b16"],
-//            "name": ["rgb_i3d"],
+//            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+            "name": ["clip_vit/b16"],
 
             "rgb_i3d_reduce": {"name":  "max_l2"},
             "s3d_reduce": {"name":  "mean"},
@@ -123,9 +152,10 @@
         "neck":
         {
             "name":"TAN",
-            "num_backbones": 3,
+            "num_backbones": 1,
             "num_heads": 8,
-            "relative_attention": true
+            "relative_attention": true,
+            "max_relative_position": 25
         },
 
         "head":
@@ -155,12 +185,12 @@
     {
         "in_train": false,
         "in_val": false,
-        "in_test": false,
+        "in_test": true,
         "metrics": [
-            {"name": "BinaryAUPRC"},
-            {"name": "BinaryPrecision"},
-            {"name": "BinaryRecall"},
-            {"name": "BinaryConfusionMatrix", "normalize": null}
+            {"name": "BinaryAUPRC"}
+//            {"name": "BinaryPrecision"},
+//            {"name": "BinaryRecall"},
+//            {"name": "BinaryConfusionMatrix", "normalize": null}
         ]
     },
 

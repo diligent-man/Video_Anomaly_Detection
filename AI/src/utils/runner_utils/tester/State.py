@@ -20,18 +20,6 @@ class State:
     """
     phase: str = None
 
-    step: int = 0
-    epoch: int = 1
-
-    steps: int = None   # derived from on_init_end of DefaultFlow callback
-    epochs: int = None  # derived from on_init_end of DefaultFlow callback
-
-    # logging_steps: int = None  # currently default at the end of train/ val
-    eval_strategy: str = None  # derived from eval_strategy and in on_init_end of DefaultFlow callback
-    eval_steps: str | int = None   # derived from eval_strategy and in on_init_end of DefaultFlow callback
-
-    monitor: Tuple[str, float] = None  # derived when checkpointing or from  on_init_end of DefaultFlow callback
-
     batch_output: BatchOutput = None
     stateful_callbacks: List[ExportableState] | Dict[str, Any] = None
 

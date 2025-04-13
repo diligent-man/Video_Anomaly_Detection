@@ -66,7 +66,9 @@ class BatchForwarder(object):
         fn_paras: List[Parameter] = list(inspect.signature(forward_fn).parameters.values())
         for i in range(len(fn_paras)):
             para: Parameter = fn_paras[i]
-            if para.default is not None:
+            default_val: Any = para.default
+
+            if default_val == Parameter.empty:
                 assert para.name in args.keys(), ValueError(f"{para.name} is not provided")
 
             if para.name in args.keys():

@@ -1,8 +1,9 @@
-from typing import Dict, Any, Callable, Union
+from typing import Dict, Any, Callable
 
 
 import torch
 
+from tqdm import tqdm
 from torch import GradScaler, Tensor
 from torch.utils.data import DataLoader
 from torch.optim.optimizer import Optimizer
@@ -13,16 +14,17 @@ from torch.autograd.grad_mode import set_grad_enabled, inference_mode
 import AI.src.utils.BatchForwarder as BatchForwarder  # Circular dependency
 
 from .DotDict import DotDict
-from ..runner import Trainer
 from ..losses import LossWrapper
+from ..metrics import MetricWrapper
 from ..data.model import BatchOutput
+from ..runner import Trainer, Tester
 from ..utils.runner_utils.trainer import find_initial_total
 
 
 __all__ = ["FORWARD_STRATEGIES"]
 
 
-def v1(instance: Union[Trainer],
+def v1(instance: Trainer,
        grad_ctx: set_grad_enabled | inference_mode,
        dataloader: DataLoader,
        amp_cfg: Dict[str, Any],
@@ -94,7 +96,7 @@ def v1(instance: Union[Trainer],
     instance.callback(f"on_{phase}_epoch_end")
 
 
-def v2(instance: Union[Trainer],
+def v2(instance: Trainer,
        grad_ctx: set_grad_enabled | inference_mode,
        dataloader: DataLoader,
        amp_cfg: Dict[str, Any],
@@ -165,63 +167,67 @@ def v2(instance: Union[Trainer],
     instance.callback(f"on_{phase}_epoch_end")
 
 
-def v3(T_max: int = 50,
-       frame_overlap_ratio: float = 0.5
+def v3(instance: Tester,
+       grad_ctx: set_grad_enabled | inference_mode,
+       dataloader: DataLoader,
+       amp_cfg: Dict[str, Any],
+       metric: MetricWrapper,
+       grad_scaler: GradScaler = None,
+       T_max: int = 50,
+       overlap_ratio: float = 0.5,
        ) -> None:
-    # elif phase in ("val", "test"):
-    #     cur_step: int = 0 + cur_epoch * len(dataloader)
-    #
-    #     for i, (inps, labels) in tqdm(enumerate(dataloader), initial=cur_step, total=len(dataloader) * epochs, desc=f"Forward v2, Phase: {phase}, Epoch: {cur_epoch + 1}"):
-    #         inps: Tensor = inps.squeeze()  # (B,C,T,H,W) -> (C,T,H,W)
-    #         labels: Tensor = labels.squeeze()  # (T,)
-    #
-    #         total_frames: int = inps.shape[1]
-    #         preds: Tensor = torch.zeros_like(labels, dtype=torch.float16)
-    #
-    #         with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
-    #             for j in range(total_frames):
-    #                 if j < T_max:
-    #                     pad = (0, 0, 0, 0, T_max-j, 0)
-    #                     model_inps = inps[:, :j, ...]
-    #                     model_inps = torch.nn.ZeroPad3d(pad)(model_inps)
-    #                 else:
-    #                     model_inps = inps[:, j-T_max:j, ...]
-    #
-    #                 model_inps = model_inps.unsqueeze(0)
-    #                 pred: Tensor = model(model_inps.to(device)).preds
-    #                 preds[j] = pred
-    #
-    #         metrics.update(preds, labels)
-    #
-    #         # Per step logging
-    #         batch_output: Dict[str, Any] = {
-    #             "phase": phase,
-    #             "cur_step": cur_step,
-    #             "loss": batch_loss.item(),
-    #         }
-    #
-    #         lr: float = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
-    #         batch_output["lr"] = lr
-    #
-    #         # Update step
-    #         cur_step += 1
-    #
-    #         if i == 0:
-    #             break
-    #
-    #         instance.batch_output = BatchOutput(**batch_output)
-    #         instance.run_callbacks("on_train_batch_end")
-    #
-    #         if i == 0:
-    #             break
-    #
-    #     metrics.compute()
-    #     a=metrics.get_result()
+    phase: str = instance.state.phase
+    for i, (inp, labels) in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Forward v3, Phase: {phase}"):
+        inp: Tensor = inp.squeeze()  # (B,C,T,H,W) -> (C,T,H,W)
+        labels: Tensor = labels.squeeze()  # (T,)
+        print(inp.shape, labels.shape)
+        # total_frames: int = inps.shape[1]
+        # preds: Tensor = torch.zeros_like(labels, dtype=torch.float16)
+       #
+       #      with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
+       #          for j in range(total_frames):
+       #              if j < T_max:
+       #                  pad = (0, 0, 0, 0, T_max-j, 0)
+       #                  model_inps = inps[:, :j, ...]
+       #                  model_inps = torch.nn.ZeroPad3d(pad)(model_inps)
+       #              else:
+       #                  model_inps = inps[:, j-T_max:j, ...]
+       #
+       #              model_inps = model_inps.unsqueeze(0)
+       #              pred: Tensor = model(model_inps.to(device)).preds
+       #              preds[j] = pred
+       #
+       #      metrics.update(preds, labels)
+       #
+       #      # Per step logging
+       #      batch_output: Dict[str, Any] = {
+       #          "phase": phase,
+       #          "cur_step": cur_step,
+       #          "loss": batch_loss.item(),
+       #      }
+       #
+       #      lr: float = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
+       #      batch_output["lr"] = lr
+       #
+       #      # Update step
+       #      cur_step += 1
+       #
+       #      if i == 0:
+       #          break
+       #
+       #      instance.batch_output = BatchOutput(**batch_output)
+       #      instance.run_callbacks("on_train_batch_end")
+       #
+       #      if i == 0:
+       #          break
+       #
+       #  metrics.compute()
+       #  a=metrics.get_result()
     # return None
-    raise NotImplementedError
 
 
 FORWARD_STRATEGIES: Dict[str, Callable] = {
     "v1": v1,
     "v2": v2,
+    "v3": v3
 }

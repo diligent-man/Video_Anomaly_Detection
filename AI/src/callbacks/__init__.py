@@ -12,7 +12,6 @@ __all__ = [
     "CallbackWrapper"
 ]
 
-
 # SUPPORTED_CALLBACKS: Tuple[str, ...] = (
 #     "checkpoint",
 #     "mlflow"
