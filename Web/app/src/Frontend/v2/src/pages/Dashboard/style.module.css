@@ -1,0 +1,31 @@
+/* style.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  /* theme.spacing.md thường là 1rem hoặc 16px */
+  gap: 1rem;
+}
+
+.errorPaper {
+  /* theme.colors.red[0] thường là màu nền rất nhạt */
+  background-color: #fff5f5;
+   /* theme.colors.red[3] thường là màu viền nhạt hơn */
+  border-color: #ffa8a8;
+  /* Lưu ý: Paper component của Mantine có thể tự thêm border-style và border-width
+     khi có prop 'withBorder'. Chỉ đặt border-color ở đây có thể là đủ.
+     Nếu không, bạn cần thêm: border: 1px solid #ffa8a8; */
+}
+
+/* .videoGridArea không được sử dụng trực tiếp trong JSX của bạn,
+   nhưng vẫn chuyển đổi nó nếu bạn cần sau này */
+.videoGridArea {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.centerMessage {
+  /* theme.spacing.xl thường là 2rem hoặc 32px */
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}

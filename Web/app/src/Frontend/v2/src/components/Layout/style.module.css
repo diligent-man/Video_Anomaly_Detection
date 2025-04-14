@@ -1,0 +1,34 @@
+.contentContainer {
+  
+  width: 100%;
+  padding-top: 25px;
+}
+
+.header {
+  padding-top: 10px;
+  border-bottom: none !important; /* Xóa viền dưới cùng nếu có */
+  box-shadow: none !important; /* Xóa mọi shadow */
+  background-color: transparent; /* Đảm bảo không có màu nền tạo viền ảo */
+}
+
+
+.logoContainer {
+  padding: 5px; 
+  text-align: center; 
+}
+
+
+.navbarToggle {
+  position: absolute;
+  top: 100px;
+  z-index: 10;
+}
+
+.navbarToggleOpen {
+  right: -15px;
+}
+
+.navbarToggleCollapsed {
+  right: -20px;
+}
+
