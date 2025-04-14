@@ -1,4 +1,4 @@
-from typing import Dict, Any, Callable
+from typing import Dict, Any, Callable, List
 
 
 import torch
@@ -18,6 +18,7 @@ from ..losses import LossWrapper
 from ..metrics import MetricWrapper
 from ..data.model import BatchOutput
 from ..runner import Trainer, Tester
+
 from ..utils.runner_utils.trainer import find_initial_total
 
 
@@ -173,57 +174,63 @@ def v3(instance: Tester,
        amp_cfg: Dict[str, Any],
        metric: MetricWrapper,
        grad_scaler: GradScaler = None,
-       T_max: int = 50,
+       T_max: int = 30,
        overlap_ratio: float = 0.5,
        ) -> None:
+    device: str = instance.config.Global.get("device", "cpu")
+
     phase: str = instance.state.phase
-    for i, (inp, labels) in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Forward v3, Phase: {phase}"):
-        inp: Tensor = inp.squeeze()  # (B,C,T,H,W) -> (C,T,H,W)
-        labels: Tensor = labels.squeeze()  # (T,)
-        print(inp.shape, labels.shape)
-        # total_frames: int = inps.shape[1]
-        # preds: Tensor = torch.zeros_like(labels, dtype=torch.float16)
-       #
-       #      with grad_ctx_manager, torch.amp.autocast(**amp_cfg):
-       #          for j in range(total_frames):
-       #              if j < T_max:
-       #                  pad = (0, 0, 0, 0, T_max-j, 0)
-       #                  model_inps = inps[:, :j, ...]
-       #                  model_inps = torch.nn.ZeroPad3d(pad)(model_inps)
-       #              else:
-       #                  model_inps = inps[:, j-T_max:j, ...]
-       #
-       #              model_inps = model_inps.unsqueeze(0)
-       #              pred: Tensor = model(model_inps.to(device)).preds
-       #              preds[j] = pred
-       #
-       #      metrics.update(preds, labels)
-       #
-       #      # Per step logging
-       #      batch_output: Dict[str, Any] = {
-       #          "phase": phase,
-       #          "cur_step": cur_step,
-       #          "loss": batch_loss.item(),
-       #      }
-       #
-       #      lr: float = optim.param_groups[-1]["lr"] if instance.scheduler is None else scheduler.get_last_lr()[-1]
-       #      batch_output["lr"] = lr
-       #
-       #      # Update step
-       #      cur_step += 1
-       #
-       #      if i == 0:
-       #          break
-       #
-       #      instance.batch_output = BatchOutput(**batch_output)
-       #      instance.run_callbacks("on_train_batch_end")
-       #
-       #      if i == 0:
-       #          break
-       #
-       #  metrics.compute()
-       #  a=metrics.get_result()
-    # return None
+    total_labels: None | Tensor = None
+    total_preds: None | Tensor = None
+    for i, (inp, label) in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Forward v3, Phase: {phase}"):
+        inp: Tensor = inp.squeeze()  # (B,T,C,H,W) -> (T,C,H,W)
+        inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)
+
+        label: Tensor = label.squeeze()  # (T,)
+
+        total_frames: int = label.shape[0]
+        total_labels = label if total_labels is None else torch.cat((total_labels, label), 0)
+
+        cum_frames: int = 0
+        step_preds: None | Tensor = None
+        preds: Tensor = torch.zeros_like(label, dtype=amp_cfg["dtype"])
+        with grad_ctx, torch.amp.autocast(**amp_cfg):
+            for j in range(total_frames):
+                if j < T_max or cum_frames < T_max:
+                    cum_frames += 1
+                else:
+                    # step when accumulate sufficient frames
+                    step_preds: Tensor = instance.model(inp[:, :, :, j-cum_frames:j, ...].to(device)).preds  # (B, S)
+                    cum_frames = int(T_max * overlap_ratio) + 1
+
+                # Last step
+                if j == total_frames-1:
+                    step_preds: Tensor = instance.model(inp[:, :, :, j-cum_frames:j, ...].to(device)).preds  # (B, S)
+
+                if step_preds is not None:
+                    step_preds = step_preds.squeeze(0).to("cpu")
+                    # First half
+                    if preds[j-T_max: j-(T_max//2)].equal(torch.zeros_like(preds[j-T_max: j-(T_max//2)], dtype=preds.dtype)):
+                        preds[j - T_max: j - (T_max // 2)] += step_preds
+                    else:
+                        preds[j - T_max: j - (T_max // 2)] = (preds[j - T_max: j - (T_max // 2)] + step_preds) / 2
+
+                    # Second half
+                    if j == total_frames - 1:
+                        preds[j - (T_max // 2): ] += step_preds
+                    else:
+                        preds[j - (T_max // 2): j] += step_preds
+
+                    # Reset
+                    step_preds = None
+            total_preds = preds if total_preds is None else torch.cat((total_preds, preds), 0)
+
+        if i == 5:
+            break
+    metric.update(total_preds, total_labels)
+    metric.compute()
+    result = metric.get_result()
+    return None
 
 
 FORWARD_STRATEGIES: Dict[str, Callable] = {
