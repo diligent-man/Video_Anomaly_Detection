@@ -1,11 +1,17 @@
 import warnings
+
 from functools import partial
 from typing import List, Union, Any, Dict
 
 
-import AI.src.runner.Trainer as Trainer  # due to cyclic dependency
+import AI.src.runner.Tester as Tester
+import AI.src.runner.Trainer as Trainer
+
+
 from ..utils import DotDict, is_mlflow_available
 from ..utils.runner_utils.trainer import TrainerControl
+
+from .tester_cb import TesterCallback, DEFAULT_TESTER_CALLBACKS
 from .trainer_cb import TrainerCallback, DEFAULT_TRAINER_CALLBACKS
 
 
@@ -14,16 +20,19 @@ __all__ = ["CallbackWrapper"]
 
 class CallbackWrapper(object):
     """Internal class that just calls the list of callbacks in order."""
-    def __init__(self, instance: Union[Trainer], integrated_callbacks: List[str]) -> None:
-        self.__instance: Union[Trainer] = instance
-        self.__callback_lst: List[Union[TrainerCallback]] = self._init_cb(integrated_callbacks)
+    def __init__(self,
+                 instance: Union[Trainer, Tester],
+                 integrated_callbacks: List[str]
+                 ) -> None:
+        self.__instance: Union[Trainer, Tester] = instance
+        self.__callback_lst: List[Union[TrainerCallback, TesterCallback]] = self._init_cb(integrated_callbacks)
 
     @property
-    def callback_lst(self) -> List[Union[TrainerCallback]]:
+    def callback_lst(self) -> List[Union[TrainerCallback, TesterCallback]]:
         return self.__callback_lst
 
-    def _init_cb(self, integrated_callbacks: List[str]) -> List[Union[TrainerCallback]]:
-        callbacks_to_add: List[Union[type(TrainerCallback)]] = []
+    def _init_cb(self, integrated_callbacks: List[str]) -> List[Union[TrainerCallback, TesterCallback]]:
+        callbacks_to_add: List[Union[type(TrainerCallback), type(TesterCallback)]] = []
 
         # Trainer callbacks
         if isinstance(self.__instance, Trainer.Trainer):
@@ -37,7 +46,8 @@ class CallbackWrapper(object):
                         from .intergrated_cb import Mlflow
                         callbacks_to_add.append(Mlflow)
         # Test callbacks
-
+        elif isinstance(self.__instance, Tester.Tester):
+            callbacks_to_add: List = [*DEFAULT_TESTER_CALLBACKS]
         # Inferer callbacks
 
         return_callbacks: List[Union[TrainerCallback]] = []
@@ -97,8 +107,8 @@ class CallbackWrapper(object):
     #     else:
     #         self.callbacks.remove(callback)
 
-    def insert_callback(self, callback: Union[TrainerCallback], idx: int) -> None:
-        self.__callback_lst.insert(idx, callback)
+    # def insert_callback(self, callback: Union[TrainerCallback], idx: int) -> None:
+    #     self.__callback_lst.insert(idx, callback)
 
     def __call__(self,
                  event: str,

@@ -1,0 +1,10 @@
+# Các thư mục và file không cần copy vào container
+logs/
+.git/
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+.env
+.venv/
+venv/

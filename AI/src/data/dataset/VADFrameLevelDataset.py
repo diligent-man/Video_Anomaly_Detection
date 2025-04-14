@@ -9,8 +9,6 @@ import torch
 import numpy as np
 import pandas as pd
 
-# from torch.utils.data import Dataset
-
 from ...utils import video_loader
 from torchvision.datasets import VisionDataset
 
@@ -50,7 +48,7 @@ class VADFrameLevelDataset(VisionDataset):
         self.__annotation: pd.DataFrame = pd.read_csv(
             os.path.join(root, annotation),
             header=None,
-            names=["path","start1","end1","start2","end2"]
+            names=["path", "start1", "end1", "start2", "end2"]
         )
         self.__return_device: str = return_device
 

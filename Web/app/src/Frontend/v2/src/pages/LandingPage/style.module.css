@@ -1,0 +1,94 @@
+.landingPageWrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  .heroContainer {
+    padding: 40px 20px;
+    width: 100%;
+  }
+  
+  .heroTitle {
+    letter-spacing: -1px;
+    font-weight: 800;
+  }
+  
+  .ctaButton {
+    transition: transform 0.2s ease;
+  }
+  
+  .ctaButton:hover {
+    transform: translateY(-3px);
+  }
+  
+  .imageWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .heroImage {
+    position: relative;
+    z-index: 2;
+    border-radius: 10px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+  }
+  
+  .heroImage:hover {
+    transform: translateY(-10px);
+  }
+  
+  .gradient {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #4dabf7, #228be6);
+    filter: blur(45px);
+    opacity: 0.5;
+    z-index: 1;
+    animation: pulse 6s infinite alternate;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.05);
+      opacity: 0.7;
+    }
+  }
+  
+  .featuresSection {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 40px;
+  }
+  
+  .featureItem {
+    flex: 1;
+    padding: 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .featureItem:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+    transform: translateY(-5px);
+  }
+  
+  /* Dark mode compatibility */
+  :global(.dark) .featuresSection {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  :global(.dark) .featureItem:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }

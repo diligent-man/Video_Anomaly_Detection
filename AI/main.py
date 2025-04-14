@@ -86,13 +86,5 @@ def main() -> None:
         s3d_pred = gaussian_filter1d(np.random.rand(T), sigma=8)
         i3d_pred = gaussian_filter1d(np.random.rand(T), sigma=6)
 
-        draw_anomaly_graph(
-            preds=[clip_pred, s3d_pred, i3d_pred],
-            labels=labels,
-            legends=["clip", "s3d", "i3d"],
-            name=name
-        )
-
-
 if __name__ == '__main__':
     main()

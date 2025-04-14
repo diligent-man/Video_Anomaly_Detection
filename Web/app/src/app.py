@@ -1,27 +1,36 @@
 """
 Main web app module
 """
-import gradio as gr
-
+# import gradio as gr
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 from .api import (
     index,
-    demo_1,
-    demo_2
+    video,
 )
 
-from .gradio import (
-    page_1, page_2
-)
-
+# from .Frontend.legacy import (
+#     page_1, page_2 
+# )
 
 app = FastAPI()
 
-app = gr.mount_gradio_app(app=app, blocks=page_1, path="/gradio_p1")
-app = gr.mount_gradio_app(app=app, blocks=page_2, path="/gradio_p2")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app.include_router(router=index.router, prefix="")
-app.include_router(router=demo_1.router, prefix="/demo_api_1")
-app.include_router(router=demo_2.router, prefix="/demo_api_2")
+# Thêm endpoint health check
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
+# app = gr.mount_gradio_app(app=app, blocks=page_1, path="/gradio_p1")
+# app = gr.mount_gradio_app(app=app, blocks=page_2, path="/gradio_p2")
+
+app.include_router(router=index.router)
+app.include_router(router=video.router)

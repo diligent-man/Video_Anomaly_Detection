@@ -11,7 +11,8 @@ __all__ = ["load_weights", "freeze_layer"]
 
 def load_weights(weights: str | WeightsEnum,
                  src: str = "pytorch",
-                 return_path: bool = False
+                 return_path: bool = False,
+                 weights_only: bool = True,
                  ) -> str | Mapping[str, Any]:
     if isinstance(weights, WeightsEnum):
         # Consider path from this file
@@ -21,14 +22,14 @@ def load_weights(weights: str | WeightsEnum,
             weights: str = rel_path
         else:
             if os.path.exists(rel_path):
-                weights: Mapping[str, Any] = torch.load(rel_path, weights_only=True)
+                weights: Mapping[str, Any] = torch.load(rel_path, weights_only=weights_only)
             else:
                 weights: Mapping[str, Any] = weights.get_state_dict(progress=True)
     elif isinstance(weights, str):
         if src == "hugging_face" or return_path:
             weights: str = weights
         else:
-            weights: Mapping[str, Any] = torch.load(weights, weights_only=True)
+            weights: Mapping[str, Any] = torch.load(weights, weights_only=weights_only)
     return weights
 
 

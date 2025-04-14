@@ -8,7 +8,6 @@ import warnings
 from typing import Dict
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "../../"))
 
-
 import torch
 
 from AI.src.modeling import build_model

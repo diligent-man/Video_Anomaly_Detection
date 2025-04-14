@@ -6,14 +6,13 @@ from torch.optim.optimizer import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 
 
-from ..callbacks import CallbackWrapper
-
 from ..losses import LossWrapper
 from ..metrics import MetricWrapper
+from ..callbacks import CallbackWrapper
+from ..utils import DotDict, get_services, ExportableState
 
 from ..utils.BatchForwarder import BatchForwarder
 from ..utils.runner_utils.trainer import TrainerControl, TrainerState
-from ..utils import DotDict, get_services, ExportableState
 
 
 __all__ = ["Trainer"]
