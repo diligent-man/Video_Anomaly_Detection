@@ -1,4 +1,4 @@
-from typing import Dict, Any, Callable, List
+from typing import Dict, Any, Callable
 
 
 import torch
@@ -173,7 +173,6 @@ def v3(instance: Tester,
        dataloader: DataLoader,
        amp_cfg: Dict[str, Any],
        metric: MetricWrapper,
-       grad_scaler: GradScaler = None,
        T_max: int = 30,
        overlap_ratio: float = 0.5,
        ) -> None:
@@ -217,7 +216,7 @@ def v3(instance: Tester,
 
                     # Second half
                     if j == total_frames - 1:
-                        preds[j - (T_max // 2): ] += step_preds
+                        preds[j - (T_max // 2):] += step_preds
                     else:
                         preds[j - (T_max // 2): j] += step_preds
 
@@ -226,8 +225,6 @@ def v3(instance: Tester,
             total_preds = preds if total_preds is None else torch.cat((total_preds, preds), 0)
         instance.state.preds = preds
         instance.callback(f"on_step_end")
-        if i == 1:
-            break
     metric.update(total_preds, total_labels)
     metric.compute()
     instance.state.metric_result = metric.get_result(return_dict=True)

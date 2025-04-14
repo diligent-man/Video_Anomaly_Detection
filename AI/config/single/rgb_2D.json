@@ -13,7 +13,7 @@
         "eval_strategy": "epoch",
 
         "resume": true,
-        "resume_ckpt": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/input_2d/ckpt/best_epoch7_step1581.pt",
+        "resume_ckpt": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/input_2d/Mlflow/528579867362157536/22d98f9da1ec478c8ebff673474dc70c/artifacts/ckpt/best_epoch13_step2937.pt",
 
         "use_amp": true,
         "seed": 12345,
@@ -55,7 +55,7 @@
             },
             "forward_strategy": "v1"
         },
-        /////////////////////////////////////////////////////////
+
         "val":
         {
             "dataset":
@@ -85,6 +85,37 @@
                 "multiprocessing_context": "fork"
             },
             "forward_strategy": "v1"
+        },
+
+        "test":
+        {
+            "dataset":
+            {
+                "name": "VADFrameLevelDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/test",
+                "annotation": "label.csv",
+                "loader": "v4",
+                "transform": {
+                    "ToDtype":
+                    {
+                        "dtype": "float32",
+                        "scale": true
+                    }
+                },
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "DefaultDataLoader",
+                "batch_size": 1,
+                "shuffle": false,
+                "num_workers": 1,
+                "prefetch_factor": 1,
+                "persistent_workers": false,
+                "multiprocessing_context": "fork"
+            },
+            "forward_strategy": "v3"
         }
     },
 
@@ -146,12 +177,11 @@
     {
         "in_train": false,
         "in_val": false,
-        "in_test": false,
+        "in_test": true,
         "metrics": [
             {"name": "BinaryAUPRC"},
-            {"name": "BinaryPrecision"},
-            {"name": "BinaryRecall"},
-            {"name": "BinaryConfusionMatrix", "normalize": null}
+            {"name": "BinaryAUROC"},
+            {"name": "BinaryPrecisionRecallCurve"}
         ]
     },
 
