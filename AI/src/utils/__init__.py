@@ -1,3 +1,4 @@
+from .Logger import Logger
 from .DotDict import DotDict
 from .ANSIColor import ANSIColor
 from .ConfigReader import ConfigReader
@@ -42,6 +43,7 @@ from .misc import (
 )
 
 __all__ = [
+    "Logger",
     "DotDict",
     "ANSIColor",
     "ConfigReader",

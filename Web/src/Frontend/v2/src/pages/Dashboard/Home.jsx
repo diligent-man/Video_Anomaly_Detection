@@ -9,13 +9,13 @@ import {
   IconCircleCheck,
 } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
-import HeadingLayout from "../../components/Layout/HeadingLayout";
-import VideoUpload from "../../components/VideoUpload/VideoUpload";
-import AnomalyPlot from "../../components/AnomalyPlot/AnomalyPlot";
-import { uploadVideoApi, getPlotUrl } from "../../apis/Video";
-import { baseUrl } from "../../utils/constants";
-import { NavbarContext } from "../../context/NavbarContext";
-import { storeVideo, getVideo, clearVideo } from "../../utils/indexedDBStorage";
+import HeadingLayout from "../../components/Layout/HeadingLayout.jsx";
+import VideoUpload from "../../components/VideoUpload/VideoUpload.jsx";
+import AnomalyPlot from "../../components/AnomalyPlot/AnomalyPlot.jsx";
+import { uploadVideoApi, getPlotUrl } from "../../apis/Video.js";
+import { baseUrl } from "../../utils/constants.js";
+import { NavbarContext } from "../../context/NavbarContext.jsx";
+import { storeVideo, getVideo, clearVideo } from "../../utils/indexedDBStorage.js";
 import { synchronizeVideos } from "../../utils/SynchronizeVideo";
 
 export default function HomePage() {

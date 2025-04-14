@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 
-from ....data.model import BatchOutput
+from torch import Tensor
+
 from ..ExportableState import ExportableState
 
 
@@ -19,8 +20,8 @@ class State:
     step requires going through *n* batches.
     """
     phase: str = None
-
-    batch_output: BatchOutput = None
+    preds: Tensor = None
+    metric_result: float | List[float] = None
     stateful_callbacks: List[ExportableState] | Dict[str, Any] = None
 
     def __post_init__(self) -> None:

@@ -2,13 +2,17 @@
 Main web app module
 """
 # import gradio as gr
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
-from .api import (
-    index,
-    video,
-)
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "Web", "src"))
+
+from src.api import index, video
+
 
 # from .Frontend.legacy import (
 #     page_1, page_2 

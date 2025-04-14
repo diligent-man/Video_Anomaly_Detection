@@ -8,12 +8,12 @@ from pathlib import Path
 from PIL import Image
 import sys
 from tqdm import tqdm
-# Add path to inference modules
-sys.path.append(str(Path(__file__).resolve().parent.parent / "inference"))
 
-from inference.model import generate_model
-from inference.opts import parse_opts
-from inference.learner import Learner
+
+from .model import generate_model
+from .opts import parse_opts
+from .learner import Learner
+
 
 class ToTensor(object):
     """Convert a PIL.Image or numpy.ndarray to tensor."""
@@ -68,7 +68,9 @@ def extract_frames_ffmpeg(video_path, output_dir):
     frames = sorted(Path(output_dir).glob('frame_*.jpg'))
     return frames
 
-def run_vad_model(video_path, total_frames, scores_dir):
+
+def run_vad_model(video_path: str, total_frames, scores_dir):
+    print(video_path)
     """Run Video Anomaly Detection model on video and save anomaly scores"""
     
     # Check if CUDA is available

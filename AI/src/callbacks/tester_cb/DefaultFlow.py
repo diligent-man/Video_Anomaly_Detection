@@ -34,13 +34,22 @@ class DefaultFlow(BaseCallback):
     def on_begin(self, instance: Tester) -> None:
         instance.state.phase = "test"
 
+        if os.path.exists(os.path.join(instance.config.Global.log_path, "pred_result.txt")):
+            os.remove(os.path.join(instance.config.Global.log_path, "pred_result.txt"))
+
     def on_step_begin(self, instance: Tester) -> None:
-        """Currently, use for both train/ val """
         pass
 
     def on_step_end(self, instance: Tester) -> None:
-        """Currently, use for both train/ val """
-        pass
+        instance.logger.write(
+            os.path.join(instance.config.Global.log_path, "pred_result.txt"),
+            f"{instance.state.preds.tolist()}\n",
+            "a"
+        )
 
     def on_end(self, instance: Tester) -> None:
-        pass
+        instance.logger.write(
+            os.path.join(instance.config.Global.log_path, "test_result_log.txt"),
+            instance.state.metric_result,
+            "a"
+        )

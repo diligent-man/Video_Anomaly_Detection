@@ -1,14 +1,11 @@
-import resnext
-import torch
-import torch.nn as nn
+from .resnext import resnet101
 
 
 def generate_model(opt):
     assert opt.model in ['resnext']
     assert opt.model_depth in [101]
 
-    from resnext import get_fine_tuning_parameters
-    model = resnext.resnet101(
+    model = resnet101(
         num_classes=opt.n_classes,
         shortcut_type=opt.resnet_shortcut,
         cardinality=opt.resnext_cardinality,

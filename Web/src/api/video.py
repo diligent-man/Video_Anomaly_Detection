@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Response, UploadFile, File
+from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 from urllib.parse import unquote
+
 import os
 import numpy as np
 from datetime import datetime
+
 from ..utils.video_utils import get_video_info, plot_vad_animation
-from inference.score_saver import run_vad_model as model_run_vad
+from ..inference.score_saver import run_vad_model as model_run_vad
+
 
 router = APIRouter(prefix="/apis/video", tags=["Video"])
 
@@ -21,17 +24,21 @@ os.makedirs(VIDEO_DIR, exist_ok=True)
 os.makedirs(SCORES_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
+
 def run_vad_model(video_path, total_frames):
     """ Run the actual VAD model and save anomaly scores """
     return model_run_vad(video_path, total_frames, SCORES_DIR)
+
 
 def get_scores_path(video_name):
     """Generate the expected scores file path for a video"""
     return SCORES_DIR / f"{Path(video_name).stem}_scores.npy"
 
+
 def get_plot_path(video_name):
     """Generate the expected plot animation file path for a video"""
     return PLOTS_DIR / f"{Path(video_name).stem}_plot.mp4"
+
 
 def generate_plot(video_name, scores=None):
     """Generate plot animation for a video based on its anomaly scores"""

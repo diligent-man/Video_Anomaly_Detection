@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { getAllVideosApi } from "../apis/Video";
+import { getAllVideosApi } from "../apis/Video.js";
 
 export const useFetchVideos = () => {
   const [videos, setVideos] = useState([]);

@@ -119,9 +119,13 @@ class MetricWrapper(object):
     def compute(self) -> None:
         self.__metrics = [metric.compute() for metric in self.__metrics]
 
-    def get_result(self) -> float | List[float]:
+    def get_result(self, return_dict: bool = False) -> Union[Dict[str, Union[float, List[float]]], float, List[float]]:
         # review type later
-        return [_get_metric_result(metric) for metric in self.__metrics]
+        if return_dict:
+            result = {name: _get_metric_result(metric) for metric, name in zip(self.__metrics, self.__names)}
+        else:
+            result = [_get_metric_result(metric) for metric in self.__metrics]
+        return result
 
     @staticmethod
     def _build_metric(config: DotDict) -> Tuple[List[Metric], List[str], bool]:

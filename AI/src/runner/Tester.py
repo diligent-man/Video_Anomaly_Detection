@@ -4,17 +4,19 @@ from torch.utils.data import DataLoader
 
 from ..metrics import MetricWrapper
 from ..callbacks import CallbackWrapper
-from ..utils import DotDict, get_services
+from ..utils import DotDict, get_services, Logger
 
 from ..utils.runner_utils import ExportableState
 from ..utils.BatchForwarder import BatchForwarder
 from ..utils.runner_utils.tester import TesterState
+
 
 __all__ = ["Tester"]
 
 
 class Tester(object):
     __config: DotDict
+    __logger: Logger
     __metric: MetricWrapper
     __test_dataloader: DataLoader
     __callback: CallbackWrapper
@@ -32,6 +34,7 @@ class Tester(object):
         self.__model = model
         self.__metric = metric
         self.__test_dataloader = dataloader
+        self.__logger = Logger("test")
         self.__callback = CallbackWrapper(self, get_services(config))
 
         self.state = TesterState(
@@ -59,6 +62,9 @@ class Tester(object):
     @property
     def model(self):
         return self.__model
+    @property
+    def logger(self) -> Logger:
+        return self.__logger
 
     def fit(self):
         print(f"""Start testing model ...""")

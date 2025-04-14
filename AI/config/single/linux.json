@@ -114,8 +114,8 @@
                 "name": "DefaultDataLoader",
                 "batch_size": 1,
                 "shuffle": false,
-                "num_workers": 8,
-                "prefetch_factor": 1,
+                "num_workers": 1,
+                "prefetch_factor": 2,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
@@ -187,10 +187,9 @@
         "in_val": false,
         "in_test": true,
         "metrics": [
-            {"name": "BinaryAUPRC"}
-//            {"name": "BinaryPrecision"},
-//            {"name": "BinaryRecall"},
-//            {"name": "BinaryConfusionMatrix", "normalize": null}
+            {"name": "BinaryAUPRC"},
+            {"name": "BinaryAUROC"},
+            {"name": "BinaryPrecisionRecallCurve"}
         ]
     },
 

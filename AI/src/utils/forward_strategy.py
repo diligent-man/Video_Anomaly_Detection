@@ -224,12 +224,13 @@ def v3(instance: Tester,
                     # Reset
                     step_preds = None
             total_preds = preds if total_preds is None else torch.cat((total_preds, preds), 0)
-
-        if i == 5:
+        instance.state.preds = preds
+        instance.callback(f"on_step_end")
+        if i == 1:
             break
     metric.update(total_preds, total_labels)
     metric.compute()
-    result = metric.get_result()
+    instance.state.metric_result = metric.get_result(return_dict=True)
     return None
 
 

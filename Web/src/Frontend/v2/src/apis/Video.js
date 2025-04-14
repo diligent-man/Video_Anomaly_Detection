@@ -1,5 +1,5 @@
-import apiHelper from "../utils/apiHelper";
-import { apiUrls, baseUrl } from "../utils/constants";
+import apiHelper from "../utils/apiHelper.js";
+import { apiUrls, baseUrl } from "../utils/constants.js";
 
 /**
  * Upload a new video file to the server
