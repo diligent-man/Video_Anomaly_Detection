@@ -31,6 +31,8 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    command:
+
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
       interval: 30s

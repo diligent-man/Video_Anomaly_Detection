@@ -10,7 +10,7 @@ RUN npm install
 COPY . .
 
 # Mở cổng 80 cho Vite dev server
-EXPOSE 80
+EXPOSE 6969
 
 # Chạy Vite dev server với host 0.0.0.0 để có thể truy cập từ bên ngoài container
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "80"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "6969"]

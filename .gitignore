@@ -323,13 +323,6 @@ pyrightconfig.json
 .history
 .ionide
 
-# End of https://www.toptal.com/developers/gitignore/api/pycharm,visualstudiocode,python,linux
-
-AI/weights/
-AI/results/
-MLOps/MLflow/demo/simple_train_test/mlruns/
-MLOps/.env
-
 
 ### React & Vite ###
 # Logs
@@ -366,5 +359,7 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-# Vite specific
-.vite/
+AI/weights/
+AI/results/
+MLOps/MLflow/demo/simple_train_test/mlruns/
+MLOps/.env

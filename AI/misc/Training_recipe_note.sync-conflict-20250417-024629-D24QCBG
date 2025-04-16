@@ -1,0 +1,12 @@
+Single model training
+    lr(Adam, weight_decay=1e-3):
+        2DCNN-based backbone: 1e-5
+        3DCNN-based backbone: 1e-4
+        Mix-based backbone: 1e-5
+
+    T_mult: 1
+    backbone reduce: max_l2
+    weight_decay: 1e-4
+    max_relative_position: 25
+
+    metrics: AUROC, FPR

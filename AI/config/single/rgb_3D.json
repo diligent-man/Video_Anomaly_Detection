@@ -6,14 +6,14 @@
         "experiment_name": "input_3d",
         "technique": "single",
         "mode": "train",
-        "exist_ok": true,
+        "exist_ok": false,
         "sep": "_",
 
-        "epochs": 20,
+        "epochs": 40,
         "eval_strategy": "epoch",
 
-        "resume": true,
-        "resume_ckpt": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/input_3d/Mlflow/510859847621159024/b814d78b360d4a09a29847d7f65d44e6/artifacts/ckpt/best_epoch20_step4519.pt",
+        "resume": false,
+        "resume_ckpt": null,
 
         "use_amp": true,
         "seed": 12345,
@@ -47,7 +47,7 @@
                 "name": "VADVideoLevelDataLoader",
                 "batch_size": 4,
                 "shuffle": false,
-                "method": 2,  // sampled by min datasource
+                "method": 2,  // sampled by max datasource
                 "num_workers": 6,
                 "prefetch_factor": 1,
                 "persistent_workers": false,
@@ -167,7 +167,7 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-4, "weight_decay": 0.00001, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-4, "weight_decay": 1e-3, "amsgrad": true},
         // Warm up 5 epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}
@@ -180,8 +180,7 @@
         "in_test": true,
         "metrics": [
             {"name": "BinaryAUPRC"},
-            {"name": "BinaryAUROC"},
-            {"name": "BinaryPrecisionRecallCurve"}
+            {"name": "BinaryAUROC"}
         ]
     },
 
@@ -212,10 +211,10 @@
             "apply": true,
             "prev_run_id": null,
             "init_server_on_run": false,
-            "username": "",
-            "password": "",
+            "username": null,
+            "password": null,
             "push_to_remote": false,
-            "remote_tracking_uri": ""
+            "remote_tracking_uri": null
         },
 
         {

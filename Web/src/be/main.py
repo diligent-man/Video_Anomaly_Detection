@@ -1,11 +1,12 @@
 import uvicorn
 
+
 def main() -> None:
     # Tăng timeout và worker để xử lý file lớn
     uvicorn.run(
-        "app:app",
+        "src.app:app",
         host="0.0.0.0", 
-        port=8000, 
+        port=6967,
         timeout_keep_alive=300,
         log_level="info"
     )
