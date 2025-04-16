@@ -148,6 +148,7 @@
             "name":"TAN",
             "num_backbones": 3,
             "num_heads": 8,
+//            "max_relative_position": 50,
             "relative_attention": true
         },
 

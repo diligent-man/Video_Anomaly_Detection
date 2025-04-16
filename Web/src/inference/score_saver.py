@@ -15,6 +15,9 @@ from .opts import parse_opts
 from .learner import Learner
 
 
+__all__ = ["run_vad_model"]
+
+
 class ToTensor(object):
     """Convert a PIL.Image or numpy.ndarray to tensor."""
     def __init__(self, norm_value=255):
@@ -153,5 +156,4 @@ def run_vad_model(video_path: str, total_frames, scores_dir):
     scores_file = Path(scores_dir) / f"{Path(video_path).stem}_scores.npy"
     np.save(scores_file, anomaly_scores)
     print(f"Saved anomaly scores to {scores_file}")
-    
     return str(scores_file)

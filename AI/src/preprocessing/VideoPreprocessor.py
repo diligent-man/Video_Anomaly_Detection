@@ -7,6 +7,7 @@ import torch
 import ffmpeg
 
 from ..utils.load_video import v2
+from ..utils import find_video_stream
 
 
 __all__ = ["VideoPreprocessor"]
@@ -14,10 +15,6 @@ __all__ = ["VideoPreprocessor"]
 
 class VideoPreprocessor(object):
     # Add more if necessary
-    __CODECS = [
-        "h264", "mpeg4", "vp9", "mjpeg", "av1"
-    ]
-
     __filters: Dict[str, Dict[str, Any]] = {
         "fps": {"fps": 15, "round": "up"},
         "scale": {"w": 320, "h": 320, "sws_flags": "neighbor"},
@@ -67,13 +64,6 @@ class VideoPreprocessor(object):
             flag = not flag
         return flag
 
-    def _find_video_stream(self, streams: Dict[str, Any]) -> str:
-        stream: Dict[str, Any]
-
-        for i, stream in enumerate(streams):
-            if stream["codec_name"] in self.__CODECS:
-                return str(i)
-
     def _make_spath(self, dataset_name: str, save_root: str) -> str:
         ds_name_idx = self.__fpath.split(os.sep).index(dataset_name)
 
@@ -96,7 +86,7 @@ class VideoPreprocessor(object):
                 self.__filters.pop("fps", None)
 
             probe_info: Dict[str, Any] = ffmpeg.probe(self.fpath)
-            stream = self._find_video_stream(probe_info["streams"])
+            stream = find_video_stream(probe_info["streams"])
 
             try:
                 stream = ffmpeg.input(self.__fpath, hwaccel="cuda")[stream] if self.__device == "cuda" else \

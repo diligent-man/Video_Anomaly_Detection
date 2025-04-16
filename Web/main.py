@@ -1,6 +1,4 @@
 import uvicorn
-import sys
-import os
 
 def main() -> None:
     # Tăng timeout và worker để xử lý file lớn

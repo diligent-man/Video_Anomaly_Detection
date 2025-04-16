@@ -34,7 +34,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/final/train",
+                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/labeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype": {"dtype": "float32", "scale": true},
@@ -50,10 +50,10 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 4,
+                "batch_size": 3,
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
-                "num_workers": 6,
+                "num_workers": 4,
                 "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
@@ -66,7 +66,7 @@
             "dataset":
             {
                 "name": "VADVideoLevelDataset",
-                "root": "/home/trong/Downloads/Dataset/VAD/final/val",
+                "root": "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/train/IITB/labeled",
                 "loader": "v4",
                 "transform": {
                     "ToDtype":
@@ -85,7 +85,7 @@
                 "shuffle": false,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 4,
-                "prefetch_factor": 2,
+                "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
@@ -129,7 +129,8 @@
         "backbone":
         {
 //            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
-            "name": ["clip_vit/b16"],
+//            "name": ["clip_vit/b16"],
+            "name": ["rgb_i3d"],
 
             "rgb_i3d_reduce": {"name":  "max_l2"},
             "s3d_reduce": {"name":  "mean"},

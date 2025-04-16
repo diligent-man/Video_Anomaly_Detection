@@ -113,6 +113,9 @@ class Mlflow(TrainerCallback):
             f"config{pathlib.Path(instance.config.Global.config_path).suffixes[0]}"
         )
 
+        # Log initial lr
+        mlflow.log_param("lr", instance.config.Optim.lr.lr)
+
         # Log train/ val dataloader
         mlflow.log_text(f"""Train dataloader info:
     {instance.train_dataloader.__repr__()}

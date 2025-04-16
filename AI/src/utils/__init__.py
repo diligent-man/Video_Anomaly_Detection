@@ -33,6 +33,10 @@ from .intergration_ops import (
     is_mlflow_available
 )
 
+from .ffmpeg_ops import (
+    find_video_stream
+)
+
 from .misc import (
     get_amp_cfg,
     visualize_lr,
@@ -66,6 +70,8 @@ __all__ = [
     "to_float32",
 
     "is_mlflow_available",
+
+    "find_video_stream",
 
     "get_amp_cfg",
     "visualize_lr",

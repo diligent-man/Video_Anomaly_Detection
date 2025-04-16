@@ -10,7 +10,6 @@ from datetime import datetime
 from ..utils.video_utils import get_video_info, plot_vad_animation
 from ..inference.score_saver import run_vad_model as model_run_vad
 
-
 router = APIRouter(prefix="/apis/video", tags=["Video"])
 
 # Định nghĩa thư mục lưu trữ
