@@ -1,19 +1,27 @@
-import gradio as gr
+import os
 import requests
 from pathlib import Path
-from ...api.config import API_URL
-import os
-from gradio_modal import Modal
-import safehttpx
 
-_orig_validate = safehttpx.async_validate_url
-async def async_validate_url_override(hostname: str):
+
+import safehttpx
+import gradio as gr
+from gradio_modal import Modal
+
+
+from ...api.config import API_URL
+
+__all__ = ["page_2"]
+
+
+async def _async_validate_url_override(hostname: str):
     if hostname in ["localhost", "127.0.0.1"]:
         return hostname
     return await _orig_validate(hostname)
 
-safehttpx.async_validate_url = async_validate_url_override
-__all__ = ["page_2"]
+
+_orig_validate = safehttpx.async_validate_url
+safehttpx.async_validate_url = _async_validate_url_override
+
 
 def get_uploaded_videos():
     """Lấy danh sách video đã upload"""
@@ -33,6 +41,7 @@ def get_uploaded_videos():
         print(f"Error loading videos: {e}")
         return []
 
+
 def get_anomaly_plot(video_filename: str):
     """Lấy anomaly plot từ API"""
     try:
@@ -49,6 +58,7 @@ def get_anomaly_plot(video_filename: str):
     except Exception as e:
         print(f"Error checking plot: {e}")
         return None
+
 
 def open_modal(evt: gr.SelectData):
     """Xử lý khi user click vào video trong Gallery"""
@@ -94,6 +104,7 @@ def open_modal(evt: gr.SelectData):
             gr.update(value=None),
             gr.update(visible=False),
         )
+
 
 with gr.Blocks() as page_2:
     gr.Markdown("# 📂 List of Videos")

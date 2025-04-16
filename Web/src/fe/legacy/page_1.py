@@ -6,6 +6,7 @@ from ...utils.video_utils import plot_vad_animation
 
 __all__ = ["page_1"]
 
+
 def get_uploaded_videos():
     """Get list of uploaded videos"""
     try:
@@ -17,6 +18,7 @@ def get_uploaded_videos():
     except Exception as e:
         print(f"Error fetching videos: {str(e)}")
         return []
+
 
 def process_video(video):
     """Upload video, lấy anomaly scores, vẽ plot"""
@@ -54,6 +56,7 @@ def process_video(video):
     except Exception as e:
         print(f"Error in process_video: {str(e)}")
         return video, None
+
 
 with gr.Blocks() as page_1:
     gr.Markdown("# Video Anomaly Detection")
