@@ -48,27 +48,37 @@ services:
                     devices:
                         -   capabilities: [ "gpu" ]
                             device_ids: [ "all" ]
-    web:
+
+    backend:
         build:
-            context: ./Web/app
+            context: ./Web/src/be
             dockerfile: Dockerfile
             platforms:
                 - "linux/amd64"
             tags:
-                - "capstone/web:0.0.0"
+                - "capstone/be:0.0.0"
 
-        container_name: capstone_app
+        container_name: capstone_be
 
         ports:
-            - "6969:6969"
+            - "6967:6967"
+
+        volumes:
+            - ~/AI_web_data/BE/run_results/plots:/run_results/plots
+            - ~/AI_web_data/BE/run_results/scores:/run_results/scores
+            - ~/AI_web_data/BE/run_results/videos:/run_results/videos
 
         restart: on-failure
 
         healthcheck:
-            test: [ "CMD-SHELL", "curl --silent --fail 0.0.0.0:6969/demo_api_2/health-check || exit 1" ]
-            interval: 5m
-            timeout: 3s
+            test: ["CMD", "curl", "-f", "http://localhost:6967/health"]
+            interval: 30s
+            timeout: 10s
             retries: 3
+            start_period: 15s
+
+        networks:
+            - web
 
         deploy:
             mode: global
@@ -82,8 +92,57 @@ services:
             resources:
                 limits:
                     cpus: "4"
-                    memory: 2048M
+                    memory: 4096M
                 reservations:
-                    cpus: "1"
-                    memory: 512M
+                    cpus: "2"
+                    memory: 2048M
 
+    frontend:
+        build:
+            context: ./Web/src/fe
+            dockerfile: Dockerfile
+            platforms:
+                - "linux/amd64"
+            tags:
+                - "capstone/fe:0.0.0"
+
+        container_name: capstone_fe
+
+        ports:
+            - "6969:6969"
+
+        depends_on:
+            - backend
+
+        restart: on-failure
+
+        healthcheck:
+            test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:6969/"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 5s
+
+        networks:
+            - web
+
+        deploy:
+            mode: global
+
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                window: 120s
+                max_attempts: 3
+
+            resources:
+                limits:
+                    cpus: "4"
+                    memory: 4096M
+                reservations:
+                    cpus: "2"
+                    memory: 2048M
+
+networks:
+    web:
+        driver: bridge

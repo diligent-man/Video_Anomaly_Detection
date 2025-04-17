@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "..", ".."))
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from Web.src.be.src import video
+from Web.src.be.src import video , index
 
 
 app = FastAPI()

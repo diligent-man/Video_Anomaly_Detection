@@ -3,75 +3,22 @@ from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 from urllib.parse import unquote
 
-import os
 import numpy as np
 from datetime import datetime
 
-from ..utils.video_utils import get_video_info, plot_vad_animation
-from ..inference.score_saver import run_vad_model as model_run_vad
+from .utils.handle_be import (
+    run_vad_model,
+    get_scores_path,
+    get_plot_path,
+    generate_plot,
+    VIDEO_DIR,
+    SCORES_DIR,
+    PLOTS_DIR
+)
 
 router = APIRouter(prefix="/apis/video", tags=["Video"])
 
-# Định nghĩa thư mục lưu trữ
-TMP_DIR = Path("tmp").resolve()
-VIDEO_DIR = TMP_DIR / "videos"
-SCORES_DIR = TMP_DIR / "scores"
-PLOTS_DIR = TMP_DIR / "plots"
 
-# Tạo các thư mục nếu chưa tồn tại
-os.makedirs(VIDEO_DIR, exist_ok=True)
-os.makedirs(SCORES_DIR, exist_ok=True)
-os.makedirs(PLOTS_DIR, exist_ok=True)
-
-
-def run_vad_model(video_path, total_frames):
-    """ Run the actual VAD model and save anomaly scores """
-    return model_run_vad(video_path, total_frames, SCORES_DIR)
-
-
-def get_scores_path(video_name):
-    """Generate the expected scores file path for a video"""
-    return SCORES_DIR / f"{Path(video_name).stem}_scores.npy"
-
-
-def get_plot_path(video_name):
-    """Generate the expected plot animation file path for a video"""
-    return PLOTS_DIR / f"{Path(video_name).stem}_plot.mp4"
-
-
-def generate_plot(video_name, scores=None):
-    """Generate plot animation for a video based on its anomaly scores"""
-    try:
-        plot_path = get_plot_path(video_name)
-        
-        # If scores not provided, load them
-        if scores is None:
-            scores_file = get_scores_path(video_name)
-            if not scores_file.exists():
-                return None
-            scores = np.load(scores_file).tolist()
-        
-        # Get FPS from video
-        video_path = VIDEO_DIR / video_name
-        fps, _, _ = get_video_info(video_path)
-        
-        # Generate plot animation
-        plot_path_str = plot_vad_animation(
-            scores, 
-            fps=fps, 
-            save_path=str(plot_path)
-        )
-        return plot_path_str
-    except Exception as e:
-        print(f"Error generating plot: {str(e)}")
-        return None
-
-@router.get("/")
-def say_hello():
-    return {
-        "exit code": 200,
-        "message": "Video Anomaly Detection API"
-    }
 
 @router.post("/upload_video")
 async def upload_video(file: UploadFile = File(...)):
@@ -100,8 +47,7 @@ async def upload_video(file: UploadFile = File(...)):
         
         # Tính toán scores nếu chưa có
         if not scores_file.exists():
-            _, total_frames, _ = get_video_info(video_path)
-            scores_file_path = run_vad_model(video_path, total_frames)
+            scores_file_path = run_vad_model(str(video_path))
             result["scores_path"] = str(scores_file_path)
             result["status"] = "processed"
             
@@ -148,12 +94,8 @@ async def get_video(video_name: str):
 
     # Create the FileResponse
     response = FileResponse(file_path, media_type="video/mp4")
-
-    # *** ADD THIS LINE ***
-    # Manually add the CORS header to allow access from any origin
     response.headers["Access-Control-Allow-Origin"] = "*"
-
-    return response # Return the response with the added header
+    return response
 
 @router.get("/get_all_video")
 async def list_videos():
@@ -293,8 +235,7 @@ async def get_anomaly_scores(video_name: str):
         # If scores don't exist but video does, process it
         video_path = VIDEO_DIR / video_name
         if video_path.exists():
-            _, total_frames, _ = get_video_info(video_path)
-            run_vad_model(video_path, total_frames)
+            scores_file_path = run_vad_model(str(video_path))
             
             if scores_file.exists():
                 scores = np.load(scores_file).tolist()
@@ -348,22 +289,14 @@ async def get_plot(video_name: str):
                 generate_plot(video_name, scores)
 
                 if plot_path.exists():
-                    # Create the FileResponse
                     response = FileResponse(plot_path, media_type="video/mp4")
-                    # *** ADD THIS LINE ***
                     response.headers["Access-Control-Allow-Origin"] = "*"
                     return response
             except Exception as e:
                  print(f"Error generating or serving plot after creation: {e}")
-                 # Fall through to the not found response if generation failed here
 
         return JSONResponse(status_code=404, content={"message": "Plot not found and could not be generated"})
 
-    # Create the FileResponse for existing plot
     response = FileResponse(plot_path, media_type="video/mp4")
-
-    # *** ADD THIS LINE ***
-    # Manually add the CORS header to allow access from any origin
     response.headers["Access-Control-Allow-Origin"] = "*"
-
-    return response # Return the response with the added header
+    return response

@@ -3,6 +3,12 @@ from fastapi import APIRouter, Response
 
 router = APIRouter()
 
+@router.get("/")
+def read_root():
+    return {
+      "exit code": Response(status_code=200).status_code,
+      "message": "This is root"
+    }
 
 @router.get("/health")
 def read_root():
@@ -10,8 +16,3 @@ def read_root():
       "exit code": Response(status_code=200).status_code,
       "message": "This is root"
     }
-
-
-@router.get("/health")
-def health_check():
-    return Response(content='{"status": "ok"}', media_type="application/json", status_code=200)

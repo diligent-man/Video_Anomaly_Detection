@@ -1,7 +1,0 @@
-**/
-!/src/utils
-
-!main.py
-!src/app.py
-!src/video.py
-!requirements.txt
