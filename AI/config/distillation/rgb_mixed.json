@@ -1,0 +1,325 @@
+{
+    "global":
+    {
+        "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
+        "project_name": "AIP391",
+        "experiment_name": "input_mixed_student",
+        "technique": "distillation",
+        "mode": "train",
+        "exist_ok": true,
+        "sep": "_",
+
+        "epochs": 1,
+        "eval_strategy": "epoch",
+
+        "resume": false,
+        "resume_ckpt": null,
+
+        "use_amp": true,
+        "seed": 12345,
+        "device": "cuda",
+
+        "inspect_model_arch": true,
+        "inspect_depth": 7,
+        "dummy_input_shape": [1, 32, 3, 13, 224, 224]
+    },
+
+    "data":
+    {
+        "train":
+        {
+            "dataset":
+            {
+                "name": "VADVideoLevelDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/train",
+                "loader": "v4",
+                "transform": {
+                    "ToDtype": {"dtype": "float32", "scale": true},
+                    "RandomResizedCrop_1": {"size": [224, 224], "scale": [0.75, 1], "interpolation":"NEAREST", "antialias": true},
+                    "RandomRotation": {"degrees": [-90, 90], "interpolation": "NEAREST", "expand": false}
+                },
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "VADVideoLevelDataLoader",
+                "batch_size": 4,
+                "shuffle": false,
+                "method": 2,  // sampled by max datasource
+                "num_workers": 6,
+                "prefetch_factor": 1,
+                "persistent_workers": false,
+                "multiprocessing_context": "fork"
+            },
+            "forward_strategy": "v1"
+        },
+
+        "val":
+        {
+            "dataset":
+            {
+                "name": "VADVideoLevelDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/val",
+                "loader": "v4",
+                "transform": {
+                    "ToDtype":
+                    {
+                        "dtype": "float32",
+                        "scale": true
+                    }
+                },
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "VADVideoLevelDataLoader",
+                "batch_size": 4,
+                "shuffle": false,
+                "method": 2,  // sampled by min datasource
+                "num_workers": 4,
+                "prefetch_factor": 1,
+                "persistent_workers": false,
+                "multiprocessing_context": "fork"
+            },
+            "forward_strategy": "v1"
+        },
+
+        "test":
+        {
+            "dataset":
+            {
+                "name": "VADFrameLevelDataset",
+                "root": "/home/trong/Downloads/Dataset/VAD/final/test",
+                "annotation": "label.csv",
+                "loader": "v4",
+                "transform": {
+                    "ToDtype":
+                    {
+                        "dtype": "float32",
+                        "scale": true
+                    }
+                },
+                "target_transform": {}
+            },
+
+            "dataloader":
+            {
+                "name": "DefaultDataLoader",
+                "batch_size": 1,
+                "shuffle": false,
+                "num_workers": 1,
+                "prefetch_factor": 1,
+                "persistent_workers": false,
+                "multiprocessing_context": "fork"
+            },
+            "forward_strategy": "v3"
+        }
+    },
+
+    "architecture":
+    {
+        "algorithm": "distillation",
+        "soft_label_threshold": 0.9,
+        "feat_preprocessing":
+        {
+            "name": "MLP",
+
+            // Must be compatible with neck's hid_dim output
+            "in_channels": 512,
+
+            "hid_dim": [512],
+            "hid_act": "ReLU",
+
+            "out_channels": 512,
+            "layer_order": "fc->drop->act"
+        },
+
+        "models": {
+            "student":
+            {
+                "backbone":
+                {
+                    "name": ["s3d"],
+                    "s3d_reduce": {"name":  "max_l2"},
+
+                    "compile": false,
+                    "out_proj":
+                    {
+                        "hid_dim": [512],
+                        "hid_act": "ReLU",
+
+                        "out_channels": 512,
+
+                        "dropout": 0.5,
+                        "layer_order": "fc->drop->act"
+                    }
+                },
+
+                "neck":
+                {
+                    "name":"TAN",
+                    "num_backbones": 1,
+                    "num_heads": 8,
+                    "max_relative_position": 25,
+                    "relative_attention": true,
+                    "return_neck_out": true
+                },
+
+                "head":
+                {
+                    "name":"SimpleClassifier",
+
+                    "hid_dim": [512, 32],
+                    "hid_act": "ReLU",
+
+                    "out_channels": 1,
+                    "out_act": null,  // return logits
+
+                    "dropout": 0.5,
+                    "layer_order": "fc->drop->act",
+                    "return_logits": true
+                }
+            },
+            "teacher":
+            {
+                "pretrained": "../../results/AIP391/single/train/input_mixed/ckpt/best_epoch13_step2937.pt",
+                "backbone":
+                {
+                    "name": ["s3d", "rgb_i3d", "clip_vit/b16"],
+
+                    "s3d_reduce": {"name":  "max_l2"},
+                    "rgb_i3d_reduce": {"name":  "max_l2"},
+                    "clip_vit/b16_reduce": {"name":  "max_l2"},
+
+                    "compile": false,
+                    "out_proj":
+                    {
+                        "hid_dim": [512],
+                        "hid_act": "ReLU",
+
+                        "out_channels": 512,
+                        "out_act": null,
+
+                        "dropout": 0.5,
+                        "layer_order": "fc->drop->act"
+                    }
+
+                },
+
+                "neck":
+                {
+                    "name":"TAN",
+                    "num_backbones": 3,
+                    "num_heads": 8,
+                    "max_relative_position": 25,
+                    "relative_attention": true,
+                    "return_neck_out": true
+                },
+
+                "head":
+                {
+                    "name":"SimpleClassifier",
+
+                    "hid_dim": [512, 32],
+                    "hid_act": "ReLU",
+
+                    "out_channels": 1,
+                    "out_act": "Sigmoid",
+
+                    "dropout": 0.5,
+                    "layer_order": "fc->drop->act",
+                    "return_logits": true
+                },
+
+                "postprocessing":
+                {
+                    "name": "PseudoLabelRefiner",
+                    "pad_style": "mean_ema",
+                    "kernel_size": 5
+                }
+            }
+        }
+    },
+
+    "optim":
+    {
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-3, "amsgrad": true},
+        // Warm up 5 epochs
+        "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
+        "regularizer": {}
+    },
+
+    "metric":
+    {
+        "in_train": false,
+        "in_val": false,
+        "in_test": true,
+        "metrics": [
+            {"name": "BinaryAUPRC"},
+            {"name": "BinaryAUROC"}
+        ]
+    },
+
+    "loss":
+    {
+        "name": "CombinedLoss",
+        "loss_config_lst":
+        [
+            {
+                "name": "DistillBCEWithLogitsLoss",
+                "reduction": "mean",
+
+                "combined_weight": 1,
+                "key": "soft_preds",
+                "model_idx_pairs": [[0, 0]]
+            },
+
+            {
+                "name": "DistillInfoNCE",
+                "reduction": "mean",
+                "temperature": 10,
+                "negative_mode": "unpaired",
+
+                "pred_key": "hard_preds",
+                "feat_key": "feats",
+                "combined_weight": 0.75,
+                "model_idx_pairs": [[0, 0]]
+            }
+        ]
+    },
+
+    "services": [
+        {
+            "name": "Checkpointer",
+            "apply": true,
+            "mode": "min",
+            "monitor": "val_loss",
+            "save_freq": 1,
+            "save_best_only": false,
+            "save_weights_only": true,
+            "save_total_limit": 5,
+            "include_config": true
+        },
+
+        {
+            "name": "Mlflow",
+            "apply": true,
+            "prev_run_id": null,
+            "init_server_on_run": false,
+            "username": "",
+            "password": "",
+            "push_to_remote": false,
+            "remote_tracking_uri": ""
+        },
+
+        {
+            "name": "Earlystopper",
+            "mode": "min",
+            "monitor": "val_loss",
+            "patience": 5,
+            "apply": true
+        }
+    ]
+}
