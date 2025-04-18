@@ -6,10 +6,10 @@
         "experiment_name": "input_mixed_student",
         "technique": "distillation",
         "mode": "train",
-        "exist_ok": true,
+        "exist_ok": false,
         "sep": "_",
 
-        "epochs": 1,
+        "epochs": 40,
         "eval_strategy": "epoch",
 
         "resume": false,
