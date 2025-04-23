@@ -11,6 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "."))
 
 
 import torch
+import ffmpeg
 
 from torch import Tensor
 from torch.nn import Module
@@ -20,8 +21,8 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 
 
 from AI.src.modeling import build_model
-from AI.src.utils import load_config, load_weights, DotDict
 from AI.src.utils.inference_ops import extract_frames, load_img
+from AI.src.utils import DotDict, load_config, load_weights, find_video_stream
 
 
 app = FastAPI()
@@ -103,13 +104,16 @@ async def infer(file: UploadFile = File(...)) -> JSONResponse:
 
                             # Second half
                             if i == len(total_frames) - 1:
-                                preds[i - (T_max // 2):] = (preds[i - (T_max // 2):] + step_preds) / 2
+                                preds[(i+2) - (T_max // 2):] += step_preds
                             else:
                                 preds[i - (T_max // 2): i] += step_preds
 
                             # Reset
                             step_preds = None
-        # fps = ....
-        return JSONResponse({"preds": preds.tolist(), "fps": 1})
+        # find video fps
+        probe_info: Dict[str, Any] = ffmpeg.probe(tmp_file.name)
+        video_stream: int = int(find_video_stream(probe_info["streams"]))
+        fps: int = int(probe_info["streams"][video_stream]["avg_frame_rate"].split("/")[0])
+        return JSONResponse({"preds": preds.tolist(), "fps": fps})
     except Exception as e:
         raise HTTPException(status_code=400, detail="Error processing video: " + str(e))

@@ -9,7 +9,7 @@ def main() -> None:
     }
 
     response = rq.post(url="http://0.0.0.0:6968/infer", files=files)
-    print(response.json())
+    print(type(response.json()["fps"]))
     return None
 
 
