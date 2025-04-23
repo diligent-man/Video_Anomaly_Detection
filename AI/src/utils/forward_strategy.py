@@ -193,6 +193,7 @@ def v3(instance: Tester,
         cum_frames: int = 0
         step_preds: None | Tensor = None
         preds: Tensor = torch.zeros_like(label, dtype=amp_cfg["dtype"])
+        print(total_frames, "total frames")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             for j in range(total_frames):
                 if j < T_max or cum_frames < T_max:
@@ -208,15 +209,17 @@ def v3(instance: Tester,
 
                 if step_preds is not None:
                     step_preds = step_preds.squeeze(0).to("cpu")
+
                     # First half
                     if preds[j-T_max: j-(T_max//2)].equal(torch.zeros_like(preds[j-T_max: j-(T_max//2)], dtype=preds.dtype)):
+                        # first iter
                         preds[j - T_max: j - (T_max // 2)] += step_preds
                     else:
                         preds[j - T_max: j - (T_max // 2)] = (preds[j - T_max: j - (T_max // 2)] + step_preds) / 2
 
                     # Second half
                     if j == total_frames - 1:
-                        preds[j - (T_max // 2):] += step_preds
+                        preds[(j+2) - (T_max // 2):] += step_preds
                     else:
                         preds[j - (T_max // 2): j] += step_preds
 

@@ -103,12 +103,13 @@ async def infer(file: UploadFile = File(...)) -> JSONResponse:
 
                             # Second half
                             if i == len(total_frames) - 1:
-                                preds[i - (T_max // 2):] += step_preds
+                                preds[i - (T_max // 2):] = (preds[i - (T_max // 2):] + step_preds) / 2
                             else:
                                 preds[i - (T_max // 2): i] += step_preds
 
                             # Reset
                             step_preds = None
-        return JSONResponse({"preds": preds.tolist()})
+        # fps = ....
+        return JSONResponse({"preds": preds.tolist(), "fps": 1})
     except Exception as e:
         raise HTTPException(status_code=400, detail="Error processing video: " + str(e))

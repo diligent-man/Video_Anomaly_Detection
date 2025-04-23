@@ -9,7 +9,7 @@
         "exist_ok": false,
         "sep": "_",
 
-        "epochs": 40,
+        "epochs": 20,
         "eval_strategy": "epoch",
 
         "resume": false,
@@ -167,7 +167,7 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-4, "weight_decay": 1e-3, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-5, "amsgrad": true},
         // Warm up 5 epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}
