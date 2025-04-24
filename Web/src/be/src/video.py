@@ -46,9 +46,11 @@ async def upload_video(file: UploadFile = File(...)):
                 buffer.write(chunk)
         
         # Tính toán scores nếu chưa có
+        video_fps = None  # Khởi tạo biến fps
         if not scores_file.exists():
-            scores_file_path = run_vad_model(str(video_path))
-            result["scores_path"] = str(scores_file_path)
+            scores_file_path, video_fps = run_vad_model(str(video_path))
+            result["scores_path"] = scores_file_path
+            result["fps"] = video_fps  # Lưu fps vào kết quả
             result["status"] = "processed"
             
             # Đọc scores vừa tạo để tạo plot
@@ -61,7 +63,7 @@ async def upload_video(file: UploadFile = File(...)):
         
         # Tạo plot animation nếu chưa có hoặc cần tạo lại
         if not plot_file.exists() or result["status"] == "processed":
-            plot_path = generate_plot(file.filename, scores)
+            plot_path = generate_plot(file.filename, scores, fps=video_fps)
             if plot_path:
                 result["plot_path"] = plot_path
             else:

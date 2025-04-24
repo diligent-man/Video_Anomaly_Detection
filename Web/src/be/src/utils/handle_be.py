@@ -43,7 +43,7 @@ def run_vad_model(video_path):
                 raise Exception("No predictions in API response")
             
             scores = response_data['preds']
-            
+            fps = response_data.get('fps', 30)  
             # Lưu scores vào file
             scores_file = get_scores_path(video_filename)
             np.save(scores_file, np.array(scores))
@@ -65,7 +65,7 @@ def get_plot_path(video_name):
     return PLOTS_DIR / f"{Path(video_name).stem}_plot.mp4"
 
 
-def generate_plot(video_name, scores=None):
+def generate_plot(video_name, scores=None, fps=None):
     """Generate plot animation for a video based on its anomaly scores"""
     try:
         plot_path = get_plot_path(video_name)
@@ -77,9 +77,11 @@ def generate_plot(video_name, scores=None):
                 return None
             scores = np.load(scores_file).tolist()
         
-        # Get FPS from video
-        video_path = VIDEO_DIR / video_name
-        fps, _, _ = get_video_info(video_path)
+        if fps is None:
+            video_path = VIDEO_DIR / video_name
+            fps, _, _ = get_video_info(video_path)
+        
+        
         
         # Generate plot animation
         plot_path_str = plot_vad_animation(

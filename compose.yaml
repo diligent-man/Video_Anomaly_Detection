@@ -67,6 +67,13 @@ services:
             - ~/AI_web_data/BE/run_results/plots:/run_results/plots
             - ~/AI_web_data/BE/run_results/scores:/run_results/scores
             - ~/AI_web_data/BE/run_results/videos:/run_results/videos
+        
+        environment:
+            WINDOW_LENGTH: 15
+            POLYORDER: 3
+            HIGH_THRESHOLD: 0.6
+            LOW_THRESHOLD: 0.4
+            
 
         restart: on-failure
 
