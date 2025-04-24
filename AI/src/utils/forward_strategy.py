@@ -1,3 +1,4 @@
+import gc
 from typing import Dict, Any, Callable
 
 
@@ -193,7 +194,6 @@ def v3(instance: Tester,
         cum_frames: int = 0
         step_preds: None | Tensor = None
         preds: Tensor = torch.zeros_like(label, dtype=amp_cfg["dtype"])
-        print(total_frames, "total frames")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             for j in range(total_frames):
                 if j < T_max or cum_frames < T_max:
@@ -225,9 +225,14 @@ def v3(instance: Tester,
 
                     # Reset
                     step_preds = None
+
             total_preds = preds if total_preds is None else torch.cat((total_preds, preds), 0)
+
         instance.state.preds = preds
         instance.callback(f"on_step_end")
+        gc.collect()
+        torch.cuda.empty_cache()
+
     metric.update(total_preds, total_labels)
     metric.compute()
     instance.state.metric_result = metric.get_result(return_dict=True)

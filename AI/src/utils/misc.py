@@ -213,13 +213,12 @@ def multiple_replace(string: str, ref_dict: Dict[str, str]) -> str:
     return string
 
 
-def draw_anomaly_graph(
-        preds: List[List[float]],
-        labels: List[int],
-        legends: List[str],
-        name: str,
-        spath: str = None
-):
+def draw_anomaly_graph(preds: List[List[float]],
+                       labels: List[int],
+                       legends: List[str],
+                       name: str,
+                       spath: str = None
+                       ) -> None:
     plt.switch_backend("tkagg")
 
     T = len(labels)
@@ -264,7 +263,6 @@ def draw_anomaly_graph(
 
     if spath is not None:
         plt.savefig(spath)
-
 
 ########################################################################################################################
 TORCH_2_4 = check_version(torch.__version__, "2.4.0")

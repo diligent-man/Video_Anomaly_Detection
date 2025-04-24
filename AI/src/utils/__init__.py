@@ -39,12 +39,15 @@ from .ffmpeg_ops import (
 
 from .misc import (
     get_amp_cfg,
+    make_border,
     visualize_lr,
     get_services,
     inspect_ffmpeg,
-    make_border,
-    multiple_replace
+    multiple_replace,
+    draw_anomaly_graph
 )
+
+
 
 __all__ = [
     "Logger",
@@ -75,8 +78,9 @@ __all__ = [
 
     "get_amp_cfg",
     "visualize_lr",
+    "make_border",
     "get_services",
     "inspect_ffmpeg",
-    "make_border",
-    "multiple_replace"
+    "multiple_replace",
+    "draw_anomaly_graph"
 ]
