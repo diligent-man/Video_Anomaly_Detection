@@ -1,5 +1,6 @@
 import gc
-from typing import Dict, Any, Callable
+from collections import defaultdict
+from typing import Dict, Any, Callable, List
 
 
 import torch
@@ -182,6 +183,7 @@ def v3(instance: Tester,
     phase: str = instance.state.phase
     total_labels: None | Tensor = None
     total_preds: None | Tensor = None
+
     for i, (inp, label) in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Forward v3, Phase: {phase}"):
         inp: Tensor = inp.squeeze()  # (B,T,C,H,W) -> (T,C,H,W)
         inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)

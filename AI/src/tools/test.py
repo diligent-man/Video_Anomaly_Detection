@@ -4,6 +4,7 @@ import sys
 import copy
 import argparse
 import warnings
+import multiprocessing
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "../../"))
 
 import torch
@@ -19,6 +20,8 @@ torch.set_num_interop_threads(64)
 
 warnings.filterwarnings("once")
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+multiprocessing.set_start_method("spawn")  # for batching infer run
 
 
 def main(args: argparse.Namespace) -> None:
