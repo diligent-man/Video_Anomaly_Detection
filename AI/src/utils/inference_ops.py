@@ -92,7 +92,7 @@ def infer_for_test(inp: Tensor, label: Tensor,
 
                 # Second half
                 if j == total_frames - 1:
-                    preds[(j + 2) - (T_max // 2):] += step_preds
+                    preds[j + (cum_frames-2) - (T_max // 2):] += step_preds
                 else:
                     preds[j - (T_max // 2): j] += step_preds
 

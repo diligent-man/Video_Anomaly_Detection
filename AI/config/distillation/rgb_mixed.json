@@ -1,4 +1,5 @@
 {
+//  teacher config 3
     "global":
     {
         "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
@@ -151,6 +152,7 @@
                         "hid_act": "ReLU",
 
                         "out_channels": 512,
+                        "out_act": null,
 
                         "dropout": 0.5,
                         "layer_order": "fc->drop->act"
@@ -245,7 +247,7 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-3, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-5, "amsgrad": true},
         // Warm up 5 epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}

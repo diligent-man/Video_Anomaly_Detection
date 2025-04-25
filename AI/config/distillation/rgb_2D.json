@@ -1,4 +1,5 @@
 {
+    // teacher config 1
     "global":
     {
         "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
@@ -9,7 +10,7 @@
         "exist_ok": false,
         "sep": "_",
 
-        "epochs": 40,
+        "epochs": 20,
         "eval_strategy": "epoch",
 
         "resume": false,
@@ -44,15 +45,15 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 4,
+                "batch_size": 3,
                 "shuffle": false,
                 "method": 2,  // sampled by max datasource
-                "num_workers": 6,
+                "num_workers": 4,
                 "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
-            "forward_strategy": "v1"
+            "forward_strategy": "v2"
         },
 
         "val":
@@ -75,7 +76,7 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 4,
+                "batch_size": 3,
                 "shuffle": false,
                 "method": 2,  // sampled by min datasource
                 "num_workers": 4,
@@ -83,7 +84,7 @@
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
-            "forward_strategy": "v1"
+            "forward_strategy": "v2"
         },
 
         "test":
@@ -186,7 +187,7 @@
             },
             "teacher":
             {
-                "pretrained": "../../results/AIP391/single/train/input_2d/ckpt/best_epoch18_step4067.pt",
+                "pretrained": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v1/Mlflow/995263845449942640/d4e6cc59499a4abc90cf6410eb9aef25/artifacts/ckpt/best_epoch18_step4067.pt",
                 "backbone":
                 {
                     "name": ["clip_vit/b16"],
@@ -206,7 +207,6 @@
                     }
 
                 },
-
                 "neck":
                 {
                     "name":"TAN",
@@ -216,7 +216,6 @@
                     "relative_attention": true,
                     "return_neck_out": true
                 },
-
                 "head":
                 {
                     "name":"SimpleClassifier",
@@ -244,7 +243,7 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-3, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-5, "amsgrad": true},
         // Warm up 5 epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0": 226, "num_warmup_steps": 1130, "T_mult": 1},
         "regularizer": {}
