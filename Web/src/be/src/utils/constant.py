@@ -43,13 +43,16 @@ class smooth_signal:
         return signal.copy()
 
 @dataclasses.dataclass
-class find_peaks:
-    height: float = float(os.environ.get("HIGH_THRESHOLD", 0.5))
-    prominence: float = float(os.environ.get("LOW_THRESHOLD", 0.4))
+class PeakDetector:
+    height: float = float(os.environ.get("HIGH_THRESHOLD", 0.6))  
+    prominence: float = float(os.environ.get("LOW_THRESHOLD", 0.3))  
     width: int = int(os.environ.get("PEAK_WIDTH", 1))
-    distance: int = int(os.environ.get("DISTANCE", None))
-    threshold: float = float(os.environ.get("THRESHOLD", None))
-    wlen: int = int(os.environ.get("WLEN", None))
+    
+    # Xử lý đúng các tham số None
+    distance: int = int(os.environ.get("DISTANCE", 1)) if os.environ.get("DISTANCE") is not None else None
+    threshold: float = float(os.environ.get("THRESHOLD", 0)) if os.environ.get("THRESHOLD") is not None else None
+    wlen: int = int(os.environ.get("WLEN", 0)) if os.environ.get("WLEN") is not None else None
+    
     rel_height: float = float(os.environ.get("REL_HEIGHT", 0.5))
     
     def get_params(self) -> Dict[str, Any]:

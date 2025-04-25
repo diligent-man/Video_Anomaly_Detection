@@ -61,16 +61,20 @@ async def upload_video(file: UploadFile = File(...)):
             result["status"] = "existing"
             scores = np.load(scores_file).tolist()
         
-        # Tạo plot animation nếu chưa có hoặc cần tạo lại
-        if not plot_file.exists() or result["status"] == "processed":
-            plot_path = generate_plot(file.filename, scores, fps=video_fps)
-            if plot_path:
-                result["plot_path"] = plot_path
-            else:
-                result["plot_status"] = "failed"
+        # Xóa plot cũ nếu tồn tại
+        if plot_file.exists():
+            try:
+                plot_file.unlink()
+            except Exception as e:
+                print(f"Warning: Could not delete existing plot: {str(e)}")
+        
+        # Luôn tạo mới plot (không phụ thuộc vào việc plot đã tồn tại hay chưa)
+        plot_path = generate_plot(file.filename, scores, fps=video_fps)
+        if plot_path:
+            result["plot_path"] = plot_path
+            result["plot_status"] = "generated"
         else:
-            result["plot_path"] = str(plot_file)
-            result["plot_status"] = "existing"
+            result["plot_status"] = "failed"
         
         # Thêm CORS header vào response
         response = JSONResponse(content=result)

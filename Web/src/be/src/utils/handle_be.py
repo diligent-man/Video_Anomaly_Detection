@@ -48,7 +48,7 @@ def run_vad_model(video_path):
             scores_file = get_scores_path(video_filename)
             np.save(scores_file, np.array(scores))
             
-            return str(scores_file)
+            return str(scores_file), fps
             
     except Exception as e:
         print(f"Error in run_vad_model: {str(e)}")
