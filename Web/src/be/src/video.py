@@ -87,13 +87,13 @@ async def upload_video(file: UploadFile = File(...)):
             result["status"] = "existing"
             
             # Kiểm tra xem plot đã tồn tại chưa
-            # if plot_file.exists():
-            #     # Sử dụng plot đã có
-            #     print(f"[UPLOAD] Using existing plot file: {plot_file}")
-            #     result["plot_path"] = str(plot_file)
-            #     result["plot_status"] = "existing"
-            # else:
-                # Tạo plot mới nếu chưa có
+        if plot_file.exists():
+            # Sử dụng plot đã có
+            print(f"[UPLOAD] Using existing plot file: {plot_file}")
+            result["plot_path"] = str(plot_file)
+            result["plot_status"] = "existing"
+        else:
+            # Tạo plot mới nếu chưa có
             print(f"[UPLOAD] No existing plot found, generating new plot")
             scores = np.load(scores_file).tolist()
             print(f"[UPLOAD] Scores loaded: {len(scores)} data points")
@@ -346,6 +346,12 @@ async def get_plot(video_name: str):
 
         return JSONResponse(status_code=404, content={"message": "Plot not found and could not be generated"})
 
-    response = FileResponse(plot_path, media_type="video/mp4")
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    response = FileResponse(
+        plot_path, 
+        media_type="video/mp4",
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Accept-Ranges": "bytes"  # Important for large video files
+        }
+    )
     return response
