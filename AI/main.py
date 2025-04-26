@@ -2,7 +2,10 @@ import os
 import warnings
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import uvicorn
+
+
 def main() -> None:
     if not os.path.exists(os.environ["CONFIG_PATH"]):
         warnings.warn(f"Config path is wrong so exit programme")

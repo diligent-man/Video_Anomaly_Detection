@@ -17,7 +17,7 @@ os.makedirs(SCORES_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
 # URL for the inference API
-VAD_API_URL = "http://localhost:6968/"
+VAD_API_URL = "http://0.0.0.0:6968"
 
 
 def run_vad_model(video_path):

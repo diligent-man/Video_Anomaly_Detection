@@ -186,7 +186,7 @@
             },
             "teacher":
             {
-                "pretrained": "",
+                "pretrained": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_3d/v2/Mlflow/341932603411297071/49d947ac8c4c43758a91dbbfb4b1505c/artifacts/ckpt/best_epoch20_step4519.pt",
                 "backbone":
                 {
                     "name": ["rgb_i3d", "s3d"],

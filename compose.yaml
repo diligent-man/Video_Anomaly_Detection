@@ -26,7 +26,7 @@ services:
 
         environment:
             DEVICE: "cuda"
-            CONFIG_PATH: "/weight/config.json"
+            CONFIG_PATH: " "
             WEIGHT_PATH: "/weight/best_epoch13_step2937.pt"
 
         deploy:
@@ -71,7 +71,7 @@ services:
         environment:
             WINDOW_LENGTH: 15
             POLYORDER: 3
-            HIGH_THRESHOLD: 0.7
+            HIGH_THRESHOLD: 0.9
             LOW_THRESHOLD: 0.2
 
         restart: on-failure

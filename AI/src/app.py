@@ -27,7 +27,7 @@ from AI.src.utils import DotDict, load_config, load_weights, find_video_stream
 
 app = FastAPI()
 
-device: str = os.environ.get("DEVICE", "cpu")
+device: str = os.environ.get("DEVICE", "cuda")
 overlap_ratio: float = os.environ.get("OVERLAP_RATIO", .5)
 T_max: int = os.environ.get("T_MAX", 30)
 

@@ -137,12 +137,6 @@ def find_anomaly_regions(anomaly_scores, high_threshold=None, low_threshold=None
         start = max(0, int(left_ips[i]))
         end = min(total_frames-1, int(right_ips[i]))
 
-        # Extend region to include nearby high values
-        while start > 0 and processed_scores[start-1] > peak_detector.prominence:
-            start -= 1
-        while end < total_frames-1 and processed_scores[end+1] > peak_detector.prominence:
-            end += 1
-
         anomaly_regions.append((start, end))
 
     # Merge overlapping regions
