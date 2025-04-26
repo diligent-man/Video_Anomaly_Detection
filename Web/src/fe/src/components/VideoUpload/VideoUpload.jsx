@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { IconUpload, IconX, IconAlertCircle } from "@tabler/icons-react";
 
-const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB max size
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024*1024*1024; // 100MB max size
 
 export default function VideoUpload({
   onVideoSelect,

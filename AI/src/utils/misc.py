@@ -39,7 +39,8 @@ if sys.platform == "win32":
     print("Initializing DLL path for Windows")
     for path in os.environ.get("Path", "").split(";"):
         if os.path.exists(path):
-            os.add_dll_directory(path)
+            dll_path = os.path.abspath(path)
+            os.add_dll_directory(dll_path)
 
 
 def inspect_ffmpeg() -> None:
@@ -213,12 +214,13 @@ def multiple_replace(string: str, ref_dict: Dict[str, str]) -> str:
     return string
 
 
-def draw_anomaly_graph(preds: List[List[float]],
-                       labels: List[int],
-                       legends: List[str],
-                       name: str,
-                       spath: str = None
-                       ) -> None:
+def draw_anomaly_graph(
+        preds: List[List[float]],
+        labels: List[int],
+        legends: List[str],
+        name: str,
+        spath: str = None
+):
     plt.switch_backend("tkagg")
 
     T = len(labels)
@@ -263,6 +265,7 @@ def draw_anomaly_graph(preds: List[List[float]],
 
     if spath is not None:
         plt.savefig(spath)
+
 
 ########################################################################################################################
 TORCH_2_4 = check_version(torch.__version__, "2.4.0")

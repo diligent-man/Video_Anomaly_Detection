@@ -45,7 +45,7 @@ class smooth_signal:
 
 
 @dataclasses.dataclass
-class find_peaks:
+class PeakDetector:
     height: float = float(os.environ.get("HIGH_THRESHOLD", 0.5))
     prominence: float = float(os.environ.get("LOW_THRESHOLD", 0.4))
     width: int = int(os.environ.get("PEAK_WIDTH", 1))

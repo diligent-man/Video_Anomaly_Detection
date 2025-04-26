@@ -71,8 +71,8 @@ services:
         environment:
             WINDOW_LENGTH: 15
             POLYORDER: 3
-            HIGH_THRESHOLD: 0.6
-            LOW_THRESHOLD: 0.4
+            HIGH_THRESHOLD: 0.7
+            LOW_THRESHOLD: 0.2
 
         restart: on-failure
 

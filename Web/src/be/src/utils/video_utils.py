@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 from scipy.signal import peak_widths
 
-from .constant import smooth_signal, find_peaks
+from .constant import smooth_signal, PeakDetector
 
 __all__ = ["plot_vad_animation", "find_anomaly_regions", "get_video_info"]
 
@@ -108,7 +108,7 @@ def find_anomaly_regions(anomaly_scores, high_threshold=None, low_threshold=None
     if polyorder is not None:
         smoother.polyorder = polyorder
         
-    peak_detector = find_peaks()
+    peak_detector = PeakDetector()
     if high_threshold is not None:
         peak_detector.height = high_threshold
     if low_threshold is not None:
