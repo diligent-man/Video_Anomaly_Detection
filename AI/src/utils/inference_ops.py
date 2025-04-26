@@ -102,4 +102,3 @@ def infer_for_test(inp: Tensor, label: Tensor,
         preds: List[float] = preds.tolist()
         label: List[int] = label.tolist()
     return preds, label
-

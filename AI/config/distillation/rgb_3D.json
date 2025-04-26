@@ -10,7 +10,7 @@
         "exist_ok": false,
         "sep": "_",
 
-        "epochs": 40,
+        "epochs": 20,
         "eval_strategy": "epoch",
 
         "resume": false,
@@ -48,7 +48,7 @@
                 "batch_size": 4,
                 "shuffle": false,
                 "method": 2,  // sampled by max datasource
-                "num_workers": 6,
+                "num_workers": 4,
                 "prefetch_factor": 1,
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
@@ -186,7 +186,7 @@
             },
             "teacher":
             {
-                "pretrained": "../../results/AIP391/single/train/input_3d/ckpt/best_epoch11_step2485.pt",
+                "pretrained": "",
                 "backbone":
                 {
                     "name": ["rgb_i3d", "s3d"],
