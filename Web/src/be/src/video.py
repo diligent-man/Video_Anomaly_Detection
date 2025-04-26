@@ -25,11 +25,14 @@ async def upload_video(file: UploadFile = File(...)):
     """
     Upload video, tính toán anomaly scores và tạo plot animation
     """
+    print(f"[UPLOAD] Starting upload process for file: {file.filename}")
     try:
         CHUNK_SIZE = 1024*1024  # 1MB chunks
         video_path = VIDEO_DIR / file.filename
         scores_file = get_scores_path(file.filename)
         plot_file = get_plot_path(file.filename)
+        
+        print(f"[UPLOAD] Paths prepared: video={video_path}, scores={scores_file}, plot={plot_file}")
         
         # Get current date and time for upload_date
         upload_date = datetime.now().isoformat()
@@ -41,50 +44,94 @@ async def upload_video(file: UploadFile = File(...)):
         }
         
         # Lưu video
+        print(f"[UPLOAD] Starting to save video file {file.filename}")
         with open(video_path, "wb") as buffer:
+            chunk_count = 0
             while chunk := await file.read(CHUNK_SIZE):
                 buffer.write(chunk)
+                chunk_count += 1
+                if chunk_count % 10 == 0:  # Log every 10MB
+                    print(f"[UPLOAD] Written {chunk_count * CHUNK_SIZE / 1024 / 1024:.1f}MB of video data")
+        print(f"[UPLOAD] Video saved successfully: {video_path}")
         
         # Tính toán scores nếu chưa có
         video_fps = None  # Khởi tạo biến fps
+        print(f"[UPLOAD] Checking for existing scores at {scores_file}")
         if not scores_file.exists():
+            print(f"[UPLOAD] No existing scores found, generating new scores")
             scores_file_path, video_fps = run_vad_model(str(video_path))
+            print(f"[UPLOAD] Scores generated successfully: path={scores_file_path}, fps={video_fps}")
             result["scores_path"] = scores_file_path
             result["fps"] = video_fps  # Lưu fps vào kết quả
             result["status"] = "processed"
             
             # Đọc scores vừa tạo để tạo plot
+            print(f"[UPLOAD] Loading newly created scores from {scores_file}")
             scores = np.load(scores_file).tolist()
-        else:
-            # Nếu scores đã tồn tại
-            result["scores_path"] = str(scores_file)
-            result["status"] = "existing"
-            scores = np.load(scores_file).tolist()
-        
-        # Tạo plot animation nếu chưa có hoặc cần tạo lại
-        if not plot_file.exists() or result["status"] == "processed":
+            print(f"[UPLOAD] Scores loaded: {len(scores)} data points")
+            
+            # Tạo mới plot khi scores mới được tạo
+            print(f"[UPLOAD] Starting plot generation for {file.filename}")
             plot_path = generate_plot(file.filename, scores, fps=video_fps)
             if plot_path:
+                print(f"[UPLOAD] Plot generated successfully: {plot_path}")
                 result["plot_path"] = plot_path
+                result["plot_status"] = "generated"
             else:
+                print(f"[UPLOAD] Plot generation failed")
                 result["plot_status"] = "failed"
         else:
-            result["plot_path"] = str(plot_file)
-            result["plot_status"] = "existing"
+            # Nếu scores đã tồn tại
+            print(f"[UPLOAD] Using existing scores from {scores_file}")
+            result["scores_path"] = str(scores_file)
+            result["status"] = "existing"
+            
+            # Kiểm tra xem plot đã tồn tại chưa
+            if plot_file.exists():
+                # Sử dụng plot đã có
+                print(f"[UPLOAD] Using existing plot file: {plot_file}")
+                result["plot_path"] = str(plot_file)
+                result["plot_status"] = "existing"
+            else:
+                # Tạo plot mới nếu chưa có
+                print(f"[UPLOAD] No existing plot found, generating new plot")
+                scores = np.load(scores_file).tolist()
+                print(f"[UPLOAD] Scores loaded: {len(scores)} data points")
+                
+                # Lấy fps từ video nếu không có trong scores
+                if video_fps is None:
+                    try:
+                        from .utils.video_utils import get_video_info
+                        video_fps, _, _ = get_video_info(str(video_path))
+                        result["fps"] = video_fps
+                    except Exception as e:
+                        print(f"[UPLOAD] Warning: Could not get video FPS: {str(e)}")
+                
+                plot_path = generate_plot(file.filename, scores, fps=video_fps)
+                if plot_path:
+                    print(f"[UPLOAD] Plot generated successfully: {plot_path}")
+                    result["plot_path"] = plot_path
+                    result["plot_status"] = "generated"
+                else:
+                    print(f"[UPLOAD] Plot generation failed")
+                    result["plot_status"] = "failed"
         
         # Thêm CORS header vào response
+        print(f"[UPLOAD] Process completed successfully, returning response")
         response = JSONResponse(content=result)
         response.headers["Access-Control-Allow-Origin"] = "*"
         return response
     
     except Exception as e:
-        print(f"Error in upload_video: {str(e)}")
+        print(f"[UPLOAD] Error in upload_video: {str(e)}")
+        import traceback
+        print(f"[UPLOAD] Stacktrace: {traceback.format_exc()}")
         return JSONResponse(
             status_code=500, 
             content={"message": f"Error uploading video: {str(e)}"}, 
             headers={"Access-Control-Allow-Origin": "*"}
         )
-
+    
 @router.get("/get_video/{video_name}")
 async def get_video(video_name: str):
     """ Lấy video theo tên """

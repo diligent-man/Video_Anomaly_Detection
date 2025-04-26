@@ -47,9 +47,8 @@ export async function uploadVideoApi({
       // Handle response
       if (response && (response.filename || response.status === "processed" || response.status === "existing")) {
         // Ensure plot_path is correctly formatted with full URL
-        if (response.plot_path) {
-          // Check if plot_path is already a full URL
-          if (!response.plot_path.startsWith('http')) {
+        if (data.plot_path) {
+          if (!data.plot_path.startsWith('http')) {
             response.plot_path = `${baseUrl}apis/video/get_plot/${encodeURIComponent(response.filename)}`;
           }
         }
