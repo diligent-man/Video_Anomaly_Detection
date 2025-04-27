@@ -56,7 +56,7 @@ def run_vad_model(video_path):
 
 def get_scores_path(video_name: str) -> Path:
     """Generate the expected scores file path for a video"""
-    return Path("{SCORES_DIR}{os.sep}{Path(video_name).stem}_scores.npy")
+    return Path(f"{SCORES_DIR}{os.sep}{Path(video_name).stem}_scores.npy")
 
 
 def get_plot_path(video_name: str) -> Path:
