@@ -31,7 +31,6 @@ services:
 
         networks:
             - web
-#            - ai-backend
 
         deploy:
             mode: global
@@ -75,7 +74,9 @@ services:
             POLYORDER: 6
             HIGH_THRESHOLD: 0.9
             LOW_THRESHOLD: 0.2
+            TMP_DIR: "run_results"
             VAD_ENDPOINT: "http://capstone_ai:6968"
+
 
         restart: on-failure
 
@@ -88,7 +89,6 @@ services:
 
         networks:
             - web
-#            - ai-backend
 
         deploy:
             mode: global
@@ -152,5 +152,3 @@ services:
 networks:
   web:
     driver: bridge
-#  ai-backend:
-#    driver: bridge

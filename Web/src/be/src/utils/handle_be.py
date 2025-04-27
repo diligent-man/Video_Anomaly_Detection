@@ -6,10 +6,10 @@ from pathlib import Path
 from .video_utils import get_video_info, plot_vad_animation
 
 # Định nghĩa thư mục lưu trữ
-TMP_DIR = Path("tmp").resolve()
-VIDEO_DIR = TMP_DIR / "videos"
-SCORES_DIR = TMP_DIR / "scores"
-PLOTS_DIR = TMP_DIR / "plots"
+TMP_DIR = os.getenv("TMP_DIR", Path("tmp").resolve())
+VIDEO_DIR = f"{TMP_DIR}{os.sep}videos"
+SCORES_DIR = f"{TMP_DIR}{os.sep}scores"
+PLOTS_DIR = f"{TMP_DIR}{os.sep}plots"
 
 # Tạo các thư mục nếu chưa tồn tại
 os.makedirs(VIDEO_DIR, exist_ok=True)
@@ -29,7 +29,6 @@ def run_vad_model(video_path):
         with open(video_path, 'rb') as video_file:
             video_filename = os.path.basename(video_path)
             files = {'file': (video_filename, video_file, 'video/mp4')}
-            # files = {'file': video_file}
 
             # Gửi request đến API
             response = requests.post(f"{VAD_API_URL}/infer", files=files)
@@ -48,7 +47,6 @@ def run_vad_model(video_path):
             # Lưu scores vào file
             scores_file = get_scores_path(video_filename)
             np.save(scores_file, np.array(scores))
-            
             return str(scores_file), fps
             
     except Exception as e:
@@ -56,14 +54,14 @@ def run_vad_model(video_path):
         raise
 
 
-def get_scores_path(video_name):
+def get_scores_path(video_name: str) -> Path:
     """Generate the expected scores file path for a video"""
-    return SCORES_DIR / f"{Path(video_name).stem}_scores.npy"
+    return Path("{SCORES_DIR}{os.sep}{Path(video_name).stem}_scores.npy")
 
 
-def get_plot_path(video_name):
+def get_plot_path(video_name: str) -> Path:
     """Generate the expected plot animation file path for a video"""
-    return PLOTS_DIR / f"{Path(video_name).stem}_plot.mp4"
+    return Path(f"{PLOTS_DIR}{os.sep}{Path(video_name).stem}_plot.mp4")
 
 
 def generate_plot(video_name, scores=None, fps=None):
@@ -79,10 +77,8 @@ def generate_plot(video_name, scores=None, fps=None):
             scores = np.load(scores_file).tolist()
         
         if fps is None:
-            video_path = VIDEO_DIR / video_name
+            video_path = f"{VIDEO_DIR}{os.sep}{video_name}"
             fps, _, _ = get_video_info(video_path)
-        
-        
         
         # Generate plot animation
         plot_path_str = plot_vad_animation(

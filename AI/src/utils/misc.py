@@ -214,57 +214,163 @@ def multiple_replace(string: str, ref_dict: Dict[str, str]) -> str:
     return string
 
 
-def draw_anomaly_graph(
-        preds: List[List[float]],
-        labels: List[int],
-        legends: List[str],
-        name: str,
-        spath: str = None
-):
-    plt.switch_backend("tkagg")
+def draw_anomaly_graph(preds, anomaly_ranges, video_name, save_path=None, 
+                       smooth_pred=None, smooth_label="Smoothed Pred", smooth_color="grey",
+                       additional_anomaly_ranges=None, anomaly_color="red", additional_anomaly_color="green"):
+    """
+    Draws an anomaly graph with optional smoothed predictions and additional anomaly ranges.
 
-    T = len(labels)
-    x = np.arange(T)
+    Args:
+        preds (list or np.ndarray): The prediction scores.
+        anomaly_ranges (list of tuples): List of (start, end) for anomaly regions.
+        video_name (str): Title of the graph.
+        save_path (str, optional): Path to save the plot. Defaults to None.
+        smooth_pred (list or np.ndarray, optional): Smoothed prediction scores. Defaults to None.
+        smooth_label (str, optional): Label for the smoothed line. Defaults to "Smoothed Pred".
+        smooth_color (str, optional): Color for the smoothed line. Defaults to "grey".
+        additional_anomaly_ranges (list of tuples, optional): Additional anomaly regions. Defaults to None.
+        anomaly_color (str, optional): Color for the primary anomaly regions. Defaults to "red".
+        additional_anomaly_color (str, optional): Color for the additional anomaly regions. Defaults to "green".
+    """
+    plt.figure(figsize=(14, 5))
+    plt.plot(preds, label="Pred", color='blue')
 
-    fig, ax = plt.subplots(figsize=(10, 4))
+    # Plot smoothed predictions if provided
+    if smooth_pred is not None:
+        plt.plot(smooth_pred, label=smooth_label, color=smooth_color)
 
-    for pred, legend in zip(preds, legends):
-        ax.plot(x, pred, label=legend, linewidth=1.5)
+    # Add primary anomaly regions
+    for i, (start, end) in enumerate(anomaly_ranges):
+        if i == 0:  # Add label only for the first region
+            plt.axvspan(start, end, color=anomaly_color, alpha=0.3, label="Anomaly Region")
+        else:
+            plt.axvspan(start, end, color=anomaly_color, alpha=0.3)
 
-    labels_np = np.array(labels)
-    anomaly_regions = np.where(labels_np == 1)[0].tolist()
+    # Add additional anomaly regions if provided
+    if additional_anomaly_ranges is not None:
+        for i, (start, end) in enumerate(additional_anomaly_ranges):
+            if i == 0:  # Add label only for the first region
+                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3, label="Additional Anomaly Region")
+            else:
+                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3)
 
-    if len(anomaly_regions) > 0:
-        start = anomaly_regions[0]
-        for i in range(1, len(anomaly_regions)):
-            if anomaly_regions[i] != anomaly_regions[i - 1] + 1:
-                ax.axvspan(start, anomaly_regions[i - 1], color='red', alpha=0.3)
-                start = anomaly_regions[i]
-        ax.axvspan(start, anomaly_regions[-1], color='red', alpha=0.3)
+    plt.title(video_name, fontsize=16)
+    plt.xlabel("Frame", fontsize=12)
+    plt.ylabel("Anomaly Score", fontsize=12)
+    handles, labels_ = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels_, handles))
+    # Place legend outside the plot
+    plt.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+    plt.grid(False)
+    plt.xlim(left=0)
+    plt.ylim(0, 1)
+    plt.tick_params(axis='y', which='both', direction='in')
 
-    ax.set_yticks(np.linspace(0, 1, 11))
-    ax.set_xticks(np.linspace(0, T, 6))
-    ax.set_xlabel("Frame")
-    ax.set_ylabel("Score")
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight')
+        print(f"Plot saved to {save_path}")
+    plt.show()
 
-    ax.spines['left'].set_position('zero')
-    ax.spines['bottom'].set_position('zero')
-    ax.spines['right'].set_color('black')
-    ax.spines['top'].set_color('black')
+def smooth_filter (signal_data, window_length=None, polyorder=None):
+    """
+    Configure a smoother with the given parameters and apply it to the signal data.
+    
+    Parameters:
+    -----------
+    signal_data : list or numpy.ndarray
+        The signal data to be smoothed
+    window_length : int or None
+        Length of the smoothing window (None = use default)
+    polyorder : int or None
+        Polynomial order for filter (None = use default)
+        
+    Returns:
+    --------
+    numpy.ndarray
+        The smoothed signal data
+    """
 
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
+    # Create and configure the smoother
+    smoother = smooth_signal()
+    if window_length is not None:
+        smoother.window_length = window_length
+    if polyorder is not None:
+        smoother.polyorder = polyorder
+        
+    # Apply the smoother to the signal data
+    return smoother.apply(signal_data)
 
-    ax.set_xlim(left=0)
-    ax.set_ylim(bottom=0, top=1.05)
+def find_anomaly_regions(anomaly_scores, high_threshold=None, low_threshold=None,MERGE_GAP=5):
+    """
+    Find anomaly regions using peak detection with signal filtering.
 
-    ax.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Legend")
+    Parameters:
+    -----------
+    anomaly_scores : list or array
+        The anomaly scores to analyze
+    high_threshold : float or None
+        Threshold for peak height detection (None = use default)
+    low_threshold : float or None
+        Threshold for peak prominence (None = use default)
+    
 
-    ax.set_title(name)
-    plt.tight_layout()
+    Returns:
+    --------
+    tuple
+        (anomaly_regions, processed_scores, peaks)
+        - anomaly_regions: list of (start, end) tuples
+        - processed_scores: smoothed signal
+        - peaks: array of detected peak indices
+    """
+    
+        
+    peak_detector = PeakDetector()
+    if high_threshold is not None:
+        peak_detector.height = high_threshold
+    if low_threshold is not None:
+        peak_detector.prominence = low_threshold
+    
+    # Convert to numpy array if not already
+    anomaly_scores = np.array(anomaly_scores)
+    total_frames = len(anomaly_scores)
 
-    if spath is not None:
-        plt.savefig(spath)
+    
+
+    # Find peaks using the peak_detector dataclass
+    peaks, properties = peak_detector.detect(anomaly_scores)
+
+    # Handle the case with no detected peaks
+    if len(peaks) == 0:
+        return [], anomaly_scores, peaks
+
+    # Calculate peak widths for determining anomaly regions
+    widths, width_heights, left_ips, right_ips = peak_detector.get_peak_regions(anomaly_scores, peaks)
+
+    # Create anomaly regions based on peak widths
+    anomaly_regions = []
+    for i, peak in enumerate(peaks):
+        start = max(0, int(left_ips[i]))
+        end = min(total_frames-1, int(right_ips[i]))
+
+        anomaly_regions.append((start, end))
+
+    # Merge overlapping regions
+    if anomaly_regions:
+        anomaly_regions.sort(key=lambda x: x[0])
+        merged_regions = [anomaly_regions[0]]
+
+        for current in anomaly_regions[1:]:
+            prev = merged_regions[-1]
+            if current[0] <= prev[1] + MERGE_GAP:
+                # Gộp nếu chạm hoặc cách nhau dưới ngưỡng MERGE_GAP
+                merged_regions[-1] = (prev[0], max(prev[1], current[1]))
+            else:
+                merged_regions.append(current)
+
+        anomaly_regions = merged_regions
+
+    return anomaly_regions, anomaly_scores, peaks
+
 
 
 ########################################################################################################################

@@ -3,6 +3,7 @@ FROM python:3.11.10
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt install -y curl && apt clean
+RUN apt install -y curl ffmpeg libsm6 libxext6 libgl1-mesa-glx && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN adduser nonroot
 RUN mkdir -p /Web/src/be && chown -R nonroot:nonroot /Web/src/be

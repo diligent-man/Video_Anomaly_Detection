@@ -1,23 +1,23 @@
+import os
+from datetime import datetime
+
+
+import numpy as np
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 from urllib.parse import unquote
 
-import numpy as np
-from datetime import datetime
 
 from .utils.handle_be import (
     run_vad_model,
     get_scores_path,
     get_plot_path,
     generate_plot,
-    VIDEO_DIR,
-    SCORES_DIR,
-    PLOTS_DIR
+    VIDEO_DIR
 )
 
 router = APIRouter(prefix="/apis/video", tags=["Video"])
-
 
 
 @router.post("/upload_video")
@@ -28,7 +28,7 @@ async def upload_video(file: UploadFile = File(...)):
     print(f"[UPLOAD] Starting upload process for file: {file.filename}")
     try:
         CHUNK_SIZE = 1024*1024  # 1MB chunks
-        video_path = VIDEO_DIR / file.filename
+        video_path = f"{VIDEO_DIR}{os.sep}{file.filename}"
         scores_file = get_scores_path(file.filename)
         plot_file = get_plot_path(file.filename)
         
@@ -98,7 +98,7 @@ async def upload_video(file: UploadFile = File(...)):
             scores = np.load(scores_file).tolist()
             print(f"[UPLOAD] Scores loaded: {len(scores)} data points")
                 
-                # Lấy fps từ video nếu không có trong scores
+            # Lấy fps từ video nếu không có trong scores
             if video_fps is None:
                 try:
                     from .utils.video_utils import get_video_info
@@ -131,7 +131,8 @@ async def upload_video(file: UploadFile = File(...)):
             content={"message": f"Error uploading video: {str(e)}"}, 
             headers={"Access-Control-Allow-Origin": "*"}
         )
-    
+
+
 @router.get("/get_video/{video_name}")
 async def get_video(video_name: str):
     """ Lấy video theo tên """
@@ -145,6 +146,7 @@ async def get_video(video_name: str):
     response = FileResponse(file_path, media_type="video/mp4")
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+
 
 @router.get("/get_all_video")
 async def list_videos():
@@ -174,11 +176,12 @@ async def list_videos():
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"Error listing videos: {str(e)}"})
 
+
 @router.delete("/delete_video/{video_name}")
 async def delete_video(video_name: str):
     """ Xóa video và tất cả dữ liệu liên quan (scores, plot) """
     try:
-        video_path = VIDEO_DIR / video_name
+        video_path = Path(f"{VIDEO_DIR}{os.sep}{video_name}")
         scores_file = get_scores_path(video_name)
         plot_file = get_plot_path(video_name)
         
@@ -261,6 +264,7 @@ async def delete_video(video_name: str):
             }
         )
 
+
 @router.get("/check_score/{video_name}")
 async def check_scores_exist(video_name: str):
     """Check if scores for a specific video already exist"""
@@ -275,6 +279,7 @@ async def check_scores_exist(video_name: str):
         "plot_path": str(plot_file) if plot_file.exists() else None
     }
 
+
 @router.get("/get_score/{video_name}")
 async def get_anomaly_scores(video_name: str):
     """ Lấy anomaly scores theo tên video """
@@ -282,7 +287,8 @@ async def get_anomaly_scores(video_name: str):
     
     if not scores_file.exists():
         # If scores don't exist but video does, process it
-        video_path = VIDEO_DIR / video_name
+        video_path = Path(f"{VIDEO_DIR}{os.sep}{video_name}")
+
         if video_path.exists():
             scores_file_path = run_vad_model(str(video_path))
             
@@ -323,6 +329,7 @@ async def get_anomaly_scores(video_name: str):
         )
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"Error reading scores: {str(e)}"})
+
 
 @router.api_route("/get_plot/{video_name}", methods=["GET", "HEAD"])
 async def get_plot(video_name: str):
