@@ -1,8 +1,8 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Tuple
 from matplotlib.animation import FuncAnimation, FFMpegWriter
-from scipy.signal import peak_widths
 
 from .constant import smooth_signal, PeakDetector
 
@@ -18,18 +18,18 @@ def get_video_info(video_path):
     Returns: fps, total_frames, video_duration
     """
     import ffmpeg
-    
+
     try:
         # Get video information using ffprobe
         probe = ffmpeg.probe(str(video_path))
-        
+
         # Extract video stream information
-        video_stream = next((stream for stream in probe['streams'] 
+        video_stream = next((stream for stream in probe['streams']
                            if stream['codec_type'] == 'video'), None)
-        
+
         if video_stream is None:
             raise ValueError("Không tìm thấy video stream!")
-        
+
         # Get frame rate
         if 'r_frame_rate' in video_stream:
             # Frame rate often comes as a fraction (e.g., "24/1")
@@ -47,7 +47,7 @@ def get_video_info(video_path):
                 fps = num / den if den else 0
             else:
                 fps = float(framerate_str)
-        
+
         # Get total frames - directly from stream if available
         if 'nb_frames' in video_stream and video_stream['nb_frames'].isdigit():
             total_frames = int(video_stream['nb_frames'])
@@ -58,15 +58,15 @@ def get_video_info(video_path):
             else:
                 # If stream doesn't have duration, check format
                 duration = float(probe['format'].get('duration', 0))
-            
+
             # Calculate frames from duration and fps
             total_frames = int(duration * fps)
-        
+
         # Calculate video duration
         video_duration = total_frames / fps if fps > 0 else 0
-        
+
         return fps, total_frames, video_duration
-        
+
     except ffmpeg.Error as e:
         # FFmpeg error messages are usually in stderr
         error_message = e.stderr.decode('utf-8') if hasattr(e, 'stderr') else str(e)
@@ -75,8 +75,12 @@ def get_video_info(video_path):
         raise ValueError(f"Lỗi khi đọc thông tin video: {str(e)}")
 
 
-def find_anomaly_regions(anomaly_scores, high_threshold=None, low_threshold=None, 
-                         window_length=None, polyorder=None):
+def find_anomaly_regions(anomaly_scores: np.ndarray,
+                         window_length=None,
+                         polyorder=None,
+                         high_threshold=None,
+                         low_threshold=None,
+                         ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Find anomaly regions using peak detection with signal filtering.
 
@@ -84,14 +88,14 @@ def find_anomaly_regions(anomaly_scores, high_threshold=None, low_threshold=None
     -----------
     anomaly_scores : list or array
         The anomaly scores to analyze
-    high_threshold : float or None
-        Threshold for peak height detection (None = use default)
-    low_threshold : float or None
-        Threshold for peak prominence (None = use default)
     window_length : int or None
         Length of the smoothing window (None = use default)
     polyorder : int or None
         Polynomial order for filter (None = use default)
+    high_threshold : float or None
+        Threshold for peak height detection (None = use default)
+    low_threshold : float or None
+        Threshold for peak prominence (None = use default)
 
     Returns:
     --------
@@ -102,34 +106,33 @@ def find_anomaly_regions(anomaly_scores, high_threshold=None, low_threshold=None
         - peaks: array of detected peak indices
     """
     # Create configuration objects with provided or default values
-    smoother = smooth_signal()
     if window_length is not None:
-        smoother.window_length = window_length
+        smooth_signal.window_length = window_length
+
     if polyorder is not None:
-        smoother.polyorder = polyorder
-        
-    peak_detector = PeakDetector()
+        smooth_signal.polyorder = polyorder
+
     if high_threshold is not None:
-        peak_detector.height = high_threshold
+        PeakDetector.height = high_threshold
     if low_threshold is not None:
-        peak_detector.prominence = low_threshold
-    
+        PeakDetector.prominence = low_threshold
+
     # Convert to numpy array if not already
     anomaly_scores = np.array(anomaly_scores)
     total_frames = len(anomaly_scores)
 
     # Apply smoothing using the smoother dataclass
-    processed_scores = smoother.apply(anomaly_scores)
+    processed_scores = smooth_signal.apply(anomaly_scores)
 
     # Find peaks using the peak_detector dataclass
-    peaks, properties = peak_detector.detect(processed_scores)
+    peaks, properties = PeakDetector.detect(processed_scores)
 
     # Handle the case with no detected peaks
     if len(peaks) == 0:
-        return [], processed_scores, peaks
+        return np.array([]), processed_scores, peaks
 
     # Calculate peak widths for determining anomaly regions
-    widths, width_heights, left_ips, right_ips = peak_detector.get_peak_regions(processed_scores, peaks)
+    widths, width_heights, left_ips, right_ips = PeakDetector.get_peak_regions(processed_scores, peaks)
 
     # Create anomaly regions based on peak widths
     anomaly_regions = []
@@ -153,13 +156,12 @@ def find_anomaly_regions(anomaly_scores, high_threshold=None, low_threshold=None
                 merged_regions.append(current)
 
         anomaly_regions = merged_regions
-
     return anomaly_regions, processed_scores, peaks
 
 
 def plot_vad_animation(anomaly_scores, fps=30, save_path="vad_plot.mp4", 
-                      high_threshold=None, low_threshold=None,
-                      window_length=None, polyorder=None):
+                      high_threshold=0.7, low_threshold=0.3,
+                      window_length=15, polyorder=6):
     """
     Creates an animated plot of video anomaly detection scores.
     

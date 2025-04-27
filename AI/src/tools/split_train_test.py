@@ -5,7 +5,7 @@ from AI.src.preprocessing.split_train_test import *
 
 
 def main() -> None:
-    spath: str = "/home/trong/Downloads/Dataset/VAD/final"
+    spath: str = "/home/trong/Downloads/Dataset/VAD/tmp_test/final/IITB"
 
     # Key format: f"{ds_phase}_{ds_name}_{ds_phase}_{ds_type}"
     counter: Dict[str, int] = defaultdict(int)
@@ -26,16 +26,14 @@ def main() -> None:
     #     overwrite_prev_log=True
     # )
 
-    # labeled_to_test(
-    #     [
-    #         "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/IITB/",
-    #         "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/UBI-FIGHT/",
-    #         "/home/trong/Downloads/Dataset/VAD/preprocessing/stage_2/test/UCF/",
-    #     ],
-    #     deepcopy(spath),
-    #     counter,
-    #     overwrite_prev_log=False
-    # )
+    labeled_to_test(
+        [
+            "/home/trong/Downloads/Dataset/VAD/tmp_test/out/IITB"
+        ],
+        deepcopy(spath),
+        counter,
+        overwrite_prev_log=True
+    )
 
     # labeled_to_train_val(
     #     [
