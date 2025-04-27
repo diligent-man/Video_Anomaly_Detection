@@ -70,7 +70,7 @@ class VADFrameLevelDataset(VisionDataset):
         labeled_indices: List[np.int64] = self.__annotation.iloc[idx, self.__annotation.columns != "path"].to_list()
         for i in range(0, len(labeled_indices), 2):
             start, end = labeled_indices[i: i+2]
-            start, end = int(start), int(end)
+            start, end = int(float(start)), int(float(end))
 
             if (start, end) != (-1, -1):
                 labels[start: end+1] = 1

@@ -1,7 +1,7 @@
 import dataclasses
 import os
 import numpy as np
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 from scipy.signal import find_peaks, peak_widths, savgol_filter
 
 
@@ -10,10 +10,11 @@ class smooth_signal:
     window_length: int = int(os.environ.get("WINDOW_LENGTH", 15))
     polyorder: int = int(os.environ.get("POLYORDER", 6))
 
-    def validate_params(self, signal_length: int) -> tuple[int, int]:
+    @classmethod
+    def validate_params(cls, signal_length: int) -> tuple[int, int]:
         """Validate and adjust parameters based on signal length"""
         # Make window length odd
-        window_length = self.window_length
+        window_length = cls.window_length
         if window_length % 2 == 0:
             window_length += 1
 
@@ -21,20 +22,20 @@ class smooth_signal:
         window_length = min(window_length, signal_length - 1)
 
         # Ensure polyorder is valid for window length
-        polyorder = min(self.polyorder, window_length - 1)
-
+        polyorder = min(cls.polyorder, window_length - 1)
         return window_length, polyorder
 
-    def apply(self, signal: np.ndarray) -> np.ndarray:
+    @classmethod
+    def apply(cls, signal: np.ndarray) -> np.ndarray:
         """Apply Savitzky-Golay filter to signal"""
         signal = np.array(signal)
 
         # Handle very short signals
-        if len(signal) <= self.polyorder + 2:
+        if len(signal) <= cls.polyorder + 2:
             return signal.copy()
 
         # Get validated parameters
-        window_length, polyorder = self.validate_params(len(signal))
+        window_length, polyorder = cls.validate_params(len(signal))
 
         # Apply filter if parameters are valid
         if window_length > polyorder:
@@ -46,38 +47,42 @@ class smooth_signal:
 
 @dataclasses.dataclass
 class PeakDetector:
-    height: float = os.environ.get("HIGH_THRESHOLD", 0.7)
-    prominence: float = os.environ.get("LOW_THRESHOLD", 0.4)
-    width: int = os.environ.get("PEAK_WIDTH", None)
-    distance: int = os.environ.get("DISTANCE", None)
-    threshold: float = os.environ.get("THRESHOLD", None)
-    wlen: int = os.environ.get("WLEN", None)
+    height: float = os.environ.get("HEIGHT", 0.7)
+    prominence: float = os.environ.get("PROMINENCE", 0.4)
+    width: int = None if os.environ.get("WIDTH") is None else int(os.environ.get("PEAK_WIDTH"))
+    distance: int = None if os.environ.get("DISTANCE") is None else int(os.environ.get("DISTANCE"))
+    threshold: float = None if os.environ.get("THRESHOLD") is None else int(os.environ.get("THRESHOLD"))
+    wlen: int = None if os.environ.get("WLEN") is None else int(os.environ.get("WLEN"))
     rel_height: float = os.environ.get("REL_HEIGHT", 0.2)
 
-    def get_params(self) -> Dict[str, Any]:
+    @classmethod
+    def get_params(cls) -> Dict[str, Any]:
         """Get parameters dictionary for scipy.signal.find_peaks"""
         params = {
-            "height": self.height,
-            "prominence": self.prominence,
-            "width": self.width
+            "height": cls.height,
+            "prominence": cls.prominence,
+            "width": cls.width
         }
 
         # Only include optional parameters if they are not None
-        if self.distance is not None:
-            params["distance"] = self.distance
-        if self.threshold is not None:
-            params["threshold"] = self.threshold
-        if self.wlen is not None:
-            params["wlen"] = self.wlen
+        if cls.distance is not None:
+            params["distance"] = cls.distance
+        if cls.threshold is not None:
+            params["threshold"] = cls.threshold
+        if cls.wlen is not None:
+            params["wlen"] = cls.wlen
         return params
 
-    def detect(self, signal: np.ndarray) -> tuple[np.ndarray, Dict[str, np.ndarray]]:
+    @classmethod
+    def detect(cls, signal: np.ndarray) -> tuple[np.ndarray, Dict[str, np.ndarray]]:
         """Detect peaks in the signal using configured parameters"""
-        return find_peaks(signal, **self.get_params())
+        return find_peaks(signal, **cls.get_params())
 
-    def get_peak_regions(self,
+    @classmethod
+    def get_peak_regions(cls,
                          signal: np.ndarray,
                          peaks: np.ndarray
-                         ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+                         ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Calculate peak width regions using peak_widths"""
-        return peak_widths(signal, peaks, rel_height=self.rel_height)
+        widths, width_heights, left_ips, right_ips = peak_widths(signal, peaks, rel_height=cls.rel_height)
+        return widths, width_heights, left_ips, right_ips

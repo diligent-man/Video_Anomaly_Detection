@@ -72,8 +72,15 @@ services:
         environment:
             WINDOW_LENGTH: 15
             POLYORDER: 6
-            HIGH_THRESHOLD: 0.9
-            LOW_THRESHOLD: 0.2
+
+            HEIGHT: 0.7
+            PROMINENCE: 0.4
+#            WIDTH:
+#            DISTANCE
+#            THRESHOLD
+#            WLEN
+            REL_HEIGHT: 0.2
+
             TMP_DIR: "run_results"
             VAD_ENDPOINT: "http://capstone_ai:6968"
 
