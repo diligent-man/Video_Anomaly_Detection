@@ -87,18 +87,21 @@ async def upload_video(file: UploadFile = File(...)):
             result["status"] = "existing"
             
             # Kiểm tra xem plot đã tồn tại chưa
-        if plot_file.exists():
-            # Sử dụng plot đã có
-            print(f"[UPLOAD] Using existing plot file: {plot_file}")
-            result["plot_path"] = str(plot_file)
-            result["plot_status"] = "existing"
-        else:
-            # Tạo plot mới nếu chưa có
-            print(f"[UPLOAD] No existing plot found, generating new plot")
+            if plot_file.exists():
+                # Xóa plot đã có
+                print(f"[UPLOAD] Existing plot file found, deleting: {plot_file}")
+                try:
+                    plot_file.unlink()
+                    print(f"[UPLOAD] Existing plot file deleted successfully")
+                except Exception as e:
+                    print(f"[UPLOAD] Warning: Could not delete existing plot file: {str(e)}")
+
+            # Tạo plot mới
+            print(f"[UPLOAD] Generating new plot")
             scores = np.load(scores_file).tolist()
             print(f"[UPLOAD] Scores loaded: {len(scores)} data points")
-                
-                # Lấy fps từ video nếu không có trong scores
+
+            # Lấy fps từ video nếu không có trong scores
             if video_fps is None:
                 try:
                     from .utils.video_utils import get_video_info
@@ -106,7 +109,7 @@ async def upload_video(file: UploadFile = File(...)):
                     result["fps"] = video_fps
                 except Exception as e:
                     print(f"[UPLOAD] Warning: Could not get video FPS: {str(e)}")
-                
+
             plot_path = generate_plot(file.filename, scores, fps=video_fps)
             if plot_path:
                 print(f"[UPLOAD] Plot generated successfully: {plot_path}")
@@ -115,7 +118,6 @@ async def upload_video(file: UploadFile = File(...)):
             else:
                 print(f"[UPLOAD] Plot generation failed")
                 result["plot_status"] = "failed"
-        
         # Thêm CORS header vào response
         print(f"[UPLOAD] Process completed successfully, returning response")
         response = JSONResponse(content=result)

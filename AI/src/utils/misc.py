@@ -214,57 +214,62 @@ def multiple_replace(string: str, ref_dict: Dict[str, str]) -> str:
     return string
 
 
-def draw_anomaly_graph(
-        preds: List[List[float]],
-        labels: List[int],
-        legends: List[str],
-        name: str,
-        spath: str = None
-):
-    plt.switch_backend("tkagg")
+def draw_anomaly_graph(preds, anomaly_ranges, video_name, save_path=None, 
+                       smooth_pred=None, smooth_label="Smoothed Pred", smooth_color="grey",
+                       additional_anomaly_ranges=None, anomaly_color="red", additional_anomaly_color="green"):
+    """
+    Draws an anomaly graph with optional smoothed predictions and additional anomaly ranges.
 
-    T = len(labels)
-    x = np.arange(T)
+    Args:
+        preds (list or np.ndarray): The prediction scores.
+        anomaly_ranges (list of tuples): List of (start, end) for anomaly regions.
+        video_name (str): Title of the graph.
+        save_path (str, optional): Path to save the plot. Defaults to None.
+        smooth_pred (list or np.ndarray, optional): Smoothed prediction scores. Defaults to None.
+        smooth_label (str, optional): Label for the smoothed line. Defaults to "Smoothed Pred".
+        smooth_color (str, optional): Color for the smoothed line. Defaults to "grey".
+        additional_anomaly_ranges (list of tuples, optional): Additional anomaly regions. Defaults to None.
+        anomaly_color (str, optional): Color for the primary anomaly regions. Defaults to "red".
+        additional_anomaly_color (str, optional): Color for the additional anomaly regions. Defaults to "green".
+    """
+    plt.figure(figsize=(14, 5))
+    plt.plot(preds, label="Pred", color='blue')
 
-    fig, ax = plt.subplots(figsize=(10, 4))
+    # Plot smoothed predictions if provided
+    if smooth_pred is not None:
+        plt.plot(smooth_pred, label=smooth_label, color=smooth_color)
 
-    for pred, legend in zip(preds, legends):
-        ax.plot(x, pred, label=legend, linewidth=1.5)
+    # Add primary anomaly regions
+    for i, (start, end) in enumerate(anomaly_ranges):
+        if i == 0:  # Add label only for the first region
+            plt.axvspan(start, end, color=anomaly_color, alpha=0.3, label="Anomaly Region")
+        else:
+            plt.axvspan(start, end, color=anomaly_color, alpha=0.3)
 
-    labels_np = np.array(labels)
-    anomaly_regions = np.where(labels_np == 1)[0].tolist()
+    # Add additional anomaly regions if provided
+    if additional_anomaly_ranges is not None:
+        for i, (start, end) in enumerate(additional_anomaly_ranges):
+            if i == 0:  # Add label only for the first region
+                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3, label="Additional Anomaly Region")
+            else:
+                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3)
 
-    if len(anomaly_regions) > 0:
-        start = anomaly_regions[0]
-        for i in range(1, len(anomaly_regions)):
-            if anomaly_regions[i] != anomaly_regions[i - 1] + 1:
-                ax.axvspan(start, anomaly_regions[i - 1], color='red', alpha=0.3)
-                start = anomaly_regions[i]
-        ax.axvspan(start, anomaly_regions[-1], color='red', alpha=0.3)
+    plt.title(video_name, fontsize=16)
+    plt.xlabel("Frame", fontsize=12)
+    plt.ylabel("Anomaly Score", fontsize=12)
+    handles, labels_ = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels_, handles))
+    # Place legend outside the plot
+    plt.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+    plt.grid(False)
+    plt.xlim(left=0)
+    plt.ylim(0, 1)
+    plt.tick_params(axis='y', which='both', direction='in')
 
-    ax.set_yticks(np.linspace(0, 1, 11))
-    ax.set_xticks(np.linspace(0, T, 6))
-    ax.set_xlabel("Frame")
-    ax.set_ylabel("Score")
-
-    ax.spines['left'].set_position('zero')
-    ax.spines['bottom'].set_position('zero')
-    ax.spines['right'].set_color('black')
-    ax.spines['top'].set_color('black')
-
-    ax.xaxis.set_ticks_position('bottom')
-    ax.yaxis.set_ticks_position('left')
-
-    ax.set_xlim(left=0)
-    ax.set_ylim(bottom=0, top=1.05)
-
-    ax.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Legend")
-
-    ax.set_title(name)
-    plt.tight_layout()
-
-    if spath is not None:
-        plt.savefig(spath)
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight')
+        print(f"Plot saved to {save_path}")
+    plt.show()
 
 
 ########################################################################################################################
