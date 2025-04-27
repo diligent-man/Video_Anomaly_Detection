@@ -12,13 +12,14 @@ from typing import Tuple, Mapping, Any, List
 
 import torch
 from torch.nn import Module
+from torchvision.transforms import Compose, v2
 
-from AI.src.utils.inference_ops import infer_for_test
 
 from AI.src.utils import Logger
-from AI.src.modeling.architectures import build_model
 from AI.src.data.dataset import VADFrameLevelDataset
 from AI.src.data.dataloader import DefaultDataLoader
+from AI.src.utils.inference_ops import infer_for_test
+from AI.src.modeling.architectures import build_model
 from AI.src.utils import DotDict, load_config, load_weights
 
 
@@ -30,14 +31,18 @@ def main() -> None:
     overlap_ratio: float = 0.5
 
     logger: Logger = Logger("test")
-    pred_result: str = "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v1/log/pred_result.txt"
+    pred_result: str = "/home/trong/Downloads/Dataset/VAD/tmp_test/final/UCF/model_3_pred_result.txt"
 
     config: DotDict = DotDict(load_config(
-        "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v1/Mlflow/995263845449942640/d4e6cc59499a4abc90cf6410eb9aef25/artifacts/config.json"
+        # "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v1/Mlflow/995263845449942640/d4e6cc59499a4abc90cf6410eb9aef25/artifacts/config.json"
+        # "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_3d/v2/Mlflow/341932603411297071/49d947ac8c4c43758a91dbbfb4b1505c/artifacts/config.json"
+        "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_mixed/v3/Mlflow/991378426196781897/aaff4465b324425b91421ee50a683603/artifacts/config.json"
     ))
 
     weight: Mapping[str, Any] = load_weights(
-        "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v1/Mlflow/995263845449942640/d4e6cc59499a4abc90cf6410eb9aef25/artifacts/ckpt/best_epoch18_step4067.pt",
+        # "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v1/Mlflow/995263845449942640/d4e6cc59499a4abc90cf6410eb9aef25/artifacts/ckpt/best_epoch18_step4067.pt",
+        # "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_3d/v2/Mlflow/341932603411297071/49d947ac8c4c43758a91dbbfb4b1505c/artifacts/ckpt/best_epoch20_step4519.pt",
+        "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_mixed/v3/Mlflow/991378426196781897/aaff4465b324425b91421ee50a683603/artifacts/ckpt/best_epoch12_step2711.pt",
         weights_only=False
     )
 
@@ -48,14 +53,19 @@ def main() -> None:
 
     dl = DefaultDataLoader(
         VADFrameLevelDataset(
-            "/home/trong/Downloads/Dataset/VAD/final/test",
+            "/home/trong/Downloads/Dataset/VAD/tmp_test/final/UCF/test",
             "label.csv",
-            "v4"
+            "v4",
+            transform=Compose([v2.ToDtype(torch.float32, scale=True)])
         ), num_workers=1, shuffle=False, multiprocessing_context="fork"
     )
 
-    batch_thres = [0, 2500, 5000, 10000, 20000, 500000]
-    batch_worker = [16, 16, 16, 16, 12]
+    # batch_thres = [0, 2500, 5000, 10000, 20000, 500000]
+    # batch_worker = [16, 16, 16, 16, 12]
+
+    batch_thres = [0, 1000, 2000, 3000]
+    batch_worker = [8, 8, 8, 8]
+
     mp_inp = {i: defaultdict(list) for i in batch_thres[1:]}
 
     for i, (inp, label) in tqdm(enumerate(dl), total=len(dl)):

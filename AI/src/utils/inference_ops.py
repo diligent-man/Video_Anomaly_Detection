@@ -66,7 +66,7 @@ def infer_for_test(inp: Tensor, label: Tensor,
     step_preds: None | Tensor = None
     preds: Tensor = torch.zeros_like(label, dtype=torch.float16)
 
-    with torch.inference_mode(), torch.amp.autocast(device_type="cuda", enabled=True, dtype=torch.float16):
+    with torch.inference_mode(), torch.amp.autocast(device_type=device, enabled=True, dtype=torch.float16):
         for j in range(total_frames):
             if j < T_max or cum_frames < T_max:
                 cum_frames += 1
