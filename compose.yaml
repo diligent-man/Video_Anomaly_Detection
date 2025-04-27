@@ -29,15 +29,17 @@ services:
             CONFIG_PATH: " "
             WEIGHT_PATH: "/weight/best_epoch13_step2937.pt"
 
+        networks:
+            - web
+            - ai-backend
+
         deploy:
             mode: global
-
             restart_policy:
                 condition: on-failure
                 delay: 5s
                 window: 120s
                 max_attempts: 3
-
             resources:
                 limits:
                     cpus: "4"
@@ -70,9 +72,10 @@ services:
         
         environment:
             WINDOW_LENGTH: 15
-            POLYORDER: 3
+            POLYORDER: 6
             HIGH_THRESHOLD: 0.9
             LOW_THRESHOLD: 0.2
+            
 
         restart: on-failure
 
@@ -85,16 +88,15 @@ services:
 
         networks:
             - web
+            - ai-backend
 
         deploy:
             mode: global
-
             restart_policy:
                 condition: on-failure
                 delay: 5s
                 window: 120s
                 max_attempts: 3
-
             resources:
                 limits:
                     cpus: "4"
@@ -134,13 +136,11 @@ services:
 
         deploy:
             mode: global
-
             restart_policy:
                 condition: on-failure
                 delay: 5s
                 window: 120s
                 max_attempts: 3
-
             resources:
                 limits:
                     cpus: "4"
@@ -150,5 +150,7 @@ services:
                     memory: 2048M
 
 networks:
-    web:
-        driver: bridge
+  web:
+    driver: bridge
+  ai-backend:
+    driver: bridge

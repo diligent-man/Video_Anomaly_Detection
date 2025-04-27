@@ -42,25 +42,25 @@ export async function uploadVideoApi({
             }
           };
   
-      const response = await apiHelper.postFormData(apiUrls.UploadVideo, formData, config);
+          const response = await apiHelper.postFormData(apiUrls.UploadVideo, formData, config);
   
-      // Handle response
-      if (response && (response.filename || response.status === "processed" || response.status === "existing")) {
-        // Ensure plot_path is correctly formatted with full URL
-        if (data.plot_path) {
-          if (!data.plot_path.startsWith('http')) {
-            response.plot_path = `${baseUrl}apis/video/get_plot/${encodeURIComponent(response.filename)}`;
+          // Handle response
+          if (response && (response.filename || response.status === "processed" || response.status === "existing")) {
+            // Ensure plot_path is correctly formatted with full URL
+            if (response.plot_path) {  // Fixed: use 'response' instead of 'data'
+              if (!response.plot_path.startsWith('http')) {
+                response.plot_path = `${baseUrl}apis/video/get_plot/${encodeURIComponent(response.filename)}`;
+              }
+            }
+            onSuccess(response);
+          } else {
+            onFail(response?.message || "Failed to upload video");
           }
+        } catch (error) {
+          console.error("Upload video error:", error);
+          onFail(error?.message || "An error occurred while uploading the video");
         }
-        onSuccess(response);
-      } else {
-        onFail(response?.message || "Failed to upload video");
       }
-    } catch (error) {
-      console.error("Upload video error:", error);
-      onFail(error?.message || "An error occurred while uploading the video");
-    }
-  }
 
 /**
  * Get a specific video by name
