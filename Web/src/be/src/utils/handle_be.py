@@ -1,6 +1,6 @@
 import os
-import numpy as np
 import requests
+import numpy as np
 from pathlib import Path
 
 from .video_utils import get_video_info, plot_vad_animation
@@ -17,7 +17,7 @@ os.makedirs(SCORES_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
 # URL for the inference API
-VAD_API_URL = "http://0.0.0.0:6968"
+VAD_API_URL: str = os.getenv("VAD_ENDPOINT", "http://0.0.0.0:6968")
 
 
 def run_vad_model(video_path):
@@ -29,7 +29,8 @@ def run_vad_model(video_path):
         with open(video_path, 'rb') as video_file:
             video_filename = os.path.basename(video_path)
             files = {'file': (video_filename, video_file, 'video/mp4')}
-            
+            # files = {'file': video_file}
+
             # Gửi request đến API
             response = requests.post(f"{VAD_API_URL}/infer", files=files)
             

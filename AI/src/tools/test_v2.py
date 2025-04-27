@@ -3,6 +3,8 @@ Temp test
 """
 import gc
 import multiprocessing
+
+from tqdm import tqdm
 from multiprocessing import Pool
 from collections import defaultdict
 from typing import Tuple, Mapping, Any, List
@@ -53,10 +55,10 @@ def main() -> None:
     )
 
     batch_thres = [0, 2500, 5000, 10000, 20000, 500000]
-    batch_worker = [12, 12, 8, 8, 4]
+    batch_worker = [16, 16, 16, 16, 12]
     mp_inp = {i: defaultdict(list) for i in batch_thres[1:]}
 
-    for i, (inp, label) in enumerate(dl):
+    for i, (inp, label) in tqdm(enumerate(dl), total=len(dl)):
         for j in range(len(batch_thres)-1):
             if batch_thres[j] <= label.squeeze(0).shape[0] <= batch_thres[j+1]:
                 mp_inp[batch_thres[j+1]]["inp"].append(inp)

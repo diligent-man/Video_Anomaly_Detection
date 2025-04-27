@@ -53,7 +53,7 @@
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
-            "forward_strategy": "v1"
+            "forward_strategy": "v2"
         },
 
         "val":
@@ -84,7 +84,7 @@
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
-            "forward_strategy": "v1"
+            "forward_strategy": "v2"
         },
 
         "test":
