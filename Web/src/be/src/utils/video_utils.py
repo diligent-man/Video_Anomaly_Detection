@@ -2,7 +2,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
-from scipy.signal import peak_widths
 
 from .constant import smooth_signal, PeakDetector
 
