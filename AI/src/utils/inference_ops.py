@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Generator
 
 import torch
 import ffmpeg
@@ -10,7 +10,7 @@ from torchvision.io import decode_image, ImageReadMode
 
 from ..utils import find_video_stream
 
-__all__ = ["load_img", "extract_frames", "infer_for_test"]
+__all__ = ["load_img", "extract_frames", "infer_for_test_v1", "infer_for_test_v2"]
 
 
 def load_img(img_lst: List[str], dtype: torch.dtype, device: str) -> Tensor:
@@ -47,26 +47,70 @@ def extract_frames(video_path: str, tmp_dir: str) -> None:
     return None
 
 
-def infer_for_test(inp: Tensor, label: Tensor,
-                   model: Module,
-                   device: str = "cpu",
-                   T_max: int = 30,
-                   overlap_ratio: float = 0.5,
-                   tolist: bool = True
-                    ) -> Tuple[Tensor | List[float], Tensor | List[int]]:
+def _get_segment(inp: str | Tensor,
+                 label: Tensor,
+                 T_max: int,
+                 overlap_ratio: float
+                 ) -> Generator:
+    if isinstance(inp, str):
+        assert inp.endswith(".pt"), "Currently support .pt input file"
+        inp = torch.load(inp, map_location="cpu", weights_only=False)  # (T,H,W,C)
+        inp = v2.ToDtype(torch.float16, True)(inp)
+        inp = inp.permute(0, -1, 1, 2).unsqueeze(0)
+
     # (B,T,C,H,W) -> (T,C,H,W)
     inp: Tensor = inp.squeeze()
     inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)
 
     label: Tensor = label.squeeze()  # (T,)
-
     total_frames: int = label.shape[0]
 
     cum_frames: int = 0
-    step_preds: None | Tensor = None
-    preds: Tensor = torch.zeros_like(label, dtype=torch.float16)
 
+    for cur_frame_idx in range(total_frames):
+        if cur_frame_idx < T_max or cum_frames < T_max:
+            cum_frames += 1
+        else:
+            # step when accumulate sufficient frames
+            old_cum_frames = cum_frames
+            cum_frames = int(T_max * overlap_ratio) + 1
+            # (B, S)
+            yield inp[:, :, :, cur_frame_idx - old_cum_frames:cur_frame_idx, ...], cur_frame_idx, old_cum_frames
+
+        # Last step
+        if cur_frame_idx == total_frames - 1:
+            # (B, S)
+            yield inp[:, :, :, cur_frame_idx - cum_frames:cur_frame_idx, ...], cur_frame_idx, cum_frames
+
+
+def infer_for_test_v1(inp: str | Tensor,
+                      label: Tensor,
+                      model: Module,
+                      device: str = "cpu",
+                      T_max: int = 30,
+                      overlap_ratio: float = 0.5,
+                      tolist: bool = True
+                      ) -> Tuple[Tensor | List[float], Tensor | List[int]]:
     with torch.inference_mode(), torch.amp.autocast(device_type=device, enabled=True, dtype=torch.float16):
+        if isinstance(inp, str):
+            assert inp.endswith(".pt"), "Currently support .pt input file"
+            inp = torch.load(inp, map_location="cpu", weights_only=False)  # (T,H,W,C)
+            inp = v2.ToDtype(torch.float16, True)(inp)
+            inp = inp.permute(0, -1, 1, 2).unsqueeze(0)
+
+        # (B,T,C,H,W) -> (T,C,H,W)
+        inp: Tensor = inp.squeeze()
+        inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)
+
+        label: Tensor = label.squeeze()  # (T,)
+
+        total_frames: int = label.shape[0]
+
+        cum_frames: int = 0
+        step_preds: None | Tensor = None
+        total_frames: int = label.shape[0]
+        preds: Tensor = torch.zeros_like(label, dtype=torch.float16)
+
         for j in range(total_frames):
             if j < T_max or cum_frames < T_max:
                 cum_frames += 1
@@ -84,7 +128,8 @@ def infer_for_test(inp: Tensor, label: Tensor,
 
                 # First half
                 if preds[j - T_max: j - (T_max // 2)].equal(
-                        torch.zeros_like(preds[j - T_max: j - (T_max // 2)], dtype=preds.dtype)):
+                        torch.zeros_like(preds[j - T_max: j - (T_max // 2)], dtype=preds.dtype)
+                ):
                     # first iter
                     preds[j - T_max: j - (T_max // 2)] += step_preds
                 else:
@@ -101,4 +146,41 @@ def infer_for_test(inp: Tensor, label: Tensor,
     if tolist:
         preds: List[float] = preds.tolist()
         label: List[int] = label.tolist()
+    return preds, label
+
+
+def infer_for_test_v2(inp: str | Tensor,
+                      label: Tensor,
+                      model: Module,
+                      device: str = "cpu",
+                      T_max: int = 30,
+                      overlap_ratio: float = 0.5,
+                      tolist: bool = True
+                      ) -> Tuple[Tensor | List[float], Tensor | List[int]]:
+    with torch.inference_mode(), torch.amp.autocast(device_type=device, enabled=True, dtype=torch.float16):
+        total_frames: int = label.shape[0]
+        preds: Tensor = torch.zeros_like(label, dtype=torch.float16)
+
+        for inp, cur_frame_idx, cum_frames in _get_segment(inp, label, T_max, overlap_ratio):
+            step_preds = model(inp.to(device)).preds  # (B, S)
+            step_preds = step_preds.squeeze(0).to("cpu")
+
+            # First half
+            if preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)].equal(
+                    torch.zeros_like(preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)], dtype=preds.dtype)
+            ):
+                # first iter
+                preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)] += step_preds
+            else:
+                preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)] = (preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)] + step_preds) / 2
+
+            # Second half
+            if cur_frame_idx == total_frames - 1:
+                preds[cur_frame_idx + (cum_frames-2) - (T_max // 2):] += step_preds
+            else:
+                preds[cur_frame_idx - (T_max // 2): cur_frame_idx] += step_preds
+
+    if tolist:
+        preds: List[float] = preds.squeeze(0).tolist()  # (B,S) -> (S,)
+        label: List[int] = label.squeeze(0).tolist()  # (B,S) -> (S,)
     return preds, label

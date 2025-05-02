@@ -8,32 +8,33 @@ from typing import Optional, Callable, Any, Tuple, Dict, List
 import torch
 import numpy as np
 import pandas as pd
-
-from ...utils import video_loader
 from torchvision.datasets import VisionDataset
 
-__all__ = ["VADFrameLevelDataset"]
+
+from ...utils import video_loader
 
 
-class VADFrameLevelDataset(VisionDataset):
+__all__ = ["VADFrameLevelTestDataset"]
+
+
+class VADFrameLevelTestDataset(VisionDataset):
     _repr_indent = 4
 
     def __init__(self,
                  root: str,
                  annotation: str,
-                 loader: str = "v2",
+                 loader: str = "v4",
                  loader_args: Optional[Dict[str, Any]] = None,
                  extensions: Optional[Tuple[str, ...]] = ("mp4", "avi", "pt"),
-                 transform: Optional[Callable] = None,
                  target_transform: Optional[Callable] = None,
                  device: str = "cpu",
                  return_device: str = "cpu",
                  ) -> None:
         assert os.path.isdir(root), NotADirectoryError
         assert loader in video_loader.keys(), NotImplementedError
-        assert set(extensions) <= {"mp4", "avi", "pt"}, f"Currently supports {extensions} video"
+        assert set(extensions) <= {"mp4", "avi", "pt"}, "Currently only supports mp4 video"
 
-        super(VADFrameLevelDataset, self).__init__(root, None, transform, target_transform)
+        super(VADFrameLevelTestDataset, self).__init__(root, None, None, target_transform)
         loader: Callable = video_loader[loader]
 
         if loader_args is None:
@@ -59,28 +60,23 @@ class VADFrameLevelDataset(VisionDataset):
     def __len__(self) -> int:
         return len(self.__annotation)
 
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, idx: int) -> Tuple[int, str, torch.Tensor]:
         fpath: str = self.__annotation["path"][idx]
         fpath: str = os.path.join(self.__root, fpath)
 
-        frames: torch.Tensor = self.__loader(fpath)  # [T, H, W, C]
-        frames = frames.permute(0, -1, 1, 2)
-
-        labels: torch.Tensor = torch.zeros(frames.shape[0], dtype=torch.uint8, device=frames.device)
+        frames: int = self.__loader(fpath).shape[0]  # [T, H, W, C]
+        labels: torch.Tensor = torch.zeros((frames, ), dtype=torch.uint8, device=self.__return_device)
         labeled_indices: List[np.int64] = self.__annotation.iloc[idx, self.__annotation.columns != "path"].to_list()
         for i in range(0, len(labeled_indices), 2):
-            start, end = labeled_indices[i: i+2]
+            start, end = labeled_indices[i: i + 2]
             start, end = int(float(start)), int(float(end))
 
             if (start, end) != (-1, -1):
-                labels[start: end+1] = 1
-
-        if self.transform is not None:
-            frames = self.transform(frames)
+                labels[start: end + 1] = 1
 
         if self.target_transform is not None:
             labels = self.target_transform(labels)
-        return frames, labels
+        return idx, fpath, labels
 
     def __repr__(self):
         num_anomaly: int = len(self.__annotation.loc[self.__annotation.path.str.startswith('anomaly')])

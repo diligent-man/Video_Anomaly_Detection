@@ -1,11 +1,5 @@
-def draw_fig_1():
-    pass
-
-def draw_fig_2():
-    pass
-
 def main() -> None:
-
+    # Your code
 
 
     return None

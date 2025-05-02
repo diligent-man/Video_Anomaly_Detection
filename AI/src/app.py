@@ -94,14 +94,16 @@ async def infer(file: UploadFile = File(...)) -> JSONResponse:
                             step_preds = step_preds.squeeze(0)
 
                             # First half
-                            if preds[i - T_max: i - (T_max // 2)].equal(torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype, device=device)):
+                            if preds[i - T_max: i - (T_max // 2)].equal(
+                                    torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype, device=device)
+                            ):
                                 preds[i - T_max: i - (T_max // 2)] += step_preds
                             else:
                                 preds[i - T_max: i - (T_max // 2)] = (preds[i - T_max: i - (T_max // 2)] + step_preds) / 2
 
                             # Second half
                             if i == len(total_frames) - 1:
-                                preds[i+(cum_frames-2) - (T_max // 2):] += step_preds
+                                preds[i + (cum_frames-2) - (T_max // 2):] += step_preds
                             else:
                                 preds[i - (T_max // 2): i] += step_preds
 
