@@ -82,13 +82,13 @@ async def infer(file: UploadFile = File(...)) -> JSONResponse:
                         else:
                             # step when accumulate sufficient frames
                             inps: Tensor = load_img(total_frames[i - cum_frames: i], torch.float16, device)
-                            step_preds: Tensor = model(inps).preds  # (B, S)
+                            step_preds: Tensor = model(inps).preds  # (B, T)
                             cum_frames = int(T_max * overlap_ratio) + 1
 
                         # Last step
                         if i == len(total_frames) - 1:
-                            inps: Tensor = load_img(total_frames[i - cum_frames: i], torch.float16, device)
-                            step_preds: Tensor = model(inps).preds  # (B, S)
+                            inps: Tensor = load_img(total_frames[i - cum_frames + 1: i], torch.float16, device)
+                            step_preds: Tensor = model(inps).preds  # (B, T)
 
                         if step_preds is not None:
                             step_preds = step_preds.squeeze(0)
@@ -97,13 +97,28 @@ async def infer(file: UploadFile = File(...)) -> JSONResponse:
                             if preds[i - T_max: i - (T_max // 2)].equal(
                                     torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype, device=device)
                             ):
+                                # first iter
                                 preds[i - T_max: i - (T_max // 2)] += step_preds
                             else:
-                                preds[i - T_max: i - (T_max // 2)] = (preds[i - T_max: i - (T_max // 2)] + step_preds) / 2
+                                if i == len(total_frames) - 1:
+                                    # last iter
+                                    preds[i - cum_frames + 1:
+                                          i - cum_frames + 1 + (T_max // 2)
+                                          ] = (preds[i - cum_frames + 1:
+                                                     i - cum_frames + 1 + (T_max // 2)
+                                                     ] + step_preds) / 2
+                                else:
+                                    # others
+                                    preds[i - T_max:
+                                          i - (T_max // 2)
+                                          ] = (preds[i - T_max:
+                                                     i - (T_max // 2)
+                                                     ] + step_preds) / 2
 
                             # Second half
                             if i == len(total_frames) - 1:
-                                preds[i + (cum_frames-2) - (T_max // 2):] += step_preds
+                                # last iter
+                                preds[i - cum_frames + 1 + (T_max // 2):] += step_preds
                             else:
                                 preds[i - (T_max // 2): i] += step_preds
 

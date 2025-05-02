@@ -47,42 +47,6 @@ def extract_frames(video_path: str, tmp_dir: str) -> None:
     return None
 
 
-def _get_segment(inp: str | Tensor,
-                 label: Tensor,
-                 T_max: int,
-                 overlap_ratio: float
-                 ) -> Generator:
-    if isinstance(inp, str):
-        assert inp.endswith(".pt"), "Currently support .pt input file"
-        inp = torch.load(inp, map_location="cpu", weights_only=False)  # (T,H,W,C)
-        inp = v2.ToDtype(torch.float16, True)(inp)
-        inp = inp.permute(0, -1, 1, 2).unsqueeze(0)
-
-    # (B,T,C,H,W) -> (T,C,H,W)
-    inp: Tensor = inp.squeeze()
-    inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)
-
-    label: Tensor = label.squeeze()  # (T,)
-    total_frames: int = label.shape[0]
-
-    cum_frames: int = 0
-
-    for cur_frame_idx in range(total_frames):
-        if cur_frame_idx < T_max or cum_frames < T_max:
-            cum_frames += 1
-        else:
-            # step when accumulate sufficient frames
-            old_cum_frames = cum_frames
-            cum_frames = int(T_max * overlap_ratio) + 1
-            # (B, S)
-            yield inp[:, :, :, cur_frame_idx - old_cum_frames:cur_frame_idx, ...], cur_frame_idx, old_cum_frames
-
-        # Last step
-        if cur_frame_idx == total_frames - 1:
-            # (B, S)
-            yield inp[:, :, :, cur_frame_idx - cum_frames:cur_frame_idx, ...], cur_frame_idx, cum_frames
-
-
 def infer_for_test_v1(inp: str | Tensor,
                       label: Tensor,
                       model: Module,
@@ -102,44 +66,55 @@ def infer_for_test_v1(inp: str | Tensor,
         inp: Tensor = inp.squeeze()
         inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)
 
-        label: Tensor = label.squeeze()  # (T,)
-
-        total_frames: int = label.shape[0]
+        label: Tensor = label.squeeze(0)  # (T,)
 
         cum_frames: int = 0
         step_preds: None | Tensor = None
         total_frames: int = label.shape[0]
         preds: Tensor = torch.zeros_like(label, dtype=torch.float16)
-
-        for j in range(total_frames):
-            if j < T_max or cum_frames < T_max:
+        for i in range(total_frames):
+            if i < T_max or cum_frames < T_max:
                 cum_frames += 1
             else:
                 # step when accumulate sufficient frames
-                step_preds: Tensor = model(inp[:, :, :, j - cum_frames:j, ...].to(device)).preds  # (B, S)
+                step_preds: Tensor = model(inp[:, :, :, i - cum_frames:i, ...].to(device)).preds  # (B, S)
                 cum_frames = int(T_max * overlap_ratio) + 1
 
             # Last step
-            if j == total_frames - 1:
-                step_preds: Tensor = model(inp[:, :, :, j - cum_frames:j, ...].to(device)).preds  # (B, S)
+            if i == total_frames - 1:
+                step_preds: Tensor = model(inp[:, :, :, i - cum_frames + 1:i, ...].to(device)).preds  # (B, S)
 
             if step_preds is not None:
                 step_preds = step_preds.squeeze(0).to("cpu")
 
                 # First half
-                if preds[j - T_max: j - (T_max // 2)].equal(
-                        torch.zeros_like(preds[j - T_max: j - (T_max // 2)], dtype=preds.dtype)
+                if preds[i - T_max: i - (T_max // 2)].equal(
+                        torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype)
                 ):
                     # first iter
-                    preds[j - T_max: j - (T_max // 2)] += step_preds
+                    preds[i - T_max: i - (T_max // 2)] += step_preds
                 else:
-                    preds[j - T_max: j - (T_max // 2)] = (preds[j - T_max: j - (T_max // 2)] + step_preds) / 2
+                    if i == total_frames - 1:
+                        # last iter
+                        preds[i - cum_frames + 1:
+                              i - cum_frames + 1 + (T_max // 2)
+                              ] = (preds[i - cum_frames + 1:
+                                         i - cum_frames + 1 + (T_max // 2)
+                                         ] + step_preds) / 2
+                    else:
+                        # others
+                        preds[i - T_max:
+                              i - (T_max // 2)
+                              ] = (preds[i - T_max:
+                                         i - (T_max // 2)
+                                         ] + step_preds) / 2
 
                 # Second half
-                if j == total_frames - 1:
-                    preds[j + (cum_frames-2) - (T_max // 2):] += step_preds
+                if i == total_frames - 1:
+                    # last iter
+                    preds[i - cum_frames + 1 + (T_max // 2):] += step_preds
                 else:
-                    preds[j - (T_max // 2): j] += step_preds
+                    preds[i - (T_max // 2): i] += step_preds
 
                 # Reset
                 step_preds = None
@@ -158,11 +133,13 @@ def infer_for_test_v2(inp: str | Tensor,
                       tolist: bool = True
                       ) -> Tuple[Tensor | List[float], Tensor | List[int]]:
     with torch.inference_mode(), torch.amp.autocast(device_type=device, enabled=True, dtype=torch.float16):
+        label: Tensor = label.squeeze(0)  # (B,T) -> (T,)
+
         total_frames: int = label.shape[0]
         preds: Tensor = torch.zeros_like(label, dtype=torch.float16)
 
         for inp, cur_frame_idx, cum_frames in _get_segment(inp, label, T_max, overlap_ratio):
-            step_preds = model(inp.to(device)).preds  # (B, S)
+            step_preds = model(inp.to(device)).preds  # (B, T)
             step_preds = step_preds.squeeze(0).to("cpu")
 
             # First half
@@ -172,15 +149,61 @@ def infer_for_test_v2(inp: str | Tensor,
                 # first iter
                 preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)] += step_preds
             else:
-                preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)] = (preds[cur_frame_idx - T_max: cur_frame_idx - (T_max // 2)] + step_preds) / 2
+                if cur_frame_idx == total_frames - 1:
+                    # last iter
+                    preds[cur_frame_idx - cum_frames + 1:
+                          cur_frame_idx - cum_frames + 1 + (T_max // 2)
+                          ] = (preds[cur_frame_idx - cum_frames + 1:
+                                     cur_frame_idx - cum_frames + 1 + (T_max // 2)
+                                     ] + step_preds) / 2
+                else:
+                    # others
+                    preds[cur_frame_idx - T_max:
+                          cur_frame_idx - (T_max // 2)
+                          ] = (preds[cur_frame_idx - T_max:
+                                     cur_frame_idx - (T_max // 2)
+                                     ] + step_preds) / 2
 
             # Second half
             if cur_frame_idx == total_frames - 1:
-                preds[cur_frame_idx + (cum_frames-2) - (T_max // 2):] += step_preds
+                # last iter
+                preds[cur_frame_idx - cum_frames + 1 + (T_max // 2):] += step_preds
             else:
                 preds[cur_frame_idx - (T_max // 2): cur_frame_idx] += step_preds
-
     if tolist:
-        preds: List[float] = preds.squeeze(0).tolist()  # (B,S) -> (S,)
-        label: List[int] = label.squeeze(0).tolist()  # (B,S) -> (S,)
+        preds: List[float] = preds.tolist()  # (B,S) -> (S,)
+        label: List[int] = label.tolist()  # (B,S) -> (S,)
     return preds, label
+
+
+def _get_segment(inp: str | Tensor,
+                 label: Tensor,
+                 T_max: int,
+                 overlap_ratio: float
+                 ) -> Generator:
+    if isinstance(inp, str):
+        assert inp.endswith(".pt"), "Currently support .pt input file"
+        inp = torch.load(inp, map_location="cpu", weights_only=False)  # (T,H,W,C)
+        inp = v2.ToDtype(torch.float16, True)(inp)
+        inp = inp.permute(0, -1, 1, 2).unsqueeze(0)
+
+    # (B,T,C,H,W) -> (T,C,H,W)
+    inp: Tensor = inp.squeeze()
+    inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)
+
+    label: Tensor = label.squeeze()  # (T,)
+    total_frames: int = label.shape[0]
+
+    cum_frames: int = 0
+    for cur_frame_idx in range(total_frames):
+        if cur_frame_idx < T_max or cum_frames < T_max:
+            cum_frames += 1
+        else:
+            # others
+            prev_cum_frames = cum_frames  # cache
+            cum_frames = int(T_max * overlap_ratio) + 1  # reset
+            yield inp[:, :, :, cur_frame_idx - prev_cum_frames: cur_frame_idx, ...], cur_frame_idx, prev_cum_frames
+
+        # last step
+        if cur_frame_idx == total_frames - 1:
+            yield inp[:, :, :, cur_frame_idx - cum_frames + 1:cur_frame_idx, ...], cur_frame_idx, cum_frames

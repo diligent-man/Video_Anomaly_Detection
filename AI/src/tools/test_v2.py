@@ -190,8 +190,7 @@ def main() -> None:
             cache: Dict[str, Any] | None = video_cache.get_cache()
 
             if cache is not None:
-                print(cache["batch_worker"])
-
+                print("Batch:", cache["batch_worker"])
                 result: Tuple[List[float], List[int]] = dispatch_infer(cache, model, device, T_max, overlap_ratio)
 
                 for i in range(len(result)):
