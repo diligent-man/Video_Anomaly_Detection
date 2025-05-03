@@ -1,5 +1,8 @@
 """
 Temp test
+250
+model 3: RuntimeError: Input type (torch.FloatTensor) and weight type (torch.cuda.FloatTensor) should be the same or input should be a MKLDNN tensor and weight is a dense tensor
+
 """
 import os
 import gc
@@ -86,8 +89,12 @@ def init_proc(shared_val: multiprocessing.Value, batch_worker: int) -> None:
     global starter
     starter = shared_val
     with starter.get_lock():
-        if batch_worker < 15:
-            time.sleep(2)
+        if batch_worker == 15:
+            time.sleep(6)
+        elif batch_worker == 14:
+            time.sleep(4)
+        else:
+            time.sleep(0)
 
 
 def dispatch_infer(cache: Dict[str, Any],
@@ -171,7 +178,7 @@ def main() -> None:
         )
 
         batch_thres = [1000, 2000, 3000, 4500, 6000, 10000, 15000, 20000, torch.inf]
-        batch_worker = [16] * 4 + [14] * 2 + [10] * 3
+        batch_worker = [16] * 4 + [15] * 2 + [14] * 3
         video_cache = VideoCache(batch_thres, batch_worker)
 
         for idx, inp, label in tqdm(dl, total=len(dl)):
@@ -191,6 +198,9 @@ def main() -> None:
 
             if cache is not None:
                 print("Batch:", cache["batch_worker"])
+                if cache["batch_worker"] != 14:
+                    continue
+
                 result: Tuple[List[float], List[int]] = dispatch_infer(cache, model, device, T_max, overlap_ratio)
 
                 for i in range(len(result)):
@@ -198,7 +208,7 @@ def main() -> None:
                     logger.write(pred_result, log_info, "a")
                 gc.collect()
                 torch.cuda.empty_cache()
-
+                exit()
         # Remaining
         for cache in video_cache.get_remains():
             result: Tuple[List[float], List[int]] = dispatch_infer(cache, model, device, T_max, overlap_ratio)
