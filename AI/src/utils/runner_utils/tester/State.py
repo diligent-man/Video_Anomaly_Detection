@@ -20,7 +20,7 @@ class State:
     step requires going through *n* batches.
     """
     phase: str = None
-    preds: Tensor = None
+    step_info: str = None
     metric_result: float | List[float] = None
     stateful_callbacks: List[ExportableState] | Dict[str, Any] = None
 

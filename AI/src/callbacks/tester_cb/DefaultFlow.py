@@ -43,13 +43,13 @@ class DefaultFlow(BaseCallback):
     def on_step_end(self, instance: Tester) -> None:
         instance.logger.write(
             os.path.join(instance.config.Global.log_path, "pred_result.txt"),
-            f"{instance.state.preds.tolist()}\n",
+            f"{instance.state.step_info}\n",
             "a"
         )
 
     def on_end(self, instance: Tester) -> None:
         instance.logger.write(
-            os.path.join(instance.config.Global.log_path, "test_result_log.txt"),
+            os.path.join(instance.config.Global.log_path, "metric_result.txt"),
             instance.state.metric_result,
             "a"
         )

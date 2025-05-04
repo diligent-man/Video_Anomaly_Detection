@@ -21,8 +21,8 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 
 
 from AI.src.modeling import build_model
-from AI.src.utils.inference_ops import extract_frames, load_img
 from AI.src.utils import DotDict, load_config, load_weights, find_video_stream
+from AI.src.utils.inference_ops import extract_frames, load_img, find_first_half_idx
 
 
 app = FastAPI()
@@ -77,33 +77,40 @@ async def infer(file: UploadFile = File(...)) -> JSONResponse:
             with torch.inference_mode():
                 with torch.amp.autocast(enabled=True, dtype=torch.float16, device_type=device):
                     for i in range(len(total_frames)):
-                        if i < T_max or cum_frames < T_max:
+                        if cum_frames < T_max < i < len(total_frames) - 1:
+                            # increment cum_frames until penultimate iter
                             cum_frames += 1
                         else:
-                            # step when accumulate sufficient frames
-                            inps: Tensor = load_img(total_frames[i - cum_frames: i], torch.float16, device)
-                            step_preds: Tensor = model(inps).preds  # (B, S)
-                            cum_frames = int(T_max * overlap_ratio) + 1
+                            prev_cum_frames = cum_frames
 
-                        # Last step
-                        if i == len(total_frames) - 1:
-                            inps: Tensor = load_img(total_frames[i - cum_frames: i], torch.float16, device)
-                            step_preds: Tensor = model(inps).preds  # (B, S)
+                            if cum_frames == T_max:
+                                cum_frames = int(T_max * overlap_ratio) + 1
+
+                            if i == len(total_frames) - 1:
+                                # last step
+                                inps = load_img(total_frames[i - prev_cum_frames + 1:], torch.float16, device)
+                            else:
+                                # others
+                                inps = load_img(total_frames[i - prev_cum_frames: i], torch.float16, device)
+
+                            step_preds: Tensor = model(inps).preds  # (B, T)
 
                         if step_preds is not None:
                             step_preds = step_preds.squeeze(0)
 
                             # First half
-                            if preds[i - T_max: i - (T_max // 2)].equal(torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype, device=device)):
-                                preds[i - T_max: i - (T_max // 2)] += step_preds
+                            if preds[i - T_max: i - (T_max // 2)].equal(torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype)):
+                                # first iter
+                                first_half_start, first_half_end = i - T_max, i - (T_max // 2)
+                                preds[first_half_start: first_half_end] += step_preds
                             else:
-                                preds[i - T_max: i - (T_max // 2)] = (preds[i - T_max: i - (T_max // 2)] + step_preds) / 2
+                                # others
+                                first_half_start, first_half_end = find_first_half_idx(i, prev_cum_frames, len(total_frames), T_max)
+                                preds[first_half_start: first_half_end] = (preds[first_half_start: first_half_end] + step_preds) / 2
 
                             # Second half
-                            if i == len(total_frames) - 1:
-                                preds[i+(cum_frames-2) - (T_max // 2):] += step_preds
-                            else:
-                                preds[i - (T_max // 2): i] += step_preds
+                            second_half_end_idx: int = None if i == len(total_frames) - 1 else i
+                            preds[first_half_end: second_half_end_idx] += step_preds
 
                             # Reset
                             step_preds = None
