@@ -1,8 +1,12 @@
-import dataclasses
 import os
+import dataclasses
 import numpy as np
-from typing import Dict, Any, Tuple
-from scipy.signal import find_peaks, peak_widths, savgol_filter
+
+from typing import Dict
+from dataclasses import asdict
+
+
+from scipy.signal import find_peaks, savgol_filter
 
 
 @dataclasses.dataclass
@@ -52,7 +56,7 @@ class smooth_signal:
 class PeakDetector:
     height: float = os.environ.get("HEIGHT", 0.7)
     threshold: float | None = os.environ.get("THRESHOLD", None)
-    distance: int| None = os.environ.get("DISTANCE", None)
+    distance: int | None = os.environ.get("DISTANCE", None)
     prominence: float = os.environ.get("PROMINENCE", 0.4)
     width: int | None = os.environ.get("WIDTH", None)
     wlen: int | None = os.environ.get("WLEN", None)
@@ -70,4 +74,4 @@ class PeakDetector:
     @classmethod
     def detect(cls, signal: np.ndarray) -> tuple[np.ndarray, Dict[str, np.ndarray]]:
         """Detect peaks in the signal using configured parameters"""
-        return find_peaks(signal, **cls.__dict__)
+        return find_peaks(signal, **asdict(cls()))
