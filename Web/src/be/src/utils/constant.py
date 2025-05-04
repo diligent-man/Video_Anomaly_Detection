@@ -70,13 +70,4 @@ class PeakDetector:
     @classmethod
     def detect(cls, signal: np.ndarray) -> tuple[np.ndarray, Dict[str, np.ndarray]]:
         """Detect peaks in the signal using configured parameters"""
-        return find_peaks(signal, **cls.get_params())
-
-    @classmethod
-    def get_peak_regions(cls,
-                         signal: np.ndarray,
-                         peaks: np.ndarray
-                         ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """Calculate peak width regions using peak_widths"""
-        widths, width_heights, left_ips, right_ips = peak_widths(signal, peaks, rel_height=cls.rel_height)
-        return widths, width_heights, left_ips, right_ips
+        return find_peaks(signal, **cls.__dict__)
