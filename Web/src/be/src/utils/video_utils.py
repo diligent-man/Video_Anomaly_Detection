@@ -75,12 +75,7 @@ def get_video_info(video_path):
         raise ValueError(f"Lỗi khi đọc thông tin video: {str(e)}")
 
 
-def find_anomaly_regions(anomaly_scores: np.ndarray,
-                         window_length=None,
-                         polyorder=None,
-                         high_threshold=None,
-                         low_threshold=None,
-                         ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def find_anomaly_regions(anomaly_scores: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Find anomaly regions using peak detection with signal filtering.
 
@@ -88,14 +83,6 @@ def find_anomaly_regions(anomaly_scores: np.ndarray,
     -----------
     anomaly_scores : list or array
         The anomaly scores to analyze
-    window_length : int or None
-        Length of the smoothing window (None = use default)
-    polyorder : int or None
-        Polynomial order for filter (None = use default)
-    high_threshold : float or None
-        Threshold for peak height detection (None = use default)
-    low_threshold : float or None
-        Threshold for peak prominence (None = use default)
 
     Returns:
     --------
@@ -105,18 +92,6 @@ def find_anomaly_regions(anomaly_scores: np.ndarray,
         - processed_scores: smoothed signal
         - peaks: array of detected peak indices
     """
-    # Create configuration objects with provided or default values
-    if window_length is not None:
-        smooth_signal.window_length = window_length
-
-    if polyorder is not None:
-        smooth_signal.polyorder = polyorder
-
-    if high_threshold is not None:
-        PeakDetector.height = high_threshold
-    if low_threshold is not None:
-        PeakDetector.prominence = low_threshold
-
     # Convert to numpy array if not already
     anomaly_scores = np.array(anomaly_scores)
     total_frames = len(anomaly_scores)
@@ -125,14 +100,14 @@ def find_anomaly_regions(anomaly_scores: np.ndarray,
     processed_scores = smooth_signal.apply(anomaly_scores)
 
     # Find peaks using the peak_detector dataclass
-    peaks, properties = PeakDetector.detect(processed_scores)
-
+    peaks, props = PeakDetector.detect(processed_scores)
+    left_ips, right_ips = props["left_ips"], props["right_ips"]
     # Handle the case with no detected peaks
     if len(peaks) == 0:
         return np.array([]), processed_scores, peaks
 
     # Calculate peak widths for determining anomaly regions
-    widths, width_heights, left_ips, right_ips = PeakDetector.get_peak_regions(processed_scores, peaks)
+    # widths, width_heights, left_ips, right_ips = PeakDetector.get_peak_regions(processed_scores, peaks)
 
     # Create anomaly regions based on peak widths
     anomaly_regions = []
