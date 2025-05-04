@@ -62,12 +62,13 @@ class Tester(object):
     @property
     def model(self):
         return self.__model
+
     @property
     def logger(self) -> Logger:
         return self.__logger
 
     def fit(self):
-        print(f"""Start testing model ...""")
+        print(f"""Start running inference on test dataset ...""")
         self.__callback("on_begin")
         BatchForwarder(
             self.__config.Data[self.state.phase].forward_strategy,
@@ -76,6 +77,6 @@ class Tester(object):
                 "overridden_args": self.__config.Data[self.state.phase].get("overridden_args", DotDict({})).get_dict()
             }
         )()
-        self.__callback("on_end")
+        # self.__callback("on_end")
         print("Testing finished")
         return None

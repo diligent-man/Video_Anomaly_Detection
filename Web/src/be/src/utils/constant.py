@@ -7,8 +7,11 @@ from scipy.signal import find_peaks, peak_widths, savgol_filter
 
 @dataclasses.dataclass
 class smooth_signal:
-    window_length: int = int(os.environ.get("WINDOW_LENGTH", 15))
-    polyorder: int = int(os.environ.get("POLYORDER", 6))
+    window_length: int = os.environ.get("WINDOW_LENGTH", 15)
+    polyorder: int = os.environ.get("POLYORDER", 6)
+
+    def __post_init__(self):
+        pass
 
     @classmethod
     def validate_params(cls, signal_length: int) -> tuple[int, int]:
@@ -48,12 +51,16 @@ class smooth_signal:
 @dataclasses.dataclass
 class PeakDetector:
     height: float = os.environ.get("HEIGHT", 0.7)
+    threshold: float | None = os.environ.get("THRESHOLD", None)
+    distance: int| None = os.environ.get("DISTANCE", None)
     prominence: float = os.environ.get("PROMINENCE", 0.4)
-    width: int = None if os.environ.get("WIDTH") is None else int(os.environ.get("PEAK_WIDTH"))
-    distance: int = None if os.environ.get("DISTANCE") is None else int(os.environ.get("DISTANCE"))
-    threshold: float = None if os.environ.get("THRESHOLD") is None else int(os.environ.get("THRESHOLD"))
-    wlen: int = None if os.environ.get("WLEN") is None else int(os.environ.get("WLEN"))
-    rel_height: float = os.environ.get("REL_HEIGHT", 0.2)
+    width: int | None = os.environ.get("WIDTH", None)
+    wlen: int | None = os.environ.get("WLEN", None)
+    rel_height: float = os.environ.get("REL_HEIGHT", 0.5)
+    plateau_size: int | None = os.environ.get("PLATEAU_SIZE", None)
+
+    def __post_init__(self) -> None:
+        pass
 
     @classmethod
     def get_params(cls) -> Dict[str, Any]:
