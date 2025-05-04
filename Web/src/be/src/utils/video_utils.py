@@ -75,7 +75,8 @@ def get_video_info(video_path):
         raise ValueError(f"Lỗi khi đọc thông tin video: {str(e)}")
 
 
-def find_anomaly_regions(anomaly_scores: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def find_anomaly_regions(anomaly_scores: np.ndarray
+                         ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Find anomaly regions using peak detection with signal filtering.
 
