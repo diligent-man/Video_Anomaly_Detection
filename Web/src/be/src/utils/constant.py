@@ -60,25 +60,12 @@ class PeakDetector:
     plateau_size: int | None = os.environ.get("PLATEAU_SIZE", None)
 
     def __post_init__(self) -> None:
-        pass
+        for k, v in self.__dict__.items():
+            new_val = os.getenv(k.upper(), v)
 
-    @classmethod
-    def get_params(cls) -> Dict[str, Any]:
-        """Get parameters dictionary for scipy.signal.find_peaks"""
-        params = {
-            "height": cls.height,
-            "prominence": cls.prominence,
-            "width": cls.width
-        }
-
-        # Only include optional parameters if they are not None
-        if cls.distance is not None:
-            params["distance"] = cls.distance
-        if cls.threshold is not None:
-            params["threshold"] = cls.threshold
-        if cls.wlen is not None:
-            params["wlen"] = cls.wlen
-        return params
+            if not (new_val is None) and new_val.upper() == "NONE":
+                new_val = None
+            setattr(self, k, new_val)
 
     @classmethod
     def detect(cls, signal: np.ndarray) -> tuple[np.ndarray, Dict[str, np.ndarray]]:
