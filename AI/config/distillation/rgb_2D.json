@@ -91,7 +91,7 @@
         {
             "dataset":
             {
-                "name": "VADFrameLevelDataset",
+                "name": "VADFrameLevelTestDataset",
                 "root": "/home/trong/Downloads/Dataset/VAD/final/test",
                 "annotation": "label.csv",
                 "loader": "v4",

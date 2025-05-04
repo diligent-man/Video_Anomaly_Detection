@@ -1,4 +1,9 @@
+import time
+import multiprocessing as mp
+
+from multiprocessing import Pool
 from typing import List, Dict, Any, Tuple, Generator
+
 
 import torch
 import ffmpeg
@@ -8,13 +13,19 @@ from torch.nn import Module
 from torchvision.transforms import v2
 from torchvision.io import decode_image, ImageReadMode
 
+
 from ..utils import find_video_stream
+
 
 __all__ = [
     "load_img", "extract_frames",
     "infer_for_test_v1", "infer_for_test_v2",
-    "find_first_half_idx"
+    "find_first_half_idx",
+    "dispatch_infer"
 ]
+
+
+global starter
 
 
 def load_img(img_lst: List[str], dtype: torch.dtype, device: str) -> Tensor:
@@ -49,6 +60,41 @@ def extract_frames(video_path: str, tmp_dir: str) -> None:
     stream = stream.overwrite_output()
     stream.run()
     return None
+
+
+def dispatch_infer(cache: Dict[str, Any],
+                   model: Module,
+                   device: str,
+                   T_max: int,
+                   overlap_ratio: float) -> Tuple[List[float], List[int]]:
+    with Pool(min(32, cache["batch_worker"]), _init_proc, [mp.Value("d"), cache["batch_worker"]]) as pool:
+        result: Tuple[List[float], List[int]] = pool.starmap(
+            infer_for_test_v2,
+            zip(cache["inp"],
+                cache["label"],
+                [model] * len(cache["inp"]),
+                [device] * len(cache["inp"]),
+                [T_max] * len(cache["inp"]),
+                [overlap_ratio] * len(cache["inp"])
+                )
+        )
+        return result
+
+
+def find_first_half_idx(cur_frame_idx: int,
+                        cum_frames: int,
+                        total_frames: int,
+                        T_max: int
+                        ) -> Tuple[int, int]:
+    if cur_frame_idx == total_frames - 1:
+        # last iter
+        start_idx: int = cur_frame_idx - cum_frames
+        end_idx: int = start_idx + T_max // 2
+    else:
+        # others
+        start_idx: int = cur_frame_idx - T_max
+        end_idx: int = cur_frame_idx - (T_max // 2)
+    return start_idx, end_idx
 
 
 def infer_for_test_v1(inp: str | Tensor,
@@ -159,20 +205,15 @@ def infer_for_test_v2(inp: str | Tensor,
 ########################################################################################################################
 
 
-def find_first_half_idx(cur_frame_idx: int,
-                        cum_frames: int,
-                        total_frames: int,
-                        T_max: int
-                        ) -> Tuple[int, int]:
-    if cur_frame_idx == total_frames - 1:
-        # last iter
-        start_idx: int = cur_frame_idx - cum_frames
-        end_idx: int = start_idx + T_max // 2
-    else:
-        # others
-        start_idx: int = cur_frame_idx - T_max
-        end_idx: int = cur_frame_idx - (T_max // 2)
-    return start_idx, end_idx
+def _init_proc(shared_val: mp.Value, batch_worker: int) -> None:
+    # ref: https://stackoverflow.com/a/70449572
+    global starter
+    starter = shared_val
+    with starter.get_lock():
+        if batch_worker <= 14:
+            time.sleep(8)
+        else:
+            time.sleep(0)
 
 
 def _get_segment(inp: str | Tensor,

@@ -1,6 +1,7 @@
 from .Logger import Logger
 from .DotDict import DotDict
 from .ANSIColor import ANSIColor
+from .VideoCache import VideoCache
 from .ConfigReader import ConfigReader
 from .ModelArchInspector import ModelArchInspector
 
@@ -53,6 +54,7 @@ __all__ = [
     "Logger",
     "DotDict",
     "ANSIColor",
+    "VideoCache",
     "ConfigReader",
     "ModelArchInspector",
 

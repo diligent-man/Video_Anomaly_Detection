@@ -13,7 +13,7 @@ from AI.src.runner import Tester
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
 from AI.src.metrics import MetricWrapper
-from AI.src.utils import DotDict, load_config, get_amp_cfg
+from AI.src.utils import DotDict, load_config
 
 torch.set_num_threads(64)
 torch.set_num_interop_threads(64)
@@ -25,6 +25,7 @@ multiprocessing.set_start_method("spawn")  # for batching infer run
 
 
 def main(args: argparse.Namespace) -> None:
+    args.config = "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v1/Mlflow/995263845449942640/d4e6cc59499a4abc90cf6410eb9aef25/artifacts/config.json"
     config: DotDict = DotDict(load_config(args.config))
 
     config.Global.log_path = args.log_path

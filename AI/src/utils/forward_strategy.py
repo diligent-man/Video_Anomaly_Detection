@@ -1,6 +1,5 @@
 import gc
-from collections import defaultdict
-from typing import Dict, Any, Callable, List
+from typing import Dict, Any, Callable
 
 
 import torch
@@ -36,6 +35,9 @@ def v1(instance: Trainer,
        optim: Optimizer = None,
        scheduler: LRScheduler = None
        ) -> None:
+    """
+    Teacher training
+    """
     phase = instance.state.phase
     device: str = instance.config.Global.get("device", "cpu")
     initial, _ = find_initial_total(instance, dataloader)
@@ -108,6 +110,9 @@ def v2(instance: Trainer,
        optim: Optimizer = None,
        scheduler: LRScheduler = None
        ) -> None:
+    """
+    Student training
+    """
     phase = instance.state.phase
     device: str = instance.config.Global.get("device", "cpu")
     initial, _ = find_initial_total(instance, dataloader)
@@ -178,6 +183,9 @@ def v3(instance: Tester,
        T_max: int = 30,
        overlap_ratio: float = 0.5,
        ) -> None:
+    """
+    Test VAD model
+    """
     device: str = instance.config.Global.get("device", "cpu")
 
     phase: str = instance.state.phase
