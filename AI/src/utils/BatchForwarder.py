@@ -1,11 +1,16 @@
 import inspect
+
 from inspect import Parameter
 from typing import Dict, Callable, Any, Union, List
+
 
 import torch
 from torch.autograd.grad_mode import set_grad_enabled, inference_mode
 
+
+import AI.src.runner.Tester as Tester  # Circular import
 import AI.src.runner.Trainer as Trainer  # Circular import
+
 from ..utils import get_amp_cfg
 from ..utils.forward_strategy import FORWARD_STRATEGIES
 
@@ -20,6 +25,9 @@ class BatchForwarder(object):
     def __init__(self, forward_strategy: str, instance: Union[Trainer], **kwargs) -> None:
         if isinstance(instance, Trainer.Trainer):
             assert instance.state.phase in ("train", "val"), ValueError("Selected phase is invalid")
+
+        if isinstance(instance, Tester.Tester):
+            assert instance.state.phase in ("test", ), ValueError("Selected phase is invalid")
 
         assert forward_strategy in FORWARD_STRATEGIES.keys(), ValueError(
             f"Selected strategy '{forward_strategy}' is not supported"

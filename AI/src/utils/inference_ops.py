@@ -12,6 +12,7 @@ from torch import Tensor
 from torch.nn import Module
 from torchvision.transforms import v2
 from torchvision.io import decode_image, ImageReadMode
+from torch.autograd.grad_mode import inference_mode
 
 
 from ..utils import find_video_stream
@@ -66,7 +67,11 @@ def dispatch_infer(cache: Dict[str, Any],
                    model: Module,
                    device: str,
                    T_max: int,
-                   overlap_ratio: float) -> Tuple[List[float], List[int]]:
+                   overlap_ratio: float,
+                   tolist: bool = True,
+                   amp_cfg: Dict[str, Any] = None,
+                   grad_ctx: inference_mode = inference_mode
+                   ) -> Tuple[Tensor | List[float], Tensor | List[int]]:
     with Pool(min(32, cache["batch_worker"]), _init_proc, [mp.Value("d"), cache["batch_worker"]]) as pool:
         result: Tuple[List[float], List[int]] = pool.starmap(
             infer_for_test_v2,
@@ -75,7 +80,10 @@ def dispatch_infer(cache: Dict[str, Any],
                 [model] * len(cache["inp"]),
                 [device] * len(cache["inp"]),
                 [T_max] * len(cache["inp"]),
-                [overlap_ratio] * len(cache["inp"])
+                [overlap_ratio] * len(cache["inp"]),
+                [tolist] * len(cache["inp"]),
+                [amp_cfg] * len(cache["inp"]),
+                [grad_ctx] * len(cache["inp"])
                 )
         )
         return result
@@ -103,9 +111,16 @@ def infer_for_test_v1(inp: str | Tensor,
                       device: str = "cpu",
                       T_max: int = 30,
                       overlap_ratio: float = 0.5,
-                      tolist: bool = True
+                      tolist: bool = True,
+                      amp_cfg: Dict[str, Any] = None,
+                      grad_ctx: inference_mode = inference_mode
                       ) -> Tuple[Tensor | List[float], Tensor | List[int]]:
-    with (torch.inference_mode(), torch.amp.autocast(device_type=device, enabled=True, dtype=torch.float16)):
+    if amp_cfg is None:
+        amp_cfg: Dict[str, Any] = {"enabled": True, "dtype": torch.float16}
+
+    amp_cfg = {"device_type": device, **amp_cfg}
+
+    with grad_ctx, torch.amp.autocast(**amp_cfg):
         if isinstance(inp, str):
             assert inp.endswith(".pt"), "Currently support .pt input file"
             inp = torch.load(inp, map_location="cpu", weights_only=False)  # (T,H,W,C)
@@ -171,9 +186,15 @@ def infer_for_test_v2(inp: str | Tensor,
                       device: str = "cpu",
                       T_max: int = 30,
                       overlap_ratio: float = 0.5,
-                      tolist: bool = True
+                      tolist: bool = True,
+                      amp_cfg: Dict[str, Any] = None,
+                      grad_ctx: inference_mode = inference_mode,
                       ) -> Tuple[Tensor | List[float], Tensor | List[int]]:
-    with torch.inference_mode(), torch.amp.autocast(device_type=device, enabled=True, dtype=torch.float16):
+    if amp_cfg is None:
+        amp_cfg: Dict[str, Any] = {"enabled": True, "dtype": torch.float16}
+
+    amp_cfg = {"device_type": device, **amp_cfg}
+    with grad_ctx, torch.amp.autocast(**amp_cfg):
         label: Tensor = label.squeeze(0)  # (B,T) -> (T,)
 
         total_frames: int = label.shape[0]

@@ -35,6 +35,18 @@ class VideoCache(object):
         super(VideoCache, self).__init__()
         self.__cache = {k: defaultdict(list) for k in self.__batch_thres[1:]}
 
+    def __repr__(self) -> str:
+        return f"""Batch thres: {self.__batch_thres}
+Batch worker: {self.__batch_worker}"""
+
+    @property
+    def batch_thres(self) -> List[int | float]:
+        return self.__batch_thres
+
+    @property
+    def batch_worker(self) -> List[int]:
+        return self.__batch_worker
+
     @staticmethod
     def _convert_inf_str(batch_thres: List[int | str]) -> List[int | float]:
         return list(map(lambda x: math.inf if x == "inf" else x, batch_thres))

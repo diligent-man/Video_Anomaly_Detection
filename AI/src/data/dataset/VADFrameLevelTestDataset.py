@@ -26,6 +26,7 @@ class VADFrameLevelTestDataset(VisionDataset):
                  loader: str = "v4",
                  loader_args: Optional[Dict[str, Any]] = None,
                  extensions: Optional[Tuple[str, ...]] = ("mp4", "avi", "pt"),
+                 transform: Optional[Callable] = None,
                  target_transform: Optional[Callable] = None,
                  device: str = "cpu",
                  return_device: str = "cpu",
@@ -33,8 +34,9 @@ class VADFrameLevelTestDataset(VisionDataset):
         assert os.path.isdir(root), NotADirectoryError
         assert loader in video_loader.keys(), NotImplementedError
         assert set(extensions) <= {"mp4", "avi", "pt"}, "Currently only supports mp4 video"
+        assert transform is None, ValueError("Transform just exist for dataset creating compliance")
 
-        super(VADFrameLevelTestDataset, self).__init__(root, None, None, target_transform)
+        super(VADFrameLevelTestDataset, self).__init__(root, None, transform, target_transform)
         loader: Callable = video_loader[loader]
 
         if loader_args is None:

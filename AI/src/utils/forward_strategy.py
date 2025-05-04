@@ -1,5 +1,5 @@
 import gc
-from typing import Dict, Any, Callable
+from typing import Dict, Any, Callable, Tuple, List
 
 
 import torch
@@ -16,12 +16,12 @@ import AI.src.utils.BatchForwarder as BatchForwarder  # Circular dependency
 
 from .DotDict import DotDict
 from ..losses import LossWrapper
-from ..metrics import MetricWrapper
 from ..data.model import BatchOutput
 from ..runner import Trainer, Tester
 
+from ..utils import VideoCache
+from ..utils.inference_ops import dispatch_infer
 from ..utils.runner_utils.trainer import find_initial_total
-
 
 __all__ = ["FORWARD_STRATEGIES"]
 
@@ -179,7 +179,7 @@ def v3(instance: Tester,
        grad_ctx: set_grad_enabled | inference_mode,
        dataloader: DataLoader,
        amp_cfg: Dict[str, Any],
-       metric: MetricWrapper,
+       # metric: MetricWrapper,
        T_max: int = 30,
        overlap_ratio: float = 0.5,
        ) -> None:
@@ -187,65 +187,54 @@ def v3(instance: Tester,
     Test VAD model
     """
     device: str = instance.config.Global.get("device", "cpu")
+    batch_thres = instance.config.Global.get("batch_thres", None)
+    batch_worker = instance.config.Global.get("batch_worker", None)
 
     phase: str = instance.state.phase
-    total_labels: None | Tensor = None
-    total_preds: None | Tensor = None
+    video_cache = VideoCache(batch_thres, batch_worker)
 
-    for i, (inp, label) in tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Forward v3, Phase: {phase}"):
-        inp: Tensor = inp.squeeze()  # (B,T,C,H,W) -> (T,C,H,W)
-        inp = inp.permute(1, 0, 2, 3).unsqueeze(0).unsqueeze(0)  # (T,C,H,W) -> (1,1,C,T,H,W)
+    for idx, inp, label in tqdm(dataloader, total=len(dataloader), desc=f"Forward v3, Phase: {phase}"):
+        idx: torch.Tensor
+        inp: Tuple[str]
 
-        label: Tensor = label.squeeze()  # (T,)
+        idx: int = idx.item()
+        inp: str = inp[0]
 
-        total_frames: int = label.shape[0]
-        total_labels = label if total_labels is None else torch.cat((total_labels, label), 0)
+        video_cache.cache(label.squeeze(0).shape[0], ["inp", "label", "idx"], [inp, label, idx])
 
-        cum_frames: int = 0
-        step_preds: None | Tensor = None
-        preds: Tensor = torch.zeros_like(label, dtype=amp_cfg["dtype"])
-        with grad_ctx, torch.amp.autocast(**amp_cfg):
-            for j in range(total_frames):
-                if j < T_max or cum_frames < T_max:
-                    cum_frames += 1
-                else:
-                    # step when accumulate sufficient frames
-                    step_preds: Tensor = instance.model(inp[:, :, :, j-cum_frames:j, ...].to(device)).preds  # (B, S)
-                    cum_frames = int(T_max * overlap_ratio) + 1
+        cache: Dict[str, Any] | None = video_cache.get_cache()
 
-                # Last step
-                if j == total_frames-1:
-                    step_preds: Tensor = instance.model(inp[:, :, :, j-cum_frames:j, ...].to(device)).preds  # (B, S)
+        if cache is not None:
+            print("Batch:", cache["batch_worker"])
+            result: Tuple[List[float], List[int]] = dispatch_infer(
+                cache, instance.model, device,
+                T_max, overlap_ratio, True,
+                amp_cfg, grad_ctx
+            )
 
-                if step_preds is not None:
-                    step_preds = step_preds.squeeze(0).to("cpu")
+            for i in range(len(result)):
+                instance.state.step_info = f"{result[i][0]},{result[i][1]},{cache['idx'][i]}"
+                instance.callback(f"on_step_end")
 
-                    # First half
-                    if preds[j-T_max: j-(T_max//2)].equal(torch.zeros_like(preds[j-T_max: j-(T_max//2)], dtype=preds.dtype)):
-                        # first iter
-                        preds[j - T_max: j - (T_max // 2)] += step_preds
-                    else:
-                        preds[j - T_max: j - (T_max // 2)] = (preds[j - T_max: j - (T_max // 2)] + step_preds) / 2
+            gc.collect()
+            torch.cuda.empty_cache()
 
-                    # Second half
-                    if j == total_frames - 1:
-                        preds[j + (cum_frames-2) - (T_max // 2):] += step_preds
-                    else:
-                        preds[j - (T_max // 2): j] += step_preds
+    # Remaining
+    print("Run leftovers")
+    for cache in video_cache.get_remains():
+        print("Batch:", cache["batch_worker"])
+        result: Tuple[List[float], List[int]] = dispatch_infer(
+                cache, instance.model, device,
+                T_max, overlap_ratio, True,
+                amp_cfg, grad_ctx
+            )
 
-                    # Reset
-                    step_preds = None
+        for i in range(len(result)):
+            instance.state.step_info = f"{result[i][0]},{result[i][1]},{cache['idx'][i]}"
+            instance.callback(f"on_step_end")
 
-            total_preds = preds if total_preds is None else torch.cat((total_preds, preds), 0)
-
-        instance.state.preds = preds
-        instance.callback(f"on_step_end")
         gc.collect()
         torch.cuda.empty_cache()
-
-    metric.update(total_preds, total_labels)
-    metric.compute()
-    instance.state.metric_result = metric.get_result(return_dict=True)
     return None
 
 
