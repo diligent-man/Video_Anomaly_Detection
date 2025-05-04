@@ -107,7 +107,7 @@ def main() -> None:
                 result: Tuple[List[float], List[int]] = dispatch_infer(cache, model, device, T_max, overlap_ratio)
 
                 for i in range(len(result)):
-                    log_info = f"{result[i][0]},{result[i][1]},{cache['idx'][i]}\n"
+                    log_info = f"{result[i][0]}; {result[i][1]}; {cache['idx'][i]}\n"
                     logger.write(pred_result, log_info, "a")
                 gc.collect()
                 torch.cuda.empty_cache()
@@ -119,7 +119,7 @@ def main() -> None:
             result: Tuple[List[float], List[int]] = dispatch_infer(cache, model, device, T_max, overlap_ratio)
 
             for i in range(len(result)):
-                log_info = f"{result[i][0]},{result[i][1]},{cache['idx'][i]}\n"
+                log_info = f"{result[i][0]}; {result[i][1]}; {cache['idx'][i]}\n"
                 logger.write(pred_result, log_info, "a")
             gc.collect()
             torch.cuda.empty_cache()

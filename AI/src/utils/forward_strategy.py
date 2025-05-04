@@ -213,7 +213,7 @@ def v3(instance: Tester,
             )
 
             for i in range(len(result)):
-                instance.state.step_info = f"{result[i][0]},{result[i][1]},{cache['idx'][i]}"
+                instance.state.step_info = f"{result[i][0]}; {result[i][1]}; {cache['idx'][i]}"
                 instance.callback(f"on_step_end")
 
             gc.collect()

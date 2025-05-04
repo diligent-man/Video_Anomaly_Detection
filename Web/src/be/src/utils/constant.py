@@ -1,8 +1,12 @@
-import dataclasses
 import os
+import dataclasses
 import numpy as np
-from typing import Dict, Any, Tuple
-from scipy.signal import find_peaks, peak_widths, savgol_filter
+
+from typing import Dict, Any
+from dataclasses import asdict
+
+
+from scipy.signal import find_peaks, savgol_filter
 
 
 @dataclasses.dataclass
@@ -52,7 +56,7 @@ class smooth_signal:
 class PeakDetector:
     height: float = os.environ.get("HEIGHT", 0.7)
     threshold: float | None = os.environ.get("THRESHOLD", None)
-    distance: int| None = os.environ.get("DISTANCE", None)
+    distance: int | None = os.environ.get("DISTANCE", None)
     prominence: float = os.environ.get("PROMINENCE", 0.4)
     width: int | None = os.environ.get("WIDTH", None)
     wlen: int | None = os.environ.get("WLEN", None)
@@ -60,36 +64,29 @@ class PeakDetector:
     plateau_size: int | None = os.environ.get("PLATEAU_SIZE", None)
 
     def __post_init__(self) -> None:
-        pass
-
-    @classmethod
-    def get_params(cls) -> Dict[str, Any]:
-        """Get parameters dictionary for scipy.signal.find_peaks"""
-        params = {
-            "height": cls.height,
-            "prominence": cls.prominence,
-            "width": cls.width
+        __default_dtypes: Dict[str, Any] = {
+            "HEIGHT": float,
+            "THRESHOLD": float,
+            "DISTANCE": int,
+            "PROMINENCE": float,
+            "WIDTH": int,
+            "WLEN": int,
+            "REL_HEIGHT": float,
+            "PLATEAU_SIZE": int
         }
 
-        # Only include optional parameters if they are not None
-        if cls.distance is not None:
-            params["distance"] = cls.distance
-        if cls.threshold is not None:
-            params["threshold"] = cls.threshold
-        if cls.wlen is not None:
-            params["wlen"] = cls.wlen
-        return params
+        for k, v in self.__dict__.items():
+            new_val: Any = os.getenv(k.upper(), v)
+
+            if not (new_val is None):
+                if new_val.upper() == "NONE":
+                    new_val: None = None
+                else:
+                    new_val: int | float = __default_dtypes[k.upper()](new_val)
+            setattr(self, k, new_val)
 
     @classmethod
     def detect(cls, signal: np.ndarray) -> tuple[np.ndarray, Dict[str, np.ndarray]]:
+        print(cls())
         """Detect peaks in the signal using configured parameters"""
-        return find_peaks(signal, **cls.get_params())
-
-    @classmethod
-    def get_peak_regions(cls,
-                         signal: np.ndarray,
-                         peaks: np.ndarray
-                         ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """Calculate peak width regions using peak_widths"""
-        widths, width_heights, left_ips, right_ips = peak_widths(signal, peaks, rel_height=cls.rel_height)
-        return widths, width_heights, left_ips, right_ips
+        return find_peaks(signal, **asdict(cls()))
