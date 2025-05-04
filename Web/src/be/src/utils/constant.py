@@ -2,7 +2,7 @@ import os
 import dataclasses
 import numpy as np
 
-from typing import Dict
+from typing import Dict, Any
 from dataclasses import asdict
 
 
@@ -64,14 +64,29 @@ class PeakDetector:
     plateau_size: int | None = os.environ.get("PLATEAU_SIZE", None)
 
     def __post_init__(self) -> None:
-        for k, v in self.__dict__.items():
-            new_val = os.getenv(k.upper(), v)
+        __default_dtypes: Dict[str, Any] = {
+            "HEIGHT": float,
+            "THRESHOLD": float,
+            "DISTANCE": int,
+            "PROMINENCE": float,
+            "WIDTH": int,
+            "WLEN": int,
+            "REL_HEIGHT": float,
+            "PLATEAU_SIZE": int
+        }
 
-            if not (new_val is None) and new_val.upper() == "NONE":
-                new_val = None
+        for k, v in self.__dict__.items():
+            new_val: Any = os.getenv(k.upper(), v)
+
+            if not (new_val is None):
+                if new_val.upper() == "NONE":
+                    new_val: None = None
+                else:
+                    new_val: int | float = __default_dtypes[k.upper()](new_val)
             setattr(self, k, new_val)
 
     @classmethod
     def detect(cls, signal: np.ndarray) -> tuple[np.ndarray, Dict[str, np.ndarray]]:
+        print(cls())
         """Detect peaks in the signal using configured parameters"""
         return find_peaks(signal, **asdict(cls()))
