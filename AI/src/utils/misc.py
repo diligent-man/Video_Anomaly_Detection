@@ -11,7 +11,8 @@ import torch
 import torchaudio
 import numpy as np
 from matplotlib import pyplot as plt
-
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 
 from . import DotDict, ANSIColor
 
@@ -214,38 +215,67 @@ def multiple_replace(string: str, ref_dict: Dict[str, str]) -> str:
     return string
 
 
-def draw_anomaly_graph(preds, anomaly_ranges, video_name, save_path=None,
-                       smooth_pred=None, smooth_label="Smoothed Pred", smooth_color="grey",
+def calculate_iou(ranges1, ranges2):
+    def to_set(ranges):
+        frames = set()
+        for start, end in ranges:
+            frames.update(range(start, end + 1))
+        return frames
+
+    set1 = to_set(ranges1)
+    set2 = to_set(ranges2)
+
+    intersection = len(set1 & set2)
+    union = len(set1 | set2)
+
+    if union == 0:
+        return 1.0 if intersection == 0 else 0.0
+    return intersection / union
+
+def draw_anomaly_graph(preds=None, anomaly_ranges=None, video_name="Anomaly Graph", save_path=None,
+                       smooth_pred=None, smooth_label="Smoothed Pred", smooth_color="blue",
                        additional_anomaly_ranges=None, anomaly_color="red", additional_anomaly_color="green",
-                       ):
+                       peaks=None, iou=None):
     """
     Draws an anomaly graph with optional smoothed predictions and additional anomaly ranges.
 
     Args:
-        preds (list or np.ndarray): The prediction scores.
-        anomaly_ranges (list of tuples): List of (start, end) for anomaly regions.
-        video_name (str): Title of the graph.
+        preds (list or np.ndarray, optional): The prediction scores. If None, no prediction line is drawn.
+        anomaly_ranges (list of tuples, optional): List of (start, end) for anomaly regions. Defaults to None.
+        video_name (str, optional): Title of the graph. Defaults to "Anomaly Graph".
         save_path (str, optional): Path to save the plot. Defaults to None.
         smooth_pred (list or np.ndarray, optional): Smoothed prediction scores. Defaults to None.
         smooth_label (str, optional): Label for the smoothed line. Defaults to "Smoothed Pred".
-        smooth_color (str, optional): Color for the smoothed line. Defaults to "grey".
+        smooth_color (str, optional): Color for the smoothed line. Defaults to "blue".
         additional_anomaly_ranges (list of tuples, optional): Additional anomaly regions. Defaults to None.
         anomaly_color (str, optional): Color for the primary anomaly regions. Defaults to "red".
         additional_anomaly_color (str, optional): Color for the additional anomaly regions. Defaults to "green".
+        peaks (list, optional): Indices of detected peaks. Defaults to None.
+        iou (bool or float, optional): If True, calculate IoU between anomaly_ranges and additional_anomaly_ranges.
+                                      If float, use the provided IoU value. Defaults to None.
     """
     plt.figure(figsize=(14, 5))
-    plt.plot(preds, label="Pred", color='blue')
+    legend_elements = []
+    
+    # Calculate IoU if requested
+    if iou is True and anomaly_ranges is not None and additional_anomaly_ranges is not None:
+        iou = calculate_iou(anomaly_ranges, additional_anomaly_ranges)
+    
+    # Plot predictions if provided
+    if preds is not None:
+        plt.plot(preds, label="Pred", color='blue')
 
     # Plot smoothed predictions if provided
     if smooth_pred is not None:
-        plt.plot(smooth_pred, label=smooth_label, color=smooth_color)
-
-    # Add primary anomaly regions
-    for i, (start, end) in enumerate(anomaly_ranges):
-        if i == 0:  # Add label only for the first region
-            plt.axvspan(start, end, color=anomaly_color, alpha=0.3, label=" labeled Anomaly Region")
-        else:
-            plt.axvspan(start, end, color=anomaly_color, alpha=0.3)
+        plt.plot(smooth_pred, label=smooth_label, color=smooth_color, linewidth=1.0)
+    
+    # Add primary anomaly regions if provided
+    if anomaly_ranges is not None:
+        for i, (start, end) in enumerate(anomaly_ranges):
+            if i == 0:  # Add label only for the first region
+                plt.axvspan(start, end, color=anomaly_color, alpha=0.3, label="Labeled Anomaly Region")
+            else:
+                plt.axvspan(start, end, color=anomaly_color, alpha=0.3)
 
     # Add additional anomaly regions if provided
     if additional_anomaly_ranges is not None:
@@ -254,14 +284,38 @@ def draw_anomaly_graph(preds, anomaly_ranges, video_name, save_path=None,
                 plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3, label="Detected Anomaly Region")
             else:
                 plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3)
-
+    
+    # Plot peaks if provided and smooth_pred is also provided
+    if peaks is not None and len(peaks) > 0 and smooth_pred is not None:
+        # Get the values at the peak positions
+        peak_values = np.array(smooth_pred)[peaks]
+        plt.scatter(peaks, peak_values, color='darkred', s=20, label="Detected Peaks", 
+                    marker='x', alpha=1.0, linewidths=0.7)
+    
+    # Create title with video name (without IoU)
     plt.title(video_name, fontsize=16)
     plt.xlabel("Frame", fontsize=12)
     plt.ylabel("Anomaly Score", fontsize=12)
+    
+    # Get handles and labels for the legend
     handles, labels_ = plt.gca().get_legend_handles_labels()
+    
+    # Add IoU to legend if provided
+    if iou is not None and isinstance(iou, (int, float)):
+        # Create a custom handle for IoU that doesn't appear in the plot
+        iou_patch = Patch(color='none', label=f"IoU: {iou:.3f}")
+        handles.append(iou_patch)
+        labels_.append(f"IoU: {iou:.3f}")
+    
+    # Create legend with unique items
     by_label = dict(zip(labels_, handles))
+    
     # Place legend outside the plot
-    plt.legend(by_label.values(), by_label.keys(), loc='upper left', bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+    if by_label:  # Only add legend if there are items to show
+        plt.legend(by_label.values(), by_label.keys(), 
+                  loc='upper left', bbox_to_anchor=(1.05, 1), 
+                  borderaxespad=0., frameon=True)
+    
     plt.grid(False)
     plt.xlim(left=0)
     plt.ylim(0, 1)
@@ -271,6 +325,8 @@ def draw_anomaly_graph(preds, anomaly_ranges, video_name, save_path=None,
         plt.savefig(save_path, bbox_inches='tight')
         print(f"Plot saved to {save_path}")
         plt.close()
+    else:
+        plt.show()
 ########################################################################################################################
 
 
