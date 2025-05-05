@@ -26,8 +26,8 @@ services:
 
         environment:
             DEVICE: "cuda"
-            CONFIG_PATH: "/weight/config.json"
-            WEIGHT_PATH: "/weight/best_epoch13_step2937.pt"
+            CONFIG_PATH: "/weight/teacher/input_mixed/config.json"
+            WEIGHT_PATH: "/weight/teacher/input_mixed/best_epoch12_step2711.pt"
 
         networks:
             - web
@@ -73,17 +73,19 @@ services:
             WINDOW_LENGTH: 15
             POLYORDER: 6
 
-            HEIGHT: 0.7
-            PROMINENCE: 0.4
-#            WIDTH:
-#            DISTANCE
-#            THRESHOLD
-#            WLEN
-            REL_HEIGHT: 0.2
+            HEIGHT: 0.9
+            THRESHOLD: null
+            DISTANCE: null
+            PROMINENCE: 0.00001
+            WIDTH: 3
+            WLEN: null
+            REL_HEIGHT: 0.8
+            PLATEAU_SIZE: null
+
+            MERGE_GAP: 15
 
             TMP_DIR: "run_results"
             VAD_ENDPOINT: "http://capstone_ai:6968"
-
 
         restart: on-failure
 

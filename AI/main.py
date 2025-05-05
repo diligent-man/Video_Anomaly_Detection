@@ -20,7 +20,7 @@ def main() -> None:
         host="0.0.0.0",
         port=6968,
         timeout_keep_alive=300,
-        log_level="info",
+        log_level="info"
     )
     return None
 

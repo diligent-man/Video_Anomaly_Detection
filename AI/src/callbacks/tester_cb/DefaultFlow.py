@@ -34,15 +34,15 @@ class DefaultFlow(BaseCallback):
     def on_begin(self, instance: Tester) -> None:
         instance.state.phase = "test"
 
-        if os.path.exists(os.path.join(instance.config.Global.log_path, "pred_result.txt")):
-            os.remove(os.path.join(instance.config.Global.log_path, "pred_result.txt"))
+        if os.path.exists(os.path.join(instance.config.Global.log_path, "pred_result.csv")):
+            os.remove(os.path.join(instance.config.Global.log_path, "pred_result.csv"))
 
     def on_step_begin(self, instance: Tester) -> None:
         pass
 
     def on_step_end(self, instance: Tester) -> None:
         instance.logger.write(
-            os.path.join(instance.config.Global.log_path, "pred_result.txt"),
+            os.path.join(instance.config.Global.log_path, "pred_result.csv"),
             f"{instance.state.step_info}\n",
             "a"
         )
