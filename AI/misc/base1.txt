@@ -1,0 +1,17 @@
+sum iou: 322.5080429141815
+sum overlap ratio: 505.5846127825436
+
+
+os.environ["HEIGHT"] = str(0.9)
+os.environ["THRESHOLD"] = str(None) 
+os.environ["DISTANCE"] = str(None)
+os.environ["PROMINENCE"] = str(0.00001)
+os.environ["WIDTH"] = str(3)
+os.environ["WLEN"] = str(None)
+os.environ["REL_HEIGHT"] = str(0.8)
+os.environ["PLATEAU_SIZE"] = str(None)
+
+os.environ["MERGE_GAP"] = str(5)
+
+
+

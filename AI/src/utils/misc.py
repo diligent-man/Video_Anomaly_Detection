@@ -232,10 +232,27 @@ def calculate_iou(ranges1, ranges2):
         return 1.0 if intersection == 0 else 0.0
     return intersection / union
 
+def Overlap_ratio(ranges1, ranges2):
+    def to_set(ranges):
+        frames = set()
+        for start, end in ranges:
+            frames.update(range(start, end + 1))
+        return frames
+
+    set1 = to_set(ranges1)
+    set2 = to_set(ranges2)
+
+    intersection = len(set1 & set2)
+    union = len(set1)
+
+    if union == 0:
+        return 1.0 if intersection == 0 else 0.0
+    return intersection / union
+
 def draw_anomaly_graph(preds=None, anomaly_ranges=None, video_name="Anomaly Graph", save_path=None,
                        smooth_pred=None, smooth_label="Smoothed Pred", smooth_color="blue",
                        additional_anomaly_ranges=None, anomaly_color="red", additional_anomaly_color="green",
-                       peaks=None, iou=None):
+                       peaks=None, iou=None, Overlap=None):
     """
     Draws an anomaly graph with optional smoothed predictions and additional anomaly ranges.
 
@@ -253,13 +270,19 @@ def draw_anomaly_graph(preds=None, anomaly_ranges=None, video_name="Anomaly Grap
         peaks (list, optional): Indices of detected peaks. Defaults to None.
         iou (bool or float, optional): If True, calculate IoU between anomaly_ranges and additional_anomaly_ranges.
                                       If float, use the provided IoU value. Defaults to None.
+        Overlap (bool or float, optional): If True, calculate overlap ratio between anomaly_ranges and additional_anomaly_ranges.
     """
     plt.figure(figsize=(14, 5))
     legend_elements = []
+
+    
     
     # Calculate IoU if requested
     if iou is True and anomaly_ranges is not None and additional_anomaly_ranges is not None:
         iou = calculate_iou(anomaly_ranges, additional_anomaly_ranges)
+
+    if Overlap is True and anomaly_ranges is not None and additional_anomaly_ranges is not None:
+        overlap_ratio = Overlap_ratio(anomaly_ranges, additional_anomaly_ranges)
     
     # Plot predictions if provided
     if preds is not None:
@@ -306,6 +329,12 @@ def draw_anomaly_graph(preds=None, anomaly_ranges=None, video_name="Anomaly Grap
         iou_patch = Patch(color='none', label=f"IoU: {iou:.3f}")
         handles.append(iou_patch)
         labels_.append(f"IoU: {iou:.3f}")
+    
+    if overlap_ratio is not None and isinstance(overlap_ratio, (int, float)):
+        # Create a custom handle for IoU that doesn't appear in the plot
+        overlap_ratio_patch = Patch(color='none', label=f"Overlap ratio: {overlap_ratio:.3f}")
+        handles.append(overlap_ratio_patch)
+        labels_.append(f"Overlap ratio: {overlap_ratio:.3f}")
     
     # Create legend with unique items
     by_label = dict(zip(labels_, handles))
