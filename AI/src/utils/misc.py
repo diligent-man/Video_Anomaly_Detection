@@ -288,32 +288,32 @@ def draw_anomaly_graph(preds=None, anomaly_ranges=None, video_name="Anomaly Grap
     if preds is not None:
         plt.plot(preds, label="Pred", color='blue')
 
-    # Plot smoothed predictions if provided
+    # Plot smoothed predictions if provided,
     if smooth_pred is not None:
-        plt.plot(smooth_pred, label=smooth_label, color=smooth_color, linewidth=1.0)
+        plt.plot(smooth_pred, label=smooth_label, color=smooth_color, linewidth=1.0, zorder = 3)
     
     # Add primary anomaly regions if provided
     if anomaly_ranges is not None:
         for i, (start, end) in enumerate(anomaly_ranges):
             if i == 0:  # Add label only for the first region
-                plt.axvspan(start, end, color=anomaly_color, alpha=0.3, label="Labeled Anomaly Region")
+                plt.axvspan(start, end, color=anomaly_color, alpha=0.3, label="Labeled Anomaly Region", zorder =1)
             else:
-                plt.axvspan(start, end, color=anomaly_color, alpha=0.3)
+                plt.axvspan(start, end, color=anomaly_color, alpha=0.3, zorder = 1)
 
     # Add additional anomaly regions if provided
     if additional_anomaly_ranges is not None:
         for i, (start, end) in enumerate(additional_anomaly_ranges):
             if i == 0:  # Add label only for the first region
-                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3, label="Detected Anomaly Region")
+                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3, label="Detected Anomaly Region", zorder = 2)
             else:
-                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3)
+                plt.axvspan(start, end, color=additional_anomaly_color, alpha=0.3, zorder = 2)
     
     # Plot peaks if provided and smooth_pred is also provided
     if peaks is not None and len(peaks) > 0 and smooth_pred is not None:
         # Get the values at the peak positions
         peak_values = np.array(smooth_pred)[peaks]
         plt.scatter(peaks, peak_values, color='darkred', s=20, label="Detected Peaks", 
-                    marker='x', alpha=1.0, linewidths=0.7)
+                    marker='x', alpha=1.0, linewidths=0.7, zorder = 4)
     
     # Create title with video name (without IoU)
     plt.title(video_name, fontsize=16)
