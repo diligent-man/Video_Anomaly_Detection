@@ -13,6 +13,7 @@ sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "."))
 import torch
 import ffmpeg
 
+from tqdm import tqdm
 from torch import Tensor
 from torch.nn import Module
 
@@ -63,7 +64,7 @@ def check_cuda() -> Dict[str, Any]:
 async def infer(file: UploadFile = File(...)) -> JSONResponse:
     # Create temporary directory for extracted frames
     try:
-        tmp_file = NamedTemporaryFile(delete=False, suffix=".mp4")
+        tmp_file = NamedTemporaryFile(delete=True, suffix=".mp4")
         tmp_file.write(await file.read())
 
         with TemporaryDirectory() as tmp_dir:
@@ -74,46 +75,45 @@ async def infer(file: UploadFile = File(...)) -> JSONResponse:
             step_preds: None | Tensor = None
             preds: Tensor = torch.zeros(len(total_frames), dtype=torch.float16, device=device)
 
-            with torch.inference_mode():
-                with torch.amp.autocast(enabled=True, dtype=torch.float16, device_type=device):
-                    for i in range(len(total_frames)):
-                        if cum_frames < T_max < i < len(total_frames) - 1:
-                            # increment cum_frames until penultimate iter
-                            cum_frames += 1
+            with torch.inference_mode(), torch.amp.autocast(enabled=True, dtype=torch.float16, device_type=device):
+                for i in tqdm(range(len(total_frames)), colour="cyan", desc=f"Running inference on video {tmp_file.name}"):
+                    if cum_frames < T_max and i < len(total_frames) - 1:
+                        # increment cum_frames until penultimate iter
+                        cum_frames += 1
+                    else:
+                        prev_cum_frames = cum_frames
+
+                        if cum_frames == T_max:
+                            cum_frames = int(T_max * overlap_ratio) + 1
+
+                        if i == len(total_frames) - 1:
+                            # last step
+                            inps = load_img(total_frames[i - prev_cum_frames + 1:], torch.float16, device)
                         else:
-                            prev_cum_frames = cum_frames
+                            # others
+                            inps = load_img(total_frames[i - prev_cum_frames: i], torch.float16, device)
 
-                            if cum_frames == T_max:
-                                cum_frames = int(T_max * overlap_ratio) + 1
+                        step_preds: Tensor = model(inps).preds  # (B, T)
 
-                            if i == len(total_frames) - 1:
-                                # last step
-                                inps = load_img(total_frames[i - prev_cum_frames + 1:], torch.float16, device)
-                            else:
-                                # others
-                                inps = load_img(total_frames[i - prev_cum_frames: i], torch.float16, device)
+                    if step_preds is not None:
+                        step_preds = step_preds.squeeze(0)
 
-                            step_preds: Tensor = model(inps).preds  # (B, T)
+                        # First half
+                        if preds[i - T_max: i - (T_max // 2)].equal(torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype)):
+                            # first iter
+                            first_half_start, first_half_end = i - T_max, i - (T_max // 2)
+                            preds[first_half_start: first_half_end] += step_preds
+                        else:
+                            # others
+                            first_half_start, first_half_end = find_first_half_idx(i, prev_cum_frames, len(total_frames), T_max)
+                            preds[first_half_start: first_half_end] = (preds[first_half_start: first_half_end] + step_preds) / 2
 
-                        if step_preds is not None:
-                            step_preds = step_preds.squeeze(0)
+                        # Second half
+                        second_half_end_idx: int = None if i == len(total_frames) - 1 else i
+                        preds[first_half_end: second_half_end_idx] += step_preds
 
-                            # First half
-                            if preds[i - T_max: i - (T_max // 2)].equal(torch.zeros_like(preds[i - T_max: i - (T_max // 2)], dtype=preds.dtype)):
-                                # first iter
-                                first_half_start, first_half_end = i - T_max, i - (T_max // 2)
-                                preds[first_half_start: first_half_end] += step_preds
-                            else:
-                                # others
-                                first_half_start, first_half_end = find_first_half_idx(i, prev_cum_frames, len(total_frames), T_max)
-                                preds[first_half_start: first_half_end] = (preds[first_half_start: first_half_end] + step_preds) / 2
-
-                            # Second half
-                            second_half_end_idx: int = None if i == len(total_frames) - 1 else i
-                            preds[first_half_end: second_half_end_idx] += step_preds
-
-                            # Reset
-                            step_preds = None
+                        # Reset
+                        step_preds = None
         # find video fps
         probe_info: Dict[str, Any] = ffmpeg.probe(tmp_file.name)
         video_stream: int = int(find_video_stream(probe_info["streams"]))

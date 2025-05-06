@@ -1,3 +1,11 @@
+import os
+import json
+import pandas as pd
+
+from typing import List
+
+import torch
+from torch import Tensor
 from torch.nn import Module
 from torch.utils.data import DataLoader
 
@@ -67,6 +75,35 @@ class Tester(object):
     def logger(self) -> Logger:
         return self.__logger
 
+    def compute_metrics(self, delimiter: str = "; ", chunksize: int = 10 ** 6) -> None:
+        """
+        Compute metrics from inferred result in log
+        """
+        for chunk in pd.read_csv(
+            os.path.join(self.config.Global.log_path, "pred_result.csv"),
+            delimiter=delimiter,
+            header=None,
+            names=["pred", "label", "idx"],
+            chunksize=chunksize,
+            engine="python"
+        ):
+            for _, row in chunk.iterrows():
+                pred: str
+                label: str
+
+                pred, label, i = row.pred, row.label, row.idx
+
+                pred: List[float] = json.loads(pred)
+                label: List[float] = json.loads(label)
+
+                pred: Tensor = torch.tensor(pred, dtype=torch.float16)
+                label: Tensor = torch.tensor(label, dtype=torch.uint8)
+
+                self.metric.update(pred, label)
+        self.metric.compute()
+        result = self.metric.get_result(True)
+        self.state.metric_result = result
+
     def fit(self):
         print(f"""Start running inference on test dataset ...""")
         self.__callback("on_begin")
@@ -77,6 +114,9 @@ class Tester(object):
                 "overridden_args": self.__config.Data[self.state.phase].get("overridden_args", DotDict({})).get_dict()
             }
         )()
-        # self.__callback("on_end")
+
+        print(f"""Start computing metrics from inferred results ...""")
+        self.compute_metrics()
+        self.__callback("on_end")
         print("Testing finished")
         return None

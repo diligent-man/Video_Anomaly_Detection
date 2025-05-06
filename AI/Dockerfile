@@ -22,5 +22,5 @@ RUN python3.11 -m venv $VIRTUAL_ENV
 # RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r /AI/requirements.txt
 
-EXPOSE 6968
+EXPOSE 6967
 CMD ["python3.11", "/AI/main.py"]

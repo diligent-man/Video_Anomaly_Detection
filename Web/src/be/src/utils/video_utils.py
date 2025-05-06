@@ -93,21 +93,19 @@ def find_anomaly_regions(anomaly_scores: np.ndarray) -> Tuple[np.ndarray, np.nda
         - peaks: array of detected peak indices
     """
     # Convert to numpy array if not already
-    anomaly_scores = np.array(anomaly_scores)
-    total_frames = len(anomaly_scores)
+    anomaly_scores: np.ndarray = np.array(anomaly_scores)
+    total_frames: int = len(anomaly_scores)
 
     # Apply smoothing using the smoother dataclass
-    processed_scores = smooth_signal.apply(anomaly_scores)
+    processed_scores: np.ndarray = smooth_signal.apply(anomaly_scores)
 
     # Find peaks using the peak_detector dataclass
     peaks, props = PeakDetector.detect(processed_scores)
     left_ips, right_ips = props["left_ips"], props["right_ips"]
+
     # Handle the case with no detected peaks
     if len(peaks) == 0:
         return np.array([]), processed_scores, peaks
-
-    # Calculate peak widths for determining anomaly regions
-    # widths, width_heights, left_ips, right_ips = PeakDetector.get_peak_regions(processed_scores, peaks)
 
     # Create anomaly regions based on peak widths
     anomaly_regions = []
@@ -134,9 +132,7 @@ def find_anomaly_regions(anomaly_scores: np.ndarray) -> Tuple[np.ndarray, np.nda
     return anomaly_regions, processed_scores, peaks
 
 
-def plot_vad_animation(anomaly_scores, fps=30, save_path="vad_plot.mp4", 
-                      high_threshold=0.7, low_threshold=0.3,
-                      window_length=15, polyorder=6):
+def plot_vad_animation(anomaly_scores: np.ndarray, fps: int = 30, save_path: str = "vad_plot.mp4"):
     """
     Creates an animated plot of video anomaly detection scores.
     
@@ -163,14 +159,7 @@ def plot_vad_animation(anomaly_scores, fps=30, save_path="vad_plot.mp4",
         Path to the saved animation file
     """
     total_frames = len(anomaly_scores)
-    
-    anomaly_regions, processed_scores, peaks = find_anomaly_regions(
-        anomaly_scores,
-        high_threshold=high_threshold,
-        low_threshold=low_threshold,
-        window_length=window_length,
-        polyorder=polyorder
-    )
+    anomaly_regions, processed_scores, peaks = find_anomaly_regions(anomaly_scores)
 
     # Tạo figure
     fig, ax = plt.subplots(figsize=(10, 5), tight_layout=True)
@@ -208,5 +197,4 @@ def plot_vad_animation(anomaly_scores, fps=30, save_path="vad_plot.mp4",
     writer = FFMpegWriter(fps=min(30, int(fps)), metadata=dict(artist='Video Anomaly Detection'), bitrate=800)
     ani.save(save_path, writer=writer)
     plt.close(fig)
-
     return save_path

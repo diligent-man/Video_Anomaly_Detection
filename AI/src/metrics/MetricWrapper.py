@@ -91,6 +91,7 @@ class MetricWrapper(object):
     def __init__(self, config: DotDict) -> None:
         self.__metrics, self.__names, self.__in_train = self._build_metric(config)
 
+
     @property
     def metrics(self) -> List[Metric]:
         return self.__metrics

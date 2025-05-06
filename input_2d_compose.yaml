@@ -6,9 +6,9 @@ services:
             platforms:
                 - "linux/amd64"
             tags:
-                - "capstone/ai:0.0.0"
+                - "capstone/ai:2d"
 
-        container_name: capstone_ai
+        container_name: capstone_ai_2d
 
         ports:
             - "6967:6967"
@@ -16,7 +16,7 @@ services:
         restart: on-failure
 
         healthcheck:
-            test: [ "CMD-SHELL", "curl --silent --fail http://0.0.0.0:6967/ || exit 1" ]
+            test: [ "CMD-SHELL", "curl --silent --fail http://localhost:6967/ || exit 1" ]
             interval: 5m
             timeout: 3s
             retries: 3
@@ -26,8 +26,9 @@ services:
 
         environment:
             DEVICE: "cuda"
-            CONFIG_PATH: "/weight/teacher/input_mixed/config.json"
-            WEIGHT_PATH: "/weight/teacher/input_mixed/best_epoch12_step2711.pt"
+            CONFIG_PATH: "/weight/teacher/input_2d/config.json"
+            WEIGHT_PATH: "/weight/teacher/input_2d/best_epoch18_step4067.pt"
+            PORT: 6967
 
         networks:
             - web
@@ -57,18 +58,18 @@ services:
             platforms:
                 - "linux/amd64"
             tags:
-                - "capstone/be:0.0.0"
+                - "capstone/be:2d"
 
-        container_name: capstone_be
+        container_name: capstone_be_2d
 
         ports:
             - "6968:6968"
 
         volumes:
-            - ~/AI_web_data/BE/run_results/plots:/run_results/plots
-            - ~/AI_web_data/BE/run_results/scores:/run_results/scores
-            - ~/AI_web_data/BE/run_results/videos:/run_results/videos
-        
+            - ~/AI_web_data/BE/input_2d/run_results/plots:/run_results/plots
+            - ~/AI_web_data/BE/input_2d/run_results/scores:/run_results/scores
+            - ~/AI_web_data/BE/input_2d/run_results/videos:/run_results/videos
+
         environment:
             WINDOW_LENGTH: 15
             POLYORDER: 6
@@ -82,10 +83,11 @@ services:
             REL_HEIGHT: 0.8
             PLATEAU_SIZE: null
 
-            MERGE_GAP: 15
+            MERGE_GAP: 5
 
             TMP_DIR: "run_results"
-            VAD_ENDPOINT: "http://capstone_ai:6967"
+            VAD_ENDPOINT: "http://capstone_ai_2d:6967"
+            PORT: 6968
 
         restart: on-failure
 
@@ -121,12 +123,17 @@ services:
             platforms:
                 - "linux/amd64"
             tags:
-                - "capstone/fe:0.0.0"
+                - "capstone/fe:2d"
 
-        container_name: capstone_fe
+        container_name: capstone_fe_2d
 
         ports:
             - "6969:6969"
+
+        environment:
+            VITE_API_URL: "http://0.0.0.0:6968/"
+            VITE_PORT: 6969
+#            BASE_URL: "http://0.0.0.0:6968"
 
         depends_on:
             - backend
