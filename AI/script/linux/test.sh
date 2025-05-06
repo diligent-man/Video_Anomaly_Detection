@@ -12,9 +12,16 @@
 # Chay rieng v3 input_mixed
 python3 ../../src/tools/test.py \
     --device "cuda" \
-    --config /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_mixed/v3/Mlflow/991378426196781897/aaff4465b324425b91421ee50a683603/artifacts/config.json \
-    --resume_ckpt /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_mixed/v3/Mlflow/991378426196781897/aaff4465b324425b91421ee50a683603/artifacts/ckpt/best_epoch12_step2711.pt \
-    --log_path /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_mixed/v3/log
+    --config /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v2/Mlflow/371379892464714510/ca8300cd05d4495db1070b9d9ea987d8/artifacts/config.json \
+    --resume_ckpt /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v2/Mlflow/371379892464714510/ca8300cd05d4495db1070b9d9ea987d8/artifacts/ckpt/best_epoch13_step2937.pt \
+    --log_path /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v2/log && \
+
+python3 ../../src/tools/test.py \
+    --device "cuda" \
+    --config /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v3/Mlflow/118746316556651065/dd5c8e46f4274cd481ea91465b591ea9/artifacts/config.json \
+    --resume_ckpt /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v3/Mlflow/118746316556651065/dd5c8e46f4274cd481ea91465b591ea9/artifacts/ckpt/best_epoch13_step2937.pt \
+    --log_path /home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_2d/v3/log
+
 
 
 
