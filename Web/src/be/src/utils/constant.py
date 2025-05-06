@@ -2,7 +2,7 @@ import os
 import dataclasses
 import numpy as np
 
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 from dataclasses import asdict
 
 
@@ -14,41 +14,50 @@ class smooth_signal:
     window_length: int = os.environ.get("WINDOW_LENGTH", 15)
     polyorder: int = os.environ.get("POLYORDER", 6)
 
-    def __post_init__(self):
-        pass
+    def __post_init__(self) -> None:
+        __default_dtypes: Dict[str, Any] = {
+            "WINDOW_LENGTH": int,
+            "POLYORDER": int,
+        }
+
+        for k, v in self.__dict__.items():
+            new_val: Any = os.getenv(k.upper(), v)
+
+            if not (new_val is None):
+                if new_val.upper() == "NONE":
+                    new_val: None = None
+                else:
+                    new_val: int | float = __default_dtypes[k.upper()](new_val)
+            setattr(self, k, new_val)
 
     @classmethod
-    def validate_params(cls, signal_length: int) -> tuple[int, int]:
+    def validate_params(cls, signal_length: int) -> Tuple[int, int]:
+        smooth_signal_obj = cls()
+
         """Validate and adjust parameters based on signal length"""
-        # Make window length odd
-        window_length = cls.window_length
-        if window_length % 2 == 0:
-            window_length += 1
+        if smooth_signal_obj.window_length % 2 == 0:
+            smooth_signal_obj.window_length += 1
 
         # Ensure window length is smaller than signal length
-        window_length = min(window_length, signal_length - 1)
+        window_length: int = min(smooth_signal_obj.window_length, signal_length - 1)
 
         # Ensure polyorder is valid for window length
-        polyorder = min(cls.polyorder, window_length - 1)
+        polyorder: int = min(smooth_signal_obj.polyorder, window_length - 1)
         return window_length, polyorder
 
     @classmethod
     def apply(cls, signal: np.ndarray) -> np.ndarray:
+        window_length, polyorder = cls.validate_params(len(signal))
+
         """Apply Savitzky-Golay filter to signal"""
         signal = np.array(signal)
 
         # Handle very short signals
-        if len(signal) <= cls.polyorder + 2:
+        if len(signal) <= polyorder + 2:
             return signal.copy()
 
-        # Get validated parameters
-        window_length, polyorder = cls.validate_params(len(signal))
-
-        # Apply filter if parameters are valid
         if window_length > polyorder:
             return savgol_filter(signal, window_length, polyorder)
-
-        # Return original if invalid
         return signal.copy()
 
 

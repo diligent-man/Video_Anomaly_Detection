@@ -76,7 +76,7 @@ export default function StoragePage() {
     try {
       setLoadingVideos(true);
       setFetchError(null);
-      
+      console.log(import.meta.env.VITE_API_URL)
       console.log("Fetching videos from API...");
       const fetchedVideos = await getAllVideosApi(abortControllerRef.current.signal);
       

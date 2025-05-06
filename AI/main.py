@@ -18,7 +18,7 @@ def main() -> None:
     uvicorn.run(
         "src.app:app",
         host="0.0.0.0",
-        port=6968,
+        port=int(os.getenv("PORT", 6967)),
         timeout_keep_alive=300,
         log_level="info"
     )

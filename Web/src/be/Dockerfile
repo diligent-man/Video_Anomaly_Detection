@@ -16,5 +16,5 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN python3.11 -m venv $VIRTUAL_ENV
 RUN pip install --no-cache-dir -r /Web/src/be/requirements.txt
 
-EXPOSE 6967
+EXPOSE 6968
 CMD ["python3", "/Web/src/be/main.py"]
