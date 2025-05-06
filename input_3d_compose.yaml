@@ -83,7 +83,7 @@ services:
             REL_HEIGHT: 0.8
             PLATEAU_SIZE: null
 
-            MERGE_GAP: 15
+            MERGE_GAP: 5
 
             TMP_DIR: "run_results"
             VAD_ENDPOINT: "http://capstone_ai_3d:6970"
