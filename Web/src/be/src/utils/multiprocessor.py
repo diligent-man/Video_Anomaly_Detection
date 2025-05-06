@@ -1,6 +1,8 @@
 import os
-from multiprocessing.pool import Pool
+import multiprocessing
+
 from typing import List, Tuple
+from multiprocessing.pool import Pool
 
 
 class Multiprocessor:
@@ -14,7 +16,7 @@ class Multiprocessor:
         assert lower < upper, 'Lower bound must be less than upper bound'
 
         self.__pool = Pool(processes=processes)
-        self.__lower = lower;
+        self.__lower = lower
         self.__upper = upper
         self.__fixed_configurations = fixed_configurations  # all similar paras needed for each process
         self.__configurations = self.__multiprocess_splitter(processes, process_counter)

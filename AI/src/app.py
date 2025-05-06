@@ -3,6 +3,7 @@ API for model will be defined here.
 """
 import os
 import sys
+import multiprocessing
 
 from pathlib import Path
 from typing import Dict, Any, Mapping, List
@@ -27,6 +28,7 @@ from AI.src.utils.inference_ops import extract_frames, load_img, find_first_half
 
 
 app = FastAPI()
+multiprocessing.set_start_method("spawn")
 
 device: str = os.environ.get("DEVICE", "cuda")
 overlap_ratio: float = os.environ.get("OVERLAP_RATIO", .5)

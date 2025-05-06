@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SPLITTER_PROPORTION" value="0.5061111" />
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="59484e5b-1c28-4621-955a-794ead15a907" name="Changes" comment="resolve conflict">
+      <change afterPath="$PROJECT_DIR$/input_2d_compose.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/input_3d_compose.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/input_mixed_compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/.idea/PaddleOCR-main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/.idea/PaddleOCR-main.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/data/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/data/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/losses/combined_loss.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/losses/combined_loss.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/losses/distillation_loss.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/losses/distillation_loss.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/modeling/architectures/distillation_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/modeling/architectures/distillation_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/optimizer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/ppocr/optimizer/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/tools/program.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Ha/PaddleOCR/tools/program.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/.idea/Sign-Language-Recognition.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/.idea/Sign-Language-Recognition.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/configs/train.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734196587.Alienware.553823.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734196647.Alienware.555456.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734196848.Alienware.568381.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734204151.Alienware.1023319.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734204638.Alienware.1054409.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734204710.Alienware.1060485.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734205419.Alienware.1107352.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734205558.Alienware.1117231.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734205632.Alienware.1123497.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734206314.Alienware.1166790.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734206378.Alienware.1171362.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/output/1/tensorboard/events.out.tfevents.1734206461.Alienware.1178657.0" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/read_args.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/dataset/VideoDataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/dataset/VideoDataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/dataset/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/dataset/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/manager/DataManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/manager/DataManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/manager/LossManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/manager/LossManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/manager/ModelManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/manager/ModelManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/model/TwoStreamS3D.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/model/TwoStreamS3D.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/model/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/model/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/preprocessing/VideoPreprocessor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/preprocessing/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/preprocessing/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/tools/Tester.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/tools/Tester.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/tools/Trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/tools/Trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/Logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/Logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/loading.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/loading.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/saving.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/saving.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../DL_projects/CV/Sign-Language-Recognition/src/utils/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Misc/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Misc/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Misc/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Misc/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../semester_8/FAI/.idea/other.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jsonSchemas.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/AI/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/AI/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI/notebooks/fig_generator.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/AI/notebooks/fig_generator.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AI/tmp.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/be/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/be/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/be/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/be/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/be/src/utils/constant.py" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/be/src/utils/constant.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/be/src/utils/video_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/be/src/utils/video_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/be/src/video.py" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/be/src/video.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/fe/src/pages/Dashboard/Storage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/fe/src/pages/Dashboard/Storage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/fe/src/utils/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/fe/src/utils/constants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Web/src/fe/vite.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/Web/src/fe/vite.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/compose.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" module-name="Video_anomaly_detection" is-module-sdk="true">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myUseModuleSdk" value="true" />
+    <option name="myModuleName" value="Video_anomaly_detection" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/torcheval/metrics/classification/auprc.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/torcheval/metrics/functional/classification/auprc.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2pL0j1cqw6jhyq7KjcAEAyAwuEN" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Docker.AI/Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.AI/Dockerfile_dev.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.MLOps/compose.yaml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #1.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Doctests in lr_scheduler.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Doctests in modeling_utils.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Doctests in tmp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ANSIColor.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ANSI_COLOR.executor&quot;: &quot;Run&quot;,
+    &quot;Python.BaseModel.executor&quot;: &quot;Run&quot;,
+    &quot;Python.BatchForwarder.executor&quot;: &quot;Run&quot;,
+    &quot;Python.CLIPMLP.executor&quot;: &quot;Run&quot;,
+    &quot;Python.CLIP_Weights.executor&quot;: &quot;Run&quot;,
+    &quot;Python.CTAModel.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Config.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ConfigReader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.CustomSequentialLR.executor&quot;: &quot;Run&quot;,
+    &quot;Python.I3D.executor&quot;: &quot;Run&quot;,
+    &quot;Python.MLP.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ModelForwarder.executor&quot;: &quot;Run&quot;,
+    &quot;Python.PseudoLabelRefiner.executor&quot;: &quot;Run&quot;,
+    &quot;Python.QKVProj.executor&quot;: &quot;Run&quot;,
+    &quot;Python.RelPosProj.executor&quot;: &quot;Run&quot;,
+    &quot;Python.TAModel.executor&quot;: &quot;Run&quot;,
+    &quot;Python.TAN.executor&quot;: &quot;Run&quot;,
+    &quot;Python.TemporalAggregation.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Tester.executor&quot;: &quot;Run&quot;,
+    &quot;Python.VADFrameLevelDataset.executor&quot;: &quot;Run&quot;,
+    &quot;Python.VADVideoLevelDataset.executor&quot;: &quot;Run&quot;,
+    &quot;Python.VideoDataset.executor&quot;: &quot;Run&quot;,
+    &quot;Python.VideoFolderDataset.executor&quot;: &quot;Run&quot;,
+    &quot;Python.VideoPreprocessor.executor&quot;: &quot;Run&quot;,
+    &quot;Python.WarmupCosineAnnealingWarmRestarts.executor&quot;: &quot;Run&quot;,
+    &quot;Python.__init__.executor&quot;: &quot;Run&quot;,
+    &quot;Python._video_opt.executor&quot;: &quot;Run&quot;,
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.base_model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.chien_distillation.executor&quot;: &quot;Run&quot;,
+    &quot;Python.constant.executor&quot;: &quot;Run&quot;,
+    &quot;Python.crawl_data.executor&quot;: &quot;Run&quot;,
+    &quot;Python.data_preprocessing.executor&quot;: &quot;Run&quot;,
+    &quot;Python.dataloader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.dataset_dataloader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.dataset_dataloader_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.demo_KD_training.executor&quot;: &quot;Run&quot;,
+    &quot;Python.example.executor&quot;: &quot;Run&quot;,
+    &quot;Python.export_run.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract_2D_net.executor&quot;: &quot;Run&quot;,
+    &quot;Python.extract_3D_net.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ffmpeg_ops.executor&quot;: &quot;Run&quot;,
+    &quot;Python.fluent.executor&quot;: &quot;Run&quot;,
+    &quot;Python.forward_strategy.executor&quot;: &quot;Run&quot;,
+    &quot;Python.functional.executor&quot;: &quot;Run&quot;,
+    &quot;Python.handle_be.executor&quot;: &quot;Run&quot;,
+    &quot;Python.inference_ops.executor&quot;: &quot;Run&quot;,
+    &quot;Python.inspect_media_tool.executor&quot;: &quot;Run&quot;,
+    &quot;Python.knowledge_distillation_training_demo.executor&quot;: &quot;Run&quot;,
+    &quot;Python.load_video.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.mlflow_export_import.executor&quot;: &quot;Run&quot;,
+    &quot;Python.mlp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.model_ops.executor&quot;: &quot;Run&quot;,
+    &quot;Python.modeling_deberta.executor&quot;: &quot;Run&quot;,
+    &quot;Python.page_1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pipeline_component_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pipeline_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.preprocess.executor&quot;: &quot;Run&quot;,
+    &quot;Python.preprocess_video.executor&quot;: &quot;Run&quot;,
+    &quot;Python.quick_example.executor&quot;: &quot;Run&quot;,
+    &quot;Python.repository.executor&quot;: &quot;Run&quot;,
+    &quot;Python.resnext.executor&quot;: &quot;Run&quot;,
+    &quot;Python.s3d.executor&quot;: &quot;Run&quot;,
+    &quot;Python.split_train_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_v2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_v3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tmp.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tmp2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tmp_tracer.executor&quot;: &quot;Run&quot;,
+    &quot;Python.train.executor&quot;: &quot;Run&quot;,
+    &quot;Python.utils.executor&quot;: &quot;Run&quot;,
+    &quot;Python.visualize_lr.executor&quot;: &quot;Run&quot;,
+    &quot;Python.visualize_lr_scheduler.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Shell Script.docker-entrypoint.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.docker-entrypoiny.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.mlflow_export_import.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.preprocess.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.preprocess_stage1.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.preprocess_stage2.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.preprocess_stage3.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.test.sh.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.train.sh.executor&quot;: &quot;Run&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_3d/v2/plot&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.notifications&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/trong/App/pycharm/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="Video_anomaly_detection" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="Video_anomaly_detection" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher/input_3d/v2/plot" />
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher/input_mixed/v3/plot" />
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher/input_mixed/v3/plot/fig_2" />
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher/input_3d/v2/plot/fig_2" />
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher/input_2d/v1/plot" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher/input_2d/v1/log" />
+      <recent name="$PROJECT_DIR$/AI/test/test_api" />
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher/input_3d/v1/Mlflow/890005033899140195/6653ca3fc5da40cbaf0101124bac5d70/artifacts/ckpt" />
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/teacher" />
+      <recent name="$PROJECT_DIR$/AI/results/final_train_result/input_mixed" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.17890.14" />
+        <option value="bundled-python-sdk-5b207ade9991-7e9c3bbb6e34-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.17890.14" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SshConsoleOptionsProvider">
+    <option name="myEncoding" value="UTF-8" />
+    <option name="myConnectionType" value="NONE" />
+    <option name="myConnectionId" value="" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="59484e5b-1c28-4621-955a-794ead15a907" name="Changes" comment="" />
+      <created>1732530180058</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1732530180058</updated>
+      <workItem from="1732530181070" duration="1084000" />
+      <workItem from="1732544802489" duration="25000" />
+      <workItem from="1732550458408" duration="1765000" />
+      <workItem from="1732638950176" duration="1442000" />
+      <workItem from="1732641743466" duration="206000" />
+      <workItem from="1732642224299" duration="195000" />
+      <workItem from="1732693230217" duration="13849000" />
+      <workItem from="1732715145401" duration="1720000" />
+      <workItem from="1732726028202" duration="695000" />
+      <workItem from="1732870759571" duration="1009000" />
+      <workItem from="1732947573118" duration="6390000" />
+      <workItem from="1732961417322" duration="9644000" />
+      <workItem from="1733172134605" duration="738000" />
+      <workItem from="1733154175345" duration="3328000" />
+      <workItem from="1733213415906" duration="4583000" />
+      <workItem from="1733239781109" duration="3807000" />
+      <workItem from="1733294496077" duration="9397000" />
+      <workItem from="1733369677792" duration="19123000" />
+      <workItem from="1733402211341" duration="430000" />
+      <workItem from="1733454013742" duration="10966000" />
+      <workItem from="1733468665942" duration="42548000" />
+      <workItem from="1733571599285" duration="17329000" />
+      <workItem from="1733623004211" duration="3592000" />
+      <workItem from="1733646207640" duration="5161000" />
+      <workItem from="1733677113068" duration="18195000" />
+      <workItem from="1733970599717" duration="85000" />
+      <workItem from="1734020705436" duration="434000" />
+      <workItem from="1734534725107" duration="809000" />
+      <workItem from="1734966244855" duration="262000" />
+      <workItem from="1734969302692" duration="1905000" />
+      <workItem from="1735015298141" duration="5800000" />
+      <workItem from="1735192159032" duration="733000" />
+      <workItem from="1735193420515" duration="11652000" />
+      <workItem from="1735208851344" duration="1579000" />
+      <workItem from="1735443815459" duration="6024000" />
+      <workItem from="1735457034962" duration="14768000" />
+      <workItem from="1735535142356" duration="10294000" />
+      <workItem from="1735564910527" duration="10444000" />
+      <workItem from="1735652365273" duration="653000" />
+      <workItem from="1735787586837" duration="24000" />
+      <workItem from="1735804919862" duration="1274000" />
+      <workItem from="1735903965906" duration="843000" />
+      <workItem from="1735967320966" duration="35000" />
+      <workItem from="1735998527153" duration="13760000" />
+      <workItem from="1736054182832" duration="604000" />
+      <workItem from="1736143182377" duration="4673000" />
+      <workItem from="1736149696754" duration="662000" />
+      <workItem from="1736167399976" duration="1248000" />
+      <workItem from="1736173749200" duration="82000" />
+      <workItem from="1736239623754" duration="5482000" />
+      <workItem from="1736260904023" duration="997000" />
+      <workItem from="1736302433138" duration="15112000" />
+      <workItem from="1736317561643" duration="10814000" />
+      <workItem from="1736339277076" duration="7175000" />
+      <workItem from="1736577110199" duration="315000" />
+      <workItem from="1736578502038" duration="4135000" />
+      <workItem from="1736597482255" duration="891000" />
+      <workItem from="1736605994418" duration="627000" />
+      <workItem from="1736652954198" duration="39633000" />
+      <workItem from="1736743683682" duration="5253000" />
+      <workItem from="1736755582718" duration="520000" />
+      <workItem from="1736772275076" duration="10197000" />
+      <workItem from="1736864455557" duration="3479000" />
+      <workItem from="1736934951316" duration="302000" />
+      <workItem from="1737128282001" duration="333000" />
+      <workItem from="1737198099117" duration="604000" />
+      <workItem from="1737311540101" duration="1311000" />
+      <workItem from="1737381532949" duration="1350000" />
+      <workItem from="1737389638694" duration="5017000" />
+      <workItem from="1737462741602" duration="6794000" />
+      <workItem from="1737535127817" duration="1232000" />
+      <workItem from="1737630477064" duration="24020000" />
+      <workItem from="1737721551719" duration="18501000" />
+      <workItem from="1737778110266" duration="43666000" />
+      <workItem from="1737912470808" duration="6354000" />
+      <workItem from="1737988819204" duration="16683000" />
+      <workItem from="1738031942001" duration="7917000" />
+      <workItem from="1738054230667" duration="5447000" />
+      <workItem from="1738065665825" duration="5880000" />
+      <workItem from="1738147213498" duration="21223000" />
+      <workItem from="1738549374523" duration="43496000" />
+      <workItem from="1738763947799" duration="9023000" />
+      <workItem from="1738779822892" duration="4264000" />
+      <workItem from="1738784370028" duration="21696000" />
+      <workItem from="1738855547696" duration="1511000" />
+      <workItem from="1738857962872" duration="6330000" />
+      <workItem from="1738896613865" duration="12986000" />
+      <workItem from="1738931583744" duration="14364000" />
+      <workItem from="1739029349174" duration="6605000" />
+      <workItem from="1739079207288" duration="11433000" />
+      <workItem from="1739113370311" duration="9463000" />
+      <workItem from="1739162178246" duration="9868000" />
+      <workItem from="1739174545837" duration="8328000" />
+      <workItem from="1739189520119" duration="30013000" />
+      <workItem from="1739273860457" duration="2105000" />
+      <workItem from="1739289789780" duration="6370000" />
+      <workItem from="1739347232880" duration="18736000" />
+      <workItem from="1739369876653" duration="14696000" />
+      <workItem from="1739391160882" duration="5161000" />
+      <workItem from="1739426230489" duration="5419000" />
+      <workItem from="1739433906184" duration="4632000" />
+      <workItem from="1739449872755" duration="1573000" />
+      <workItem from="1739455935255" duration="22533000" />
+      <workItem from="1739508537275" duration="13103000" />
+      <workItem from="1739527084348" duration="16711000" />
+      <workItem from="1739595287758" duration="777000" />
+      <workItem from="1739612755404" duration="6101000" />
+      <workItem from="1739697863797" duration="7605000" />
+      <workItem from="1739711934109" duration="22614000" />
+      <workItem from="1739767682918" duration="8295000" />
+      <workItem from="1739778804004" duration="1077000" />
+      <workItem from="1739793672387" duration="20232000" />
+      <workItem from="1739857144754" duration="6598000" />
+      <workItem from="1739868589012" duration="7101000" />
+      <workItem from="1739893081979" duration="21468000" />
+      <workItem from="1739939779765" duration="6666000" />
+      <workItem from="1739956756369" duration="7299000" />
+      <workItem from="1739972479566" duration="7273000" />
+      <workItem from="1740029199358" duration="6596000" />
+      <workItem from="1740039551160" duration="6279000" />
+      <workItem from="1740051020811" duration="10564000" />
+      <workItem from="1740069373069" duration="9232000" />
+      <workItem from="1740112415642" duration="8793000" />
+      <workItem from="1740127994492" duration="24005000" />
+      <workItem from="1740326700336" duration="1822000" />
+      <workItem from="1740412381879" duration="24144000" />
+      <workItem from="1740468452642" duration="9095000" />
+      <workItem from="1740483609035" duration="5790000" />
+      <workItem from="1740492088290" duration="1700000" />
+      <workItem from="1740493792119" duration="4438000" />
+      <workItem from="1740542311348" duration="36574000" />
+      <workItem from="1740587606948" duration="8342000" />
+      <workItem from="1740646658021" duration="2555000" />
+      <workItem from="1740665803057" duration="11210000" />
+      <workItem from="1740714851775" duration="23142000" />
+      <workItem from="1740816449876" duration="4768000" />
+      <workItem from="1740855083251" duration="1713000" />
+      <workItem from="1741153246673" duration="8353000" />
+      <workItem from="1741169662481" duration="302000" />
+      <workItem from="1741171567775" duration="1024000" />
+      <workItem from="1741178875430" duration="31658000" />
+      <workItem from="1741319672644" duration="3487000" />
+      <workItem from="1741323851897" duration="762000" />
+      <workItem from="1741325525664" duration="680000" />
+      <workItem from="1741326967481" duration="2869000" />
+      <workItem from="1741337593860" duration="19763000" />
+      <workItem from="1741358902825" duration="15571000" />
+      <workItem from="1741375393439" duration="6751000" />
+      <workItem from="1741414245538" duration="11648000" />
+      <workItem from="1741433653962" duration="9927000" />
+      <workItem from="1741449694401" duration="20135000" />
+      <workItem from="1741501514760" duration="7015000" />
+      <workItem from="1741508944890" duration="9523000" />
+      <workItem from="1741526172419" duration="9427000" />
+      <workItem from="1741585000361" duration="750000" />
+      <workItem from="1741613622895" duration="36871000" />
+      <workItem from="1741667416663" duration="4726000" />
+      <workItem from="1741699910160" duration="1761000" />
+      <workItem from="1741712338612" duration="727000" />
+      <workItem from="1741725056832" duration="3693000" />
+      <workItem from="1741758770833" duration="1205000" />
+      <workItem from="1741763421092" duration="509000" />
+      <workItem from="1741764117820" duration="1304000" />
+      <workItem from="1742019631039" duration="7137000" />
+      <workItem from="1742046154786" duration="1954000" />
+      <workItem from="1742052812094" duration="681000" />
+      <workItem from="1742056076544" duration="1053000" />
+      <workItem from="1742058782276" duration="1269000" />
+      <workItem from="1742382042506" duration="8196000" />
+      <workItem from="1742405254523" duration="1140000" />
+      <workItem from="1742458841100" duration="6386000" />
+      <workItem from="1742468425985" duration="3949000" />
+      <workItem from="1742530039411" duration="835000" />
+      <workItem from="1742574029285" duration="9002000" />
+      <workItem from="1742625602315" duration="1910000" />
+      <workItem from="1742628713134" duration="5300000" />
+      <workItem from="1742638934213" duration="8835000" />
+      <workItem from="1742669620074" duration="4299000" />
+      <workItem from="1742708290027" duration="2426000" />
+      <workItem from="1742713304878" duration="3735000" />
+      <workItem from="1742717354549" duration="819000" />
+      <workItem from="1742718188217" duration="1339000" />
+      <workItem from="1742719551932" duration="95000" />
+      <workItem from="1742719656014" duration="81000" />
+      <workItem from="1742719742306" duration="1038000" />
+      <workItem from="1742720793718" duration="2037000" />
+      <workItem from="1742749575986" duration="9436000" />
+      <workItem from="1742788264126" duration="3759000" />
+      <workItem from="1742769200728" duration="816000" />
+      <workItem from="1742816501473" duration="10817000" />
+      <workItem from="1742831948453" duration="8476000" />
+      <workItem from="1742892447982" duration="12376000" />
+      <workItem from="1742960140800" duration="14988000" />
+      <workItem from="1742995669369" duration="15950000" />
+      <workItem from="1743011741085" duration="1173000" />
+      <workItem from="1743053380725" duration="3974000" />
+      <workItem from="1743088505568" duration="3524000" />
+      <workItem from="1743103288713" duration="2769000" />
+      <workItem from="1743133466220" duration="11787000" />
+      <workItem from="1743122341026" duration="4250000" />
+      <workItem from="1743164220719" duration="21684000" />
+      <workItem from="1743221908319" duration="43890000" />
+      <workItem from="1743311765789" duration="6735000" />
+      <workItem from="1743326759463" duration="19819000" />
+      <workItem from="1743363294659" duration="8823000" />
+      <workItem from="1743400771353" duration="1838000" />
+      <workItem from="1743404871434" duration="5773000" />
+      <workItem from="1743412132862" duration="974000" />
+      <workItem from="1743419527369" duration="5706000" />
+      <workItem from="1743427483264" duration="5170000" />
+      <workItem from="1743435207459" duration="11286000" />
+      <workItem from="1743480588536" duration="2349000" />
+      <workItem from="1743489823000" duration="1645000" />
+      <workItem from="1743500459599" duration="8157000" />
+      <workItem from="1743513092774" duration="5164000" />
+      <workItem from="1743532676795" duration="6610000" />
+      <workItem from="1743569026086" duration="9749000" />
+      <workItem from="1743588971013" duration="24358000" />
+      <workItem from="1743601418483" duration="7081000" />
+      <workItem from="1743660961225" duration="3803000" />
+      <workItem from="1743667127676" duration="4000" />
+      <workItem from="1743667153125" duration="3000" />
+      <workItem from="1743668892993" duration="5176000" />
+      <workItem from="1743703202279" duration="37619000" />
+      <workItem from="1743778759479" duration="19387000" />
+      <workItem from="1743838974274" duration="13875000" />
+      <workItem from="1743928417056" duration="12272000" />
+      <workItem from="1743945201717" duration="2209000" />
+      <workItem from="1743964632638" duration="1062000" />
+      <workItem from="1743965758380" duration="689000" />
+      <workItem from="1744048444204" duration="3607000" />
+      <workItem from="1744080454534" duration="33646000" />
+      <workItem from="1744121787254" duration="2071000" />
+      <workItem from="1744132826605" duration="63000" />
+      <workItem from="1744268720697" duration="2332000" />
+      <workItem from="1744347828860" duration="20058000" />
+      <workItem from="1744445969448" duration="4053000" />
+      <workItem from="1744510557596" duration="1832000" />
+      <workItem from="1744523649234" duration="2223000" />
+      <workItem from="1744554822211" duration="15222000" />
+      <workItem from="1744608206574" duration="5630000" />
+      <workItem from="1744631798090" duration="10825000" />
+      <workItem from="1744643359024" duration="641000" />
+      <workItem from="1744650061066" duration="2687000" />
+      <workItem from="1744657862459" duration="6411000" />
+      <workItem from="1744685267688" duration="4323000" />
+      <workItem from="1744695716938" duration="5495000" />
+      <workItem from="1744704279852" duration="315000" />
+      <workItem from="1744723083929" duration="35114000" />
+      <workItem from="1744846351091" duration="1159000" />
+      <workItem from="1744900778363" duration="4367000" />
+      <workItem from="1744987638970" duration="5612000" />
+      <workItem from="1745042878247" duration="24000" />
+      <workItem from="1745069366818" duration="22491000" />
+      <workItem from="1745247938567" duration="28657000" />
+      <workItem from="1745439212826" duration="4679000" />
+      <workItem from="1745501919308" duration="2482000" />
+      <workItem from="1745509120437" duration="3204000" />
+      <workItem from="1745551850182" duration="22675000" />
+      <workItem from="1745588174777" duration="21321000" />
+      <workItem from="1745657758817" duration="1425000" />
+      <workItem from="1745675840538" duration="5564000" />
+      <workItem from="1745687901642" duration="13868000" />
+      <workItem from="1745734100417" duration="1429000" />
+      <workItem from="1745736186576" duration="30520000" />
+      <workItem from="1745781294160" duration="6263000" />
+      <workItem from="1745789572931" duration="5534000" />
+      <workItem from="1746039159147" duration="626000" />
+      <workItem from="1746076011376" duration="885000" />
+      <workItem from="1746082616414" duration="11101000" />
+      <workItem from="1746093904651" duration="688000" />
+      <workItem from="1746095486491" duration="9121000" />
+      <workItem from="1746118770606" duration="1908000" />
+      <workItem from="1746120809401" duration="385000" />
+      <workItem from="1746122040653" duration="1048000" />
+      <workItem from="1746123342837" duration="95739000" />
+      <workItem from="1746347537596" duration="12844000" />
+      <workItem from="1746367590319" duration="13318000" />
+      <workItem from="1746449878240" duration="8480000" />
+      <workItem from="1746505966676" duration="12582000" />
+      <workItem from="1746519973313" duration="9317000" />
+    </task>
+    <task id="LOCAL-00001" summary="resolve conflict">
+      <option name="closed" value="true" />
+      <created>1739705368840</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1739705368840</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.ps1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="resolve conflict" />
+    <option name="LAST_COMMIT_MESSAGE" value="resolve conflict" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="initial" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$tmp.coverage" NAME="tmp Coverage Results" MODIFIED="1738170002713" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/__init___py$test.coverage" NAME="test Coverage Results" MODIFIED="1746378553941" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$convert_onnx.coverage" NAME="convert_onnx Coverage Results" MODIFIED="1741753498898" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$extract_3D_net.coverage" NAME="extract_3D_net Coverage Results" MODIFIED="1741697092777" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$BatchForwarder.coverage" NAME="BatchForwarder Coverage Results" MODIFIED="1741157887942" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$PseudoLabelRefiner.coverage" NAME="PseudoLabelRefiner Coverage Results" MODIFIED="1739466390165" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$tmp_tracer.coverage" NAME="tmp_tracer Coverage Results" MODIFIED="1735535469753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/__init___py$ModelForwarder.coverage" NAME="ModelForwarder Coverage Results" MODIFIED="1745748963528" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/modeling/backbones" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$fluent.coverage" NAME="fluent Coverage Results" MODIFIED="1737393936588" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/mlflow/tracking" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$repository.coverage" NAME="repository Coverage Results" MODIFIED="1739911369213" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/lakefs" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$Embeddings.coverage" NAME="Embeddings Coverage Results" MODIFIED="1741753076093" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/modeling/backbones/CLIP/Transformer/Vision" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$ANSI_COLOR.coverage" NAME="ANSIColor Coverage Results" MODIFIED="1739088679889" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$VADFrameLevelDataset.coverage" NAME="VADFrameLevelDataset Coverage Results" MODIFIED="1740581345758" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/data/dataset" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$main.coverage" NAME="main Coverage Results" MODIFIED="1743664138493" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$load_video.coverage" NAME="load_video Coverage Results" MODIFIED="1742059627326" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$Trainer.coverage" NAME="Trainer Coverage Results" MODIFIED="1741351894560" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools/Trainer" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$CTAModel.coverage" NAME="CTAModel Coverage Results" MODIFIED="1737998103748" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model/CTA" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$dataset_dataloader.coverage" NAME="dataset_dataloader Coverage Results" MODIFIED="1739963813851" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$pipeline_test.coverage" NAME="pipeline_component_test Coverage Results" MODIFIED="1736748907870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$model_ops.coverage" NAME="model_ops Coverage Results" MODIFIED="1739530021264" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$TemporalAggregation.coverage" NAME="TemporalAggregation Coverage Results" MODIFIED="1737630547677" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model/TAM" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$pipeline_component_test.coverage" NAME="pipeline_component_test Coverage Results" MODIFIED="1739165117202" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$CallbackWrapper.coverage" NAME="CallbackWrapper Coverage Results" MODIFIED="1741359203980" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/callbacks" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$ModelForwarder.coverage" NAME="ModelForwarder Coverage Results" MODIFIED="1739471761638" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/modeling/backbones" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$extract_2D_net.coverage" NAME="extract_2D_net Coverage Results" MODIFIED="1741700732732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$export_run.coverage" NAME="export_run Coverage Results" MODIFIED="1742845120591" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils/mlflow_utils/run" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$VADVideoLevelDataset.coverage" NAME="VADVideoLevelDataset Coverage Results" MODIFIED="1740074088923" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/data/dataset" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$dataloader.coverage" NAME="dataloader Coverage Results" MODIFIED="1740052521184" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/torch/utils/data" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$example.coverage" NAME="example Coverage Results" MODIFIED="1737469886028" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MLOps/MLflow/demo" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$s3d.coverage" NAME="s3d Coverage Results" MODIFIED="1735473231323" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/capstone/AI/lib/python3.11/site-packages/torchvision/models/video" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1739477279687" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/optimizer" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$CustomSequentialLR.coverage" NAME="CustomSequentialLR Coverage Results" MODIFIED="1738170932472" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/optim/lr_scheduler" />
+    <SUITE FILE_PATH="coverage/__init___py$inference_ops.coverage" NAME="inference_ops Coverage Results" MODIFIED="1746242778479" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$resnext.coverage" NAME="resnext Coverage Results" MODIFIED="1739294123540" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test/tmp" />
+    <SUITE FILE_PATH="coverage/__init___py$train.coverage" NAME="train Coverage Results" MODIFIED="1745070880835" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$forward_strategy.coverage" NAME="forward_strategy Coverage Results" MODIFIED="1740735241475" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$TAN.coverage" NAME="TAN Coverage Results" MODIFIED="1739466005568" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$Doctests_in_modeling_utils.coverage" NAME="Doctests in modeling_utils Coverage Results" MODIFIED="1737733807145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/transformers" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$data_preprocessing.coverage" NAME="data_preprocessing Coverage Results" MODIFIED="1740439087083" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/__init___py$test_v2.coverage" NAME="test_v2 Coverage Results" MODIFIED="1746356140426" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$MLP.coverage" NAME="MLP Coverage Results" MODIFIED="1738002914035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model" />
+    <SUITE FILE_PATH="coverage/__init___py$main.coverage" NAME="main Coverage Results" MODIFIED="1746524621622" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test/test_api" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$Doctests_in_lr_scheduler.coverage" NAME="Doctests in lr_scheduler Coverage Results" MODIFIED="1738155277551" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/torch/optim" />
+    <SUITE FILE_PATH="coverage/__init___py$test_v3.coverage" NAME="test_v3 Coverage Results" MODIFIED="1745654766296" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$split_train_test.coverage" NAME="split_train_test Coverage Results" MODIFIED="1743634959772" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$visualize_lr.coverage" NAME="visualize_lr Coverage Results" MODIFIED="1738157718342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$I3D.coverage" NAME="I3D Coverage Results" MODIFIED="1736306829212" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model/InceptionI3D" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$TAModel.coverage" NAME="TAModel Coverage Results" MODIFIED="1737999888984" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model/TA" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$_video_opt.coverage" NAME="_video_opt Coverage Results" MODIFIED="1735197035484" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/capstone/AI/lib/python3.11/site-packages/torchvision/io" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$VideoPreprocessor.coverage" NAME="VideoPreprocessor Coverage Results" MODIFIED="1742461232920" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/preprocessing" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$functional.coverage" NAME="functional Coverage Results" MODIFIED="1739464951836" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/modeling/necks" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$model.coverage" NAME="model Coverage Results" MODIFIED="1739293434354" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test/tmp" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$QKVProj.coverage" NAME="QKVProj Coverage Results" MODIFIED="1738000038767" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model/TA/Proj" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$visualize_lr_scheduler.coverage" NAME="visualize_lr_scheduler Coverage Results" MODIFIED="1739029485902" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$demo_KD_training.coverage" NAME="demo_KD_training Coverage Results" MODIFIED="1736661238010" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$constant.coverage" NAME="constant Coverage Results" MODIFIED="1739463755578" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/modeling/backbones" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$RelPosProj.coverage" NAME="RelPosProj Coverage Results" MODIFIED="1737840233607" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model/CTA/Proj" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$BaseModel.coverage" NAME="base_model Coverage Results" MODIFIED="1739470626469" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$Doctests_in_tmp.coverage" NAME="Doctests in tmp Coverage Results" MODIFIED="1735544440111" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$VideoDataset.coverage" NAME="VideoDataset Coverage Results" MODIFIED="1740045592168" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/data/dataset" />
+    <SUITE FILE_PATH="coverage/__init___py$split_train_test.coverage" NAME="split_train_test Coverage Results" MODIFIED="1746209392443" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$check_ffmpeg_win.coverage" NAME="check_ffmpeg_win Coverage Results" MODIFIED="1742721813261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/__init___py$tmp.coverage" NAME="tmp Coverage Results" MODIFIED="1746526423911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$dataset_dataloader_test.coverage" NAME="dataset_dataloader_test Coverage Results" MODIFIED="1739467154293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$app.coverage" NAME="app Coverage Results" MODIFIED="1732950204434" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/App/src" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$inspect_media_tool.coverage" NAME="inspect_media_tool Coverage Results" MODIFIED="1736326776197" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$chien_distillation.coverage" NAME="chien_distillation Coverage Results" MODIFIED="1739475041293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/losses" />
+    <SUITE FILE_PATH="coverage/__init___py$tmp2.coverage" NAME="tmp2 Coverage Results" MODIFIED="1745573744310" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$CLIPMLP.coverage" NAME="CLIPMLP Coverage Results" MODIFIED="1737734258668" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/model/CLIP" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$Config.coverage" NAME="Config Coverage Results" MODIFIED="1738555113485" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$knowledge_distillation_training_demo.coverage" NAME="knowledge_distillation_training_demo Coverage Results" MODIFIED="1736346906745" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/__init___py$constant.coverage" NAME="constant Coverage Results" MODIFIED="1746378793086" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Web/src/be/src/utils" />
+    <SUITE FILE_PATH="coverage/__init___py$handle_be.coverage" NAME="handle_be Coverage Results" MODIFIED="1745679615541" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Web/src/be/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$quick_example.coverage" NAME="quick_example Coverage Results" MODIFIED="1742894999882" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MLOps/MLflow/demo" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$preprocess_video.coverage" NAME="preprocess_video Coverage Results" MODIFIED="1740495091170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$mlp.coverage" NAME="mlp Coverage Results" MODIFIED="1739464331757" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/__init___py$ffmpeg_ops.coverage" NAME="ffmpeg_ops Coverage Results" MODIFIED="1746112860749" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$mlflow_export_import.coverage" NAME="mlflow_export_import Coverage Results" MODIFIED="1743170395635" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$CLIP_Weights.coverage" NAME="CLIP_Weights Coverage Results" MODIFIED="1739436658240" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/modeling/backbones/CLIP" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$modeling_deberta.coverage" NAME="modeling_deberta Coverage Results" MODIFIED="1737993220686" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/PyVenv/py311/Video_anomaly_detection/AI/lib/python3.11/site-packages/transformers/models/deberta" />
+    <SUITE FILE_PATH="coverage/__init___py$VADFrameLevelDataset.coverage" NAME="VADFrameLevelDataset Coverage Results" MODIFIED="1745747629327" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/data/dataset" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$page_1.coverage" NAME="page_1 Coverage Results" MODIFIED="1740149709544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Web/app/src/gradio" />
+    <SUITE FILE_PATH="coverage/__init___py$app.coverage" NAME="app Coverage Results" MODIFIED="1744777361395" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$WarmupCosineAnnealingWarmRestarts.coverage" NAME="WarmupCosineAnnealingWarmRestarts Coverage Results" MODIFIED="1738169504424" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/optim/lr_scheduler" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$ConfigReader.coverage" NAME="ConfigReader Coverage Results" MODIFIED="1739080051637" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$base_model.coverage" NAME="base_model Coverage Results" MODIFIED="1739474085867" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/test" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$preprocess.coverage" NAME="preprocess Coverage Results" MODIFIED="1742619458223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$VideoFolderDataset.coverage" NAME="VideoFolderDataset Coverage Results" MODIFIED="1740072228268" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/data/dataset" />
+    <SUITE FILE_PATH="coverage/__init___py$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1745654081211" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/modeling/architectures" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$utils.coverage" NAME="utils Coverage Results" MODIFIED="1739079630047" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/utils" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$crawl_data.coverage" NAME="crawl_data Coverage Results" MODIFIED="1742720802442" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/Video_anomaly_detection$train.coverage" NAME="train Coverage Results" MODIFIED="1743625476174" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/tools" />
+    <SUITE FILE_PATH="coverage/__init___py$Tester.coverage" NAME="Tester Coverage Results" MODIFIED="1746357618170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AI/src/runner" />
+  </component>
+</project>

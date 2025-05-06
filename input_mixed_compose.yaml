@@ -42,11 +42,11 @@ services:
                 max_attempts: 3
             resources:
                 limits:
-                    cpus: "4"
+                    cpus: "8"
                     memory: 8192M
                 reservations:
-                    cpus: "1"
-                    memory: 1024M
+                    cpus: "4"
+                    memory: 4096M
                     devices:
                         -   capabilities: [ "gpu" ]
                             device_ids: [ "all" ]
@@ -74,7 +74,7 @@ services:
             WINDOW_LENGTH: 15
             POLYORDER: 6
 
-            HEIGHT: 0.9
+            HEIGHT: 0.75
             THRESHOLD: null
             DISTANCE: null
             PROMINENCE: 0.00001
@@ -110,11 +110,11 @@ services:
                 max_attempts: 3
             resources:
                 limits:
+                    cpus: "8"
+                    memory: 8192M
+                reservations:
                     cpus: "4"
                     memory: 4096M
-                reservations:
-                    cpus: "2"
-                    memory: 2048M
 
     frontend:
         build:

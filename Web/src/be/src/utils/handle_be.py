@@ -3,7 +3,7 @@ import requests
 import numpy as np
 from pathlib import Path
 
-from .video_utils import get_video_info, plot_vad_animation
+from .video_utils import get_video_info, plot_vad_animation_v2
 
 # Định nghĩa thư mục lưu trữ
 TMP_DIR = os.getenv("TMP_DIR", Path("tmp").resolve())
@@ -81,7 +81,7 @@ def generate_plot(video_name, scores=None, fps=None):
             fps, _, _ = get_video_info(video_path)
         
         # Generate plot animation
-        plot_path_str = plot_vad_animation(
+        plot_path_str = plot_vad_animation_v2(
             scores, 
             fps=fps, 
             save_path=str(plot_path)
