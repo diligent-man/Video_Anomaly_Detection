@@ -14,7 +14,7 @@ For the ease of source code management, this repo encompasses all implemented co
   * Tasks:  
     * Set up and manage MLOps-related services [here](./MLOps).  
     * Propose solution and implement core modules in [AI](./AI/).  
-    * Plan project management document [here](./PMP.mpp)  
+    * Plan project management document  
     * Review code.
 * Cao Khánh Vy - SE162136  
   * GitHub: [here](https://github.com/vy11244)
