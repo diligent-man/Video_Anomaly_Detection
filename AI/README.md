@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Language-English-blue.svg">|<img src="https://img.shields.io/badge/License-MIT%20-dfd.svg">|<img src="https://img.shields.io/badge/python-3.11%20-orange.svg">|<img src="https://img.shields.io/badge/OS-linux, win%20-red.svg">|<img src="https://img.shields.io/badge/Version-1.0.1%20-green.svg">
+<img src="https://img.shields.io/badge/Language-English-0011FF.svg"> | <img src="https://img.shields.io/badge/License-MIT-1047FE.svg"> | <img src="https://img.shields.io/badge/python-3.11-207CFD.svg"> | <img src="https://img.shields.io/badge/OS-linux, win-30B2FB.svg"> | <img src="https://img.shields.io/badge/Version-1.0.1-40E7FA.svg">
 
 # Introduction
 This source code implementation aims to assist researcher, user in creating DL-based algorithm for VAD problem quickly and systematically. In this project, we have:
