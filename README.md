@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/Language-English-0011FF.svg"> | <img src="https://img.shields.io/badge/License-MIT-1047FE.svg"> |  <img src="https://img.shields.io/badge/OS-linux, win-30B2FB.svg"> | <img src="https://img.shields.io/badge/Version-1.0.1-40E7FA.svg">
+
 # Anomalous Human Activity Detection By Weakly Supervised Learning
 ## What is project for
 * Implement training, testing and inference workflow for [VAD](https://paperswithcode.com/task/anomaly-detection-in-surveillance-videos) problem.
