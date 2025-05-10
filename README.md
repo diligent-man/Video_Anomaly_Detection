@@ -60,3 +60,6 @@ We want to send our gratitude to following repos due to their inspiration for ou
 * [mlflow-export-import](https://github.com/mlflow/mlflow-export-import)
 * [Ultralytics](https://github.com/ultralytics/ultralytics) (a.k.a YOLO)
 * [vision](https://github.com/pytorch/vision) (part of PyTorch project)
+
+##  License:
+This project is released under [MIT license](./LICENSE).
