@@ -14,7 +14,7 @@ For the ease of source code management, this repo encompasses all implemented co
   * Tasks:  
     * Set up and manage MLOps-related services [here](./MLOps).  
     * Propose solution and implement core modules in [AI](./AI/).  
-    * Plan project management document  
+    * Plan project management document.  
     * Review code.
 * Cao Khánh Vy - SE162136  
   * GitHub: [here](https://github.com/vy11244)
@@ -32,7 +32,7 @@ For the ease of source code management, this repo encompasses all implemented co
   * GitHub: [here](https://github.com/chiennguyen383)
   * Role: Team member
   * Tasks:
-    * Support in implementing code in [AI](./AI).
+    * Support in implementing some modules in [AI](./AI).
     * Support in finding and creating dataset.
 
 ## ✨ Key Features That Might Render You Enthralling Or Not:
