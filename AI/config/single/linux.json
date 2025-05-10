@@ -1,7 +1,7 @@
 {
     "global":
     {
-        "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results",
+        "save_dir": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/tmp_results",
         "project_name": "AIP391",
         "experiment_name": "run",
         "technique": "single",
@@ -14,7 +14,7 @@
         "eval_steps": 7,
 
         "resume": false,
-        "resume_ckpt": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/input_2d/ckpt/best_epoch13_step2937.pt",
+        "resume_ckpt": null,
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
@@ -128,9 +128,9 @@
         "algorithm": "single",
         "backbone":
         {
-//            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+            "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
 //            "name": ["clip_vit/b16"],
-            "name": ["rgb_i3d"],
+//            "name": ["rgb_i3d"],
 
             "rgb_i3d_reduce": {"name":  "max_l2"},
             "s3d_reduce": {"name":  "mean"},
@@ -176,7 +176,7 @@
 
     "optim":
     {
-        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 0.00001, "amsgrad": true},
+        "lr": {"name": "Adam", "lr": 1e-5, "weight_decay": 1e-5, "amsgrad": true},
         // Warm up 10% of epochs
         "scheduler": {"name": "WarmupCosineAnnealingWarmRestarts", "T_0":  13, "num_warmup_steps": 13, "T_mult": 1},
         "regularizer": {}
@@ -224,7 +224,7 @@
             "username": "root",
             "password": "Root123!",
             "push_to_remote": false,
-            "remote_tracking_uri": "http://42.116.36.4:5000"
+            "remote_tracking_uri": null
         },
 
         {

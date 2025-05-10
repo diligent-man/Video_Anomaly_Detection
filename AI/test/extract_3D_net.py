@@ -12,7 +12,7 @@ from AI.src.utils import (
     create_feature_extractor
 )
 from AI.src.modeling.backbones import (
-    ModelForwarder,
+    MultiBackboneForwarder,
     NET_3D_REDUCE,
     DEFAULT_3D_REDUCE,
     NET_DEFAULT_CONFIG,
@@ -73,7 +73,7 @@ def main() -> None:
                 model.compile()
 
             x: torch.Tensor = torch.rand((B, S, C, T, *dummy_input[-2:]), device=device, dtype=torch.float16)
-            model_forwarder = ModelForwarder(model, name, NET_3D_REDUCE[DEFAULT_3D_REDUCE])
+            model_forwarder = MultiBackboneForwarder(model, name, NET_3D_REDUCE[DEFAULT_3D_REDUCE])
 
             features = model_forwarder(x)
 
