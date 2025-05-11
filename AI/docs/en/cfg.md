@@ -124,12 +124,12 @@ At the moment, we offer services (also called callbacks) as below:
 | `verbose`          | <p align=center> `True`       | Prompt result wordily.                                                     |
 
 ### Mlflow
-| Argument              | Default              | Description                                                                                                |
-|-----------------------|----------------------|------------------------------------------------------------------------------------------------------------|
-| `save_dir`            | <p align=center> ``  | Directory for saving mlflow experiment.                                                                    |
-| `prev_run_id`         | <p align=center> ``  | Continue to use previous experiment, especially useful for resuming training.                              |
-| `init_server_on_run`  | <p align=center> ``  | Spin up local mlflow server when start training.                                                           |
-| `username`            | <p align=center> ``  | Username for authenticating remote tracking server. If None, it retrieves value from environment variable. |
-| `password`            | <p align=center> ``  | Password for authenticating remote tracking server. If None, it retrieves value from enviroment variable.  |
-| `push_to_remote`      | <p align=center> ``  | Automatically push experiment from local mlflow server to remote server.                                   |
-| `remote_tracking_uri` | <p align=center> ``  | Uri of remote tracking server.                                                                             |
+| Argument              | Default                  | Description                                                                                                |
+|-----------------------|--------------------------|------------------------------------------------------------------------------------------------------------|
+| `save_dir`            | <p align=center> `--`    | Directory for saving mlflow experiment.                                                                    |
+| `prev_run_id`         | <p align=center> `None`  | Continue to use previous experiment, especially useful for resuming training.                              |
+| `init_server_on_run`  | <p align=center> `False` | Spin up local mlflow server when start training.                                                           |
+| `username`            | <p align=center> `None`  | Username for authenticating remote tracking server. If None, it retrieves value from environment variable. |
+| `password`            | <p align=center> `None`  | Password for authenticating remote tracking server. If None, it retrieves value from enviroment variable.  |
+| `push_to_remote`      | <p align=center> `False` | Automatically push experiment from local mlflow server to remote server.                                   |
+| `remote_tracking_uri` | <p align=center> `None`  | Uri of remote tracking server.                                                                             |
