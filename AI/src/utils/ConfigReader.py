@@ -149,9 +149,9 @@ class ConfigReader(object):
         """
         Check existence of checkpoint and log path
         If not exists, create dir as the following pattern:
-            <output_path>/<project_name>/<technique>/<mode>/<experiment_name>/ckpt
-                                                                             /log
-                                                                             /other_services (if have)
+            <save_dir>/<project_name>/<technique>/<mode>/<experiment_name>/ckpt
+                                                                          /log
+                                                                          /other_services (if have)
         Default:
             output_path: ./training_results/
             technique: normal

@@ -2,9 +2,7 @@ import os
 import pathlib
 from typing import Dict, Any
 
-
 import torch
-
 
 from ...runner import Tester
 from .BaseCallback import BaseCallback

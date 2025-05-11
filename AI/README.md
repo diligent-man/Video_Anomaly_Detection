@@ -74,8 +74,8 @@ Please read at [here](./docs/en/crawl_data.md)
 ### For data preprocessing
 Please read at [here](./docs/en/data_preprocessing.md)
 ### For training model
-Please read at [here](./docs/en/train_model.md)
+Please read at [here](./docs/en/cfg.md)
 ### For testing model
-Please read at [here](./docs/en/test_model.md)
+Please read at [here](./docs/en/cfg.md)
 ### For deploying model
 Please read at [here](./docs/en/deploy_model.md)

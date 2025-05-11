@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Callable
 
 import torch
 
@@ -20,6 +20,7 @@ class Earlystopper(BaseCallback):
 
     __patience: int
     __min_delta: float
+    __monitor_op: Callable
     __check_from_epoch: int
     __verbose: bool
 
@@ -57,7 +58,7 @@ class Earlystopper(BaseCallback):
             # New training
             instance.state.monitor = (self.__monitor, self.__best)
         else:
-            # Resume best value from previous training if have
+            # Resume best value from previous training
             self.__best = instance.state.monitor[1]
 
     def on_val_epoch_end(self, instance: Trainer) -> None:

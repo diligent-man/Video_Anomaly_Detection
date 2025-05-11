@@ -9,7 +9,7 @@
 For the ease of source code management, this repo encompasses all implemented code and relatable configurations, and they are placed in AI, MLops and Web directories.
 [AI](./AI) includes source code for building DL-based VAD algorithm. [Web](./Web) comprises both backend and frontend for simple demo web app. [MLOps](./MLOps) respectively consists of Docker configurations for lakeFS, minIO, MLflow, postgress services.
 
-## Team members:
+## 👨 Team members:
 * Nguyễn Đức Trọng - SE160931
   * GitHub: [click here](https://github.com/diligent-man)
   * Role: Team leader
@@ -37,6 +37,12 @@ For the ease of source code management, this repo encompasses all implemented co
     * Support in implementing some modules in [AI](./AI).
     * Support in finding and creating dataset.
 
+## 🔎 Panoptic view of system
+<img src="./AI/misc/fig/sys_des.jpg" alt=""/>
+
+[//]: # (## 🚩 Project Output)
+[//]: # (Writer later)
+
 ## ✨ Key Features That Might Render You Enthralling Or Not:
 * ⚡ **Easy-to-configure model [Trainer](./AI/src/runner/Trainer.py) and [Tester](AI/src/runner/Tester.py)**: Quickly training and testing DL-based VAD model with json and yaml-supported configuration.  
 * ⚙ **Dotted dictionary ([DotDict](./AI/src/utils/DotDict.py))**: Simple yet effective dotted dictionary with recursive approach for managing configuration in [AI](./AI).
@@ -47,21 +53,22 @@ For the ease of source code management, this repo encompasses all implemented co
 * 🖥️ **Intuitive demo web:** User friendly demo web interface.
 
 ## 🚀 Get Started:
-### AI Installation
+### 1/ AI Installation
 please check at [here](./AI/README.md)
-### MLOps Installation
+### 2/ MLOps Installation
 please check at [here](./MLOps/README.md)
-### Web Installation
+### 3/ Web Installation
 please check at [here](./Web/README.md)
 
-##  Acknowledgements:
+## 😌 Acknowledgements:
 We want to send our gratitude to following repos due to their inspiration for our implementation in [AI](./AI):  
 * [Box](https://github.com/cdgriffith/Box)
+* [Keras 3](https://github.com/keras-team/keras)
 * [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 * [transformers](https://github.com/huggingface/transformers)
 * [mlflow-export-import](https://github.com/mlflow/mlflow-export-import)
 * [Ultralytics](https://github.com/ultralytics/ultralytics) (a.k.a YOLO)
-* [vision](https://github.com/pytorch/vision) (part of PyTorch project)
+* [Torchvision](https://github.com/pytorch/vision) (part of PyTorch project)
 
-##  License:
-This project is released under [MIT license](./LICENSE).
+## License:
+This project is released under [MIT license](./LICENSE) <img src="./AI/misc/fig/MIT_license.png" alt="" width="15"/> .

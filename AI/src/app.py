@@ -30,7 +30,7 @@ from AI.src.utils.inference_ops import extract_frames, load_img, find_first_half
 app = FastAPI()
 multiprocessing.set_start_method("spawn")
 
-device: str = os.environ.get("DEVICE", "cuda")
+device: str = os.environ.get("DEVICE", "cpu")
 overlap_ratio: float = os.environ.get("OVERLAP_RATIO", .5)
 T_max: int = os.environ.get("T_MAX", 30)
 

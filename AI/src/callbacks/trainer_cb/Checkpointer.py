@@ -38,7 +38,7 @@ class Checkpointer(BaseCallback):
                  save_total_limit: int = 5,
                  include_config: bool = False,
                  initial_value_threshold: float = None,
-                 verbose: bool = True
+                 verbose: bool = True,
                  ) -> None:
         assert mode in self.__support_mode, ValueError(f"Currently support {self.__support_mode}. Get {mode}")
         assert monitor in self.__support_monitor, ValueError(

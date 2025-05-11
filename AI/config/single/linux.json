@@ -60,7 +60,6 @@
             },
             "forward_strategy": "v1"
         },
-        /////////////////////////////////////////////////////////
         "val":
         {
             "dataset":
@@ -119,7 +118,7 @@
                 "persistent_workers": false,
                 "multiprocessing_context": "fork"
             },
-            "forward_strategy": "v3",
+            "forward_strategy": "v3"
         }
     },
 

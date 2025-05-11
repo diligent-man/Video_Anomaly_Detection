@@ -1,5 +1,5 @@
 import os
-from typing import Tuple, List
+from typing import Tuple
 
 import torch
 from torch import Tensor
@@ -17,7 +17,7 @@ class KaggleVADVideoLevelDataset(Dataset):
     """
     _repr_indent: int = 4
 
-     def __init__(self,
+    def __init__(self,
                  normal_root: str,
                  anomaly_root: str,
                  loader: str,

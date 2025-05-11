@@ -43,7 +43,7 @@ class CallbackWrapper(object):
                     if not is_mlflow_available():
                         raise RuntimeError("MLflowCallback requires mlflow to be installed. Run `pip install mlflow`.")
                     else:
-                        from .intergrated_cb import Mlflow
+                        from .integrated_cb import Mlflow
                         callbacks_to_add.append(Mlflow)
         # Test callbacks
         elif isinstance(self.__instance, Tester.Tester):

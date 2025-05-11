@@ -71,12 +71,15 @@ class VADDistillModel(Module):
                 model: Module = BaseModel(self.__config.models[model_type])
 
                 trainable_layers: True = self.__config.models[model_type].get("trainable_layers", 0)
-                assert trainable_layers == 0, ValueError("All layers must be non-trainable in offline distillation training")
+                assert trainable_layers == 0, \
+                    ValueError("All layers must be non-trainable in offline distillation training")
 
                 pretrained: str = self.__config.models[model_type].get("pretrained", None)
-                assert pretrained is not None, ValueError(f"Weight for {model_type} must be provided in offline distillation training")
+                assert pretrained is not None, \
+                    ValueError(f"Weight for {model_type} must be provided in offline distillation training")
                 assert os.path.isfile(pretrained), ValueError("Provided path is not a file")
-                assert pretrained.endswith((".pt", ".pth")), ValueError("Provided file does not ends with '.pt' or '.pth'")
+                assert pretrained.endswith((".pt", ".pth")), \
+                    ValueError("Provided file does not ends with '.pt' or '.pth'")
 
                 ckpt: Dict[str, Any] = torch.load(pretrained)
                 model.load_state_dict(ckpt["model"] if isinstance(ckpt["model"], dict) else ckpt["model"].state_dict())
@@ -113,7 +116,10 @@ class VADDistillModel(Module):
         soft_preds: Tensor = torch.cat((anomaly_outs.logits, normal_outs.logits), dim=1)  # (B,2*S)
         return VADDistillModelOutput(soft_preds=soft_preds, hard_preds=hard_preds, feats=feats)
 
-    def forward(self, anomaly: Tensor, normal: Tensor) -> Tuple[List[VADDistillModelOutput], List[VADDistillModelOutput]]:
+    def forward(self,
+                anomaly: Tensor,
+                normal: Tensor
+                ) -> Tuple[List[VADDistillModelOutput], List[VADDistillModelOutput]]:
         """
         :param anomaly: list of input tensors in the format of Shape (S,C,T,H,W) or (B,S,C,T,H,W)
         :param normal:                                  //

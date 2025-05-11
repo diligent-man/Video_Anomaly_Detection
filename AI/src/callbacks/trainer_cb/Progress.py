@@ -1,8 +1,6 @@
 from tqdm import tqdm
 from typing import Tuple
 
-from torch.utils.data import DataLoader
-
 from ...runner import Trainer
 from .BaseCallback import BaseCallback
 from ...utils.runner_utils.trainer import find_initial_total
@@ -31,22 +29,6 @@ class Progress(BaseCallback):
         """
         super(Progress, self).__init__()
         self.__max_str_len: int = max_str_len
-
-    # @staticmethod
-    # def _find_initial_total(instance: Trainer, dataloader: DataLoader) -> Tuple[int, int]:
-    #     if instance.state.phase == "train" or instance.state.eval_strategy == "epoch":
-    #         initial: int = instance.state.epoch - 1
-    #         total: int = initial + instance.state.epochs
-    #
-    #         initial *= len(dataloader)
-    #         total *= len(dataloader)
-    #     else:
-    #         initial: int = instance.state.step // instance.state.eval_steps
-    #         total: int = instance.state.steps // instance.state.eval_steps
-    #
-    #         initial *= len(dataloader)
-    #         total *= len(dataloader)
-    #     return initial, total
 
     @staticmethod
     def _make_desc(instance: Trainer, phase: str, loss: None | float) -> str:
