@@ -8,7 +8,7 @@ from torch import Tensor
 from torch.nn import Module, ModuleList
 
 
-from ..backbones import build_backbone, ModelForwarder
+from ..backbones import build_backbone, MultiBackboneForwarder
 from ..necks import build_neck
 from ..heads import build_head, SimpleClassifierOutput
 
@@ -85,7 +85,7 @@ class BaseModel(Module):
             name: str = self.__names[i]
             reduce: partial = self._reduce[i]
 
-            feats: Tensor = ModelForwarder(backbone, name, reduce)(x)
+            feats: Tensor = MultiBackboneForwarder(backbone, name, reduce)(x)
             extracted_feats = [feats] if extracted_feats is None else extracted_feats.append(feats)
 
             if self.out_proj is not None:

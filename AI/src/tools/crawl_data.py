@@ -24,7 +24,7 @@ def main() -> None:
         # "https://www.youtube.com/watch?v=84lYjtCfIvY&list=PL3HxEb3s-wfZGi6UK_FYPdlvMO7KYxeBl&pp=gAQB":"normal"
     }
 
-    base_folder = "/home/trong/Downloads/Dataset/VAD/origin/crawled_data"
+    base_folder = "~/Downloads/crawled_data"
     os.makedirs(base_folder, exist_ok=True)
 
     ydl_opts = {

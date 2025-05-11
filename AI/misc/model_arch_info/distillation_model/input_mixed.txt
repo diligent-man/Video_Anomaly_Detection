@@ -1,0 +1,359 @@
+==================================================================================================================================================================================================================
+Layer (type:depth-idx)                                                                Input Shape               Output Shape              Param #                   Param %                   Trainable
+==================================================================================================================================================================================================================
+VADDistillModel                                                                       [1, 32, 3, 13, 224, 224]  [1, 64]                   --                             --                   Partial
+├─ModuleDict: 1-3                                                                     --                        --                        (recursive)               (recursive)               Partial
+│    └─ModuleList: 2-1                                                                --                        --                        --                             --                   Partial
+│    │    └─BaseModel: 3-1                                                            [1, 32, 3, 13, 224, 224]  [1, 32]                   --                             --                   Partial
+│    │    │    └─ModuleList: 4-5                                                      --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-1                                                [416, 3, 224, 224]        [416, 197, 768]           --                             --                   False
+│    │    │    │    │    └─VisionTransformer: 6-1                                     [416, 3, 224, 224]        [416, 768]                --                             --                   False
+│    │    │    │    │    │    └─VisionEmbeddings: 7-1                                 [416, 3, 224, 224]        [416, 197, 768]           (741,888)                   0.37%                   False
+│    │    │    │    │    │    └─LayerNorm: 7-2                                        [416, 197, 768]           [416, 197, 768]           (1,536)                     0.00%                   False
+│    │    │    │    │    │    └─Encoder: 7-3                                          --                        [416, 197, 768]           (85,054,464)               42.41%                   False
+│    │    │    │    │    │    └─LayerNorm: 7-4                                        [416, 768]                [416, 768]                (1,536)                     0.00%                   False
+│    │    │    └─ModuleList: 4-6                                                      --                        --                        (recursive)               (recursive)               True
+│    │    │    │    └─MLP: 5-2                                                        [1, 32, 768]              [1, 32, 512]              --                             --                   True
+│    │    │    │    │    └─Sequential: 6-2                                            [1, 32, 768]              [1, 32, 512]              --                             --                   True
+│    │    │    │    │    │    └─Linear: 7-5                                           [1, 32, 768]              [1, 32, 512]              393,728                     0.20%                   True
+│    │    │    │    │    │    └─Dropout: 7-6                                          [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-7                                             [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-8                                           [1, 32, 512]              [1, 32, 512]              262,656                     0.13%                   True
+│    │    │    └─TemporalAggregation: 4-3                                             [1, 1, 32, 512]           [1, 32, 512]              --                             --                   True
+│    │    │    │    └─ModuleList: 5-8                                                 --                        --                        (recursive)               (recursive)               True
+│    │    │    │    │    └─QKV: 6-3                                                   [1, 32, 512]              [1, 32, 512]              787,968                     0.39%                   True
+│    │    │    │    └─RelativePE: 5-4                                                 --                        [1, 20, 512]              10,240                      0.01%                   True
+│    │    │    │    │    └─QKV: 6-4                                                   [1, 20, 512]              [1, 20, 512]              787,968                     0.39%                   True
+│    │    │    └─SimpleClassifier: 4-4                                                [1, 32, 512]              [1, 32]                   --                             --                   True
+│    │    │    │    └─MLP: 5-5                                                        [1, 32, 512]              [1, 32, 1]                --                             --                   True
+│    │    │    │    │    └─Sequential: 6-5                                            [1, 32, 512]              [1, 32, 1]                --                             --                   True
+│    │    │    │    │    │    └─Linear: 7-9                                           [1, 32, 512]              [1, 32, 512]              262,656                     0.13%                   True
+│    │    │    │    │    │    └─Dropout: 7-10                                         [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-11                                            [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-12                                          [1, 32, 512]              [1, 32, 32]               16,416                      0.01%                   True
+│    │    │    │    │    │    └─Dropout: 7-13                                         [1, 32, 32]               [1, 32, 32]               --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-14                                            [1, 32, 32]               [1, 32, 32]               --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-15                                          [1, 32, 32]               [1, 32, 1]                33                          0.00%                   True
+│    │    └─BaseModel: 3-2                                                            [1, 32, 3, 13, 224, 224]  [1, 32]                   (recursive)               (recursive)               Partial
+│    │    │    └─ModuleList: 4-5                                                      --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-6                                                [416, 3, 224, 224]        [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    └─VisionTransformer: 6-6                                     [416, 3, 224, 224]        [416, 768]                (recursive)               (recursive)               False
+│    │    │    │    │    │    └─VisionEmbeddings: 7-16                                [416, 3, 224, 224]        [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    │    └─LayerNorm: 7-17                                       [416, 197, 768]           [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Encoder: 7-18                                         --                        [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    │    └─LayerNorm: 7-19                                       [416, 768]                [416, 768]                (recursive)               (recursive)               False
+│    │    │    └─ModuleList: 4-6                                                      --                        --                        (recursive)               (recursive)               True
+│    │    │    │    └─MLP: 5-7                                                        [1, 32, 768]              [1, 32, 512]              (recursive)               (recursive)               True
+│    │    │    │    │    └─Sequential: 6-7                                            [1, 32, 768]              [1, 32, 512]              (recursive)               (recursive)               True
+│    │    │    │    │    │    └─Linear: 7-20                                          [1, 32, 768]              [1, 32, 512]              (recursive)               (recursive)               True
+│    │    │    │    │    │    └─Dropout: 7-21                                         [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-22                                            [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-23                                          [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               True
+│    │    │    └─TemporalAggregation: 4-7                                             [1, 1, 32, 512]           [1, 32, 512]              (recursive)               (recursive)               True
+│    │    │    │    └─ModuleList: 5-8                                                 --                        --                        (recursive)               (recursive)               True
+│    │    │    │    │    └─QKV: 6-8                                                   [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               True
+│    │    │    │    └─RelativePE: 5-9                                                 --                        [1, 20, 512]              (recursive)               (recursive)               True
+│    │    │    │    │    └─QKV: 6-9                                                   [1, 20, 512]              [1, 20, 512]              (recursive)               (recursive)               True
+│    │    │    └─SimpleClassifier: 4-8                                                [1, 32, 512]              [1, 32]                   (recursive)               (recursive)               True
+│    │    │    │    └─MLP: 5-10                                                       [1, 32, 512]              [1, 32, 1]                (recursive)               (recursive)               True
+│    │    │    │    │    └─Sequential: 6-10                                           [1, 32, 512]              [1, 32, 1]                (recursive)               (recursive)               True
+│    │    │    │    │    │    └─Linear: 7-24                                          [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               True
+│    │    │    │    │    │    └─Dropout: 7-25                                         [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-26                                            [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-27                                          [1, 32, 512]              [1, 32, 32]               (recursive)               (recursive)               True
+│    │    │    │    │    │    └─Dropout: 7-28                                         [1, 32, 32]               [1, 32, 32]               --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-29                                            [1, 32, 32]               [1, 32, 32]               --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-30                                          [1, 32, 32]               [1, 32, 1]                (recursive)               (recursive)               True
+├─MLP: 1-2                                                                            [1, 64, 512]              [1, 64, 512]              --                             --                   True
+│    └─Sequential: 2-2                                                                [1, 64, 512]              [1, 64, 512]              --                             --                   True
+│    │    └─Linear: 3-3                                                               [1, 64, 512]              [1, 64, 512]              262,656                     0.13%                   True
+│    │    └─ReLU: 3-4                                                                 [1, 64, 512]              [1, 64, 512]              --                             --                   --
+│    │    └─Linear: 3-5                                                               [1, 64, 512]              [1, 64, 512]              262,656                     0.13%                   True
+├─ModuleDict: 1-3                                                                     --                        --                        (recursive)               (recursive)               Partial
+│    └─ModuleList: 2-3                                                                --                        --                        --                             --                   False
+│    │    └─BaseModel: 3-6                                                            [1, 32, 3, 13, 224, 224]  [1, 32]                   --                             --                   False
+│    │    │    └─ModuleList: 4-22                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-11                                               [32, 3, 13, 224, 224]     [32, 1024, 1, 1, 1]       --                             --                   False
+│    │    │    │    │    └─Unit3D: 6-11                                               [32, 3, 13, 224, 224]     [32, 64, 7, 112, 112]     --                             --                   False
+│    │    │    │    │    │    └─Conv3d: 7-31                                          [32, 3, 19, 229, 229]     [32, 64, 7, 112, 112]     (65,856)                    0.03%                   False
+│    │    │    │    │    │    └─BatchNorm3d: 7-32                                     [32, 64, 7, 112, 112]     [32, 64, 7, 112, 112]     (128)                       0.00%                   False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-12                                 [32, 64, 7, 112, 112]     [32, 64, 7, 56, 56]       --                             --                   --
+│    │    │    │    │    └─Unit3D: 6-13                                               [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       --                             --                   False
+│    │    │    │    │    │    └─Conv3d: 7-33                                          [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       (4,096)                     0.00%                   False
+│    │    │    │    │    │    └─BatchNorm3d: 7-34                                     [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       (128)                       0.00%                   False
+│    │    │    │    │    └─Unit3D: 6-14                                               [32, 64, 7, 56, 56]       [32, 192, 7, 56, 56]      --                             --                   False
+│    │    │    │    │    │    └─Conv3d: 7-35                                          [32, 64, 9, 58, 58]       [32, 192, 7, 56, 56]      (331,776)                   0.17%                   False
+│    │    │    │    │    │    └─BatchNorm3d: 7-36                                     [32, 192, 7, 56, 56]      [32, 192, 7, 56, 56]      (384)                       0.00%                   False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-15                                 [32, 192, 7, 56, 56]      [32, 192, 7, 28, 28]      --                             --                   --
+│    │    │    │    │    └─Module: 6-46                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-37                                          [32, 192, 7, 28, 28]      [32, 64, 7, 28, 28]       (12,416)                    0.01%                   False
+│    │    │    │    │    │    └─Module: 7-119                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-120                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-121                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-47                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-41                                          [32, 256, 7, 28, 28]      [32, 128, 7, 28, 28]      (33,024)                    0.02%                   False
+│    │    │    │    │    │    └─Module: 7-123                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-124                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-125                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-18                                 [32, 480, 7, 28, 28]      [32, 480, 4, 14, 14]      --                             --                   --
+│    │    │    │    │    └─Module: 6-49                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-45                                          [32, 480, 4, 14, 14]      [32, 192, 4, 14, 14]      (92,544)                    0.05%                   False
+│    │    │    │    │    │    └─Module: 7-127                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-128                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-129                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-50                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-49                                          [32, 512, 4, 14, 14]      [32, 160, 4, 14, 14]      (82,240)                    0.04%                   False
+│    │    │    │    │    │    └─Module: 7-131                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-132                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-133                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-51                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-53                                          [32, 512, 4, 14, 14]      [32, 128, 4, 14, 14]      (65,792)                    0.03%                   False
+│    │    │    │    │    │    └─Module: 7-135                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-136                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-137                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-52                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-57                                          [32, 512, 4, 14, 14]      [32, 112, 4, 14, 14]      (57,568)                    0.03%                   False
+│    │    │    │    │    │    └─Module: 7-139                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-140                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-141                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-53                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-61                                          [32, 528, 4, 14, 14]      [32, 256, 4, 14, 14]      (135,680)                   0.07%                   False
+│    │    │    │    │    │    └─Module: 7-143                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-144                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-145                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-24                                 [32, 832, 4, 14, 14]      [32, 832, 2, 7, 7]        --                             --                   --
+│    │    │    │    │    └─Module: 6-55                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-65                                          [32, 832, 2, 7, 7]        [32, 256, 2, 7, 7]        (213,504)                   0.11%                   False
+│    │    │    │    │    │    └─Module: 7-147                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-148                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-149                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-56                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-69                                          [32, 832, 2, 7, 7]        [32, 384, 2, 7, 7]        (320,256)                   0.16%                   False
+│    │    │    │    │    │    └─Module: 7-151                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-152                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-153                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─AvgPool3d: 6-27                                            [32, 1024, 2, 7, 7]       [32, 1024, 1, 1, 1]       --                             --                   --
+│    │    │    └─ModuleList: 4-23                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─MLP: 5-12                                                       [1, 32, 1024]             [1, 32, 512]              --                             --                   False
+│    │    │    │    │    └─Sequential: 6-28                                           [1, 32, 1024]             [1, 32, 512]              --                             --                   False
+│    │    │    │    │    │    └─Linear: 7-73                                          [1, 32, 1024]             [1, 32, 512]              (524,800)                   0.26%                   False
+│    │    │    │    │    │    └─Dropout: 7-74                                         [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-75                                            [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-76                                          [1, 32, 512]              [1, 32, 512]              (262,656)                   0.13%                   False
+│    │    │    └─ModuleList: 4-22                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-13                                               [32, 3, 13, 224, 224]     [32, 1024, 1, 1, 1]       --                             --                   False
+│    │    │    │    │    └─Module: 6-59                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-158                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-78                                       [32, 64, 7, 112, 112]     [32, 64, 7, 56, 56]       --                             --                   --
+│    │    │    │    │    │    └─Conv3dNormActivation: 7-79                            [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       (4,224)                     0.00%                   False
+│    │    │    │    │    │    └─Module: 7-161                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-81                                       [32, 192, 7, 56, 56]      [32, 192, 7, 28, 28]      --                             --                   --
+│    │    │    │    │    │    └─Module: 7-163                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-164                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-84                                       [32, 480, 7, 28, 28]      [32, 480, 4, 14, 14]      --                             --                   --
+│    │    │    │    │    │    └─Module: 7-166                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-167                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-168                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-169                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-170                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-90                                       [32, 832, 4, 14, 14]      [32, 832, 2, 7, 7]        --                             --                   --
+│    │    │    │    │    │    └─Module: 7-172                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-173                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─AvgPool3d: 6-30                                            [32, 1024, 2, 7, 7]       [32, 1024, 1, 1, 1]       --                             --                   --
+│    │    │    └─ModuleList: 4-23                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─MLP: 5-14                                                       [1, 32, 1024]             [1, 32, 512]              --                             --                   False
+│    │    │    │    │    └─Sequential: 6-31                                           [1, 32, 1024]             [1, 32, 512]              --                             --                   False
+│    │    │    │    │    │    └─Linear: 7-93                                          [1, 32, 1024]             [1, 32, 512]              (524,800)                   0.26%                   False
+│    │    │    │    │    │    └─Dropout: 7-94                                         [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-95                                            [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-96                                          [1, 32, 512]              [1, 32, 512]              (262,656)                   0.13%                   False
+│    │    │    └─ModuleList: 4-22                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-15                                               [416, 3, 224, 224]        [416, 197, 768]           --                             --                   False
+│    │    │    │    │    └─VisionTransformer: 6-32                                    [416, 3, 224, 224]        [416, 768]                --                             --                   False
+│    │    │    │    │    │    └─VisionEmbeddings: 7-97                                [416, 3, 224, 224]        [416, 197, 768]           (741,888)                   0.37%                   False
+│    │    │    │    │    │    └─LayerNorm: 7-98                                       [416, 197, 768]           [416, 197, 768]           (1,536)                     0.00%                   False
+│    │    │    │    │    │    └─Encoder: 7-99                                         --                        [416, 197, 768]           (85,054,464)               42.41%                   False
+│    │    │    │    │    │    └─LayerNorm: 7-100                                      [416, 768]                [416, 768]                (1,536)                     0.00%                   False
+│    │    │    └─ModuleList: 4-23                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─MLP: 5-16                                                       [1, 32, 768]              [1, 32, 512]              --                             --                   False
+│    │    │    │    │    └─Sequential: 6-33                                           [1, 32, 768]              [1, 32, 512]              --                             --                   False
+│    │    │    │    │    │    └─Linear: 7-101                                         [1, 32, 768]              [1, 32, 512]              (393,728)                   0.20%                   False
+│    │    │    │    │    │    └─Dropout: 7-102                                        [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-103                                           [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-104                                         [1, 32, 512]              [1, 32, 512]              (262,656)                   0.13%                   False
+│    │    │    └─TemporalAggregation: 4-15                                            [3, 1, 32, 512]           [1, 32, 512]              --                             --                   False
+│    │    │    │    └─ModuleList: 5-33                                                --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-34                                                  [1, 32, 512]              [1, 32, 512]              (787,968)                   0.39%                   False
+│    │    │    │    │    └─QKV: 6-35                                                  [1, 32, 512]              [1, 32, 512]              (787,968)                   0.39%                   False
+│    │    │    │    └─RelativePE: 5-18                                                --                        [1, 50, 512]              25,600                      0.01%                   False
+│    │    │    │    │    └─QKV: 6-36                                                  [1, 50, 512]              [1, 50, 512]              (787,968)                   0.39%                   False
+│    │    │    │    └─ModuleList: 5-33                                                --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-37                                                  [1, 32, 512]              [1, 32, 512]              (787,968)                   0.39%                   False
+│    │    │    │    └─RelativePE: 5-20                                                --                        [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-38                                                  [1, 50, 512]              [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    └─RelativePE: 5-21                                                --                        [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-39                                                  [1, 50, 512]              [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    └─SimpleClassifier: 4-16                                               [1, 32, 512]              [1, 32]                   --                             --                   False
+│    │    │    │    └─MLP: 5-22                                                       [1, 32, 512]              [1, 32, 1]                --                             --                   False
+│    │    │    │    │    └─Sequential: 6-40                                           [1, 32, 512]              [1, 32, 1]                --                             --                   False
+│    │    │    │    │    │    └─Linear: 7-105                                         [1, 32, 512]              [1, 32, 512]              (262,656)                   0.13%                   False
+│    │    │    │    │    │    └─Dropout: 7-106                                        [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-107                                           [1, 32, 512]              [1, 32, 512]              --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-108                                         [1, 32, 512]              [1, 32, 32]               (16,416)                    0.01%                   False
+│    │    │    │    │    │    └─Dropout: 7-109                                        [1, 32, 32]               [1, 32, 32]               --                             --                   --
+│    │    │    │    │    │    └─ReLU: 7-110                                           [1, 32, 32]               [1, 32, 32]               --                             --                   --
+│    │    │    │    │    │    └─Linear: 7-111                                         [1, 32, 32]               [1, 32, 1]                (33)                        0.00%                   False
+│    │    │    │    └─Sigmoid: 5-23                                                   [1, 32]                   [1, 32]                   --                             --                   --
+│    │    │    └─PseudoLabelRefiner: 4-17                                             [1, 32]                   [1, 32]                   --                             --                   --
+│    │    │    │    └─AvgPool1d: 5-24                                                 [1, 36]                   [1, 32]                   --                             --                   --
+│    │    └─BaseModel: 3-7                                                            [1, 32, 3, 13, 224, 224]  [1, 32]                   (recursive)               (recursive)               False
+│    │    │    └─ModuleList: 4-22                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-25                                               [32, 3, 13, 224, 224]     [32, 1024, 1, 1, 1]       (recursive)               (recursive)               False
+│    │    │    │    │    └─Unit3D: 6-41                                               [32, 3, 13, 224, 224]     [32, 64, 7, 112, 112]     (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Conv3d: 7-112                                         [32, 3, 19, 229, 229]     [32, 64, 7, 112, 112]     (recursive)               (recursive)               False
+│    │    │    │    │    │    └─BatchNorm3d: 7-113                                    [32, 64, 7, 112, 112]     [32, 64, 7, 112, 112]     (recursive)               (recursive)               False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-42                                 [32, 64, 7, 112, 112]     [32, 64, 7, 56, 56]       --                        (recursive)               --
+│    │    │    │    │    └─Unit3D: 6-43                                               [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Conv3d: 7-114                                         [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       (recursive)               (recursive)               False
+│    │    │    │    │    │    └─BatchNorm3d: 7-115                                    [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       (recursive)               (recursive)               False
+│    │    │    │    │    └─Unit3D: 6-44                                               [32, 64, 7, 56, 56]       [32, 192, 7, 56, 56]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Conv3d: 7-116                                         [32, 64, 9, 58, 58]       [32, 192, 7, 56, 56]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─BatchNorm3d: 7-117                                    [32, 192, 7, 56, 56]      [32, 192, 7, 56, 56]      (recursive)               (recursive)               False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-45                                 [32, 192, 7, 56, 56]      [32, 192, 7, 28, 28]      --                        (recursive)               --
+│    │    │    │    │    └─Module: 6-46                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-118                                         [32, 192, 7, 28, 28]      [32, 64, 7, 28, 28]       (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-119                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-120                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-121                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-47                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-122                                         [32, 256, 7, 28, 28]      [32, 128, 7, 28, 28]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-123                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-124                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-125                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-48                                 [32, 480, 7, 28, 28]      [32, 480, 4, 14, 14]      --                        (recursive)               --
+│    │    │    │    │    └─Module: 6-49                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-126                                         [32, 480, 4, 14, 14]      [32, 192, 4, 14, 14]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-127                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-128                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-129                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-50                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-130                                         [32, 512, 4, 14, 14]      [32, 160, 4, 14, 14]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-131                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-132                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-133                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-51                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-134                                         [32, 512, 4, 14, 14]      [32, 128, 4, 14, 14]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-135                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-136                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-137                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-52                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-138                                         [32, 512, 4, 14, 14]      [32, 112, 4, 14, 14]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-139                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-140                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-141                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-53                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-142                                         [32, 528, 4, 14, 14]      [32, 256, 4, 14, 14]      (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-143                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-144                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-145                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─MaxPool3dSamePadding: 6-54                                 [32, 832, 4, 14, 14]      [32, 832, 2, 7, 7]        --                        (recursive)               --
+│    │    │    │    │    └─Module: 6-55                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-146                                         [32, 832, 2, 7, 7]        [32, 256, 2, 7, 7]        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-147                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-148                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-149                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-56                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Unit3D: 7-150                                         [32, 832, 2, 7, 7]        [32, 384, 2, 7, 7]        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-151                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-152                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-153                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─AvgPool3d: 6-57                                            [32, 1024, 2, 7, 7]       [32, 1024, 1, 1, 1]       --                        (recursive)               --
+│    │    │    └─ModuleList: 4-23                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─MLP: 5-26                                                       [1, 32, 1024]             [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─Sequential: 6-58                                           [1, 32, 1024]             [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Linear: 7-154                                         [1, 32, 1024]             [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Dropout: 7-155                                        [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-156                                           [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-157                                         [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    └─ModuleList: 4-22                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-27                                               [32, 3, 13, 224, 224]     [32, 1024, 1, 1, 1]       (recursive)               (recursive)               False
+│    │    │    │    │    └─Module: 6-59                                               --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-158                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-159                                      [32, 64, 7, 112, 112]     [32, 64, 7, 56, 56]       --                        (recursive)               --
+│    │    │    │    │    │    └─Conv3dNormActivation: 7-160                           [32, 64, 7, 56, 56]       [32, 64, 7, 56, 56]       (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-161                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-162                                      [32, 192, 7, 56, 56]      [32, 192, 7, 28, 28]      --                        (recursive)               --
+│    │    │    │    │    │    └─Module: 7-163                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-164                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-165                                      [32, 480, 7, 28, 28]      [32, 480, 4, 14, 14]      --                        (recursive)               --
+│    │    │    │    │    │    └─Module: 7-166                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-167                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-168                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-169                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-170                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─MaxPool3d: 7-171                                      [32, 832, 4, 14, 14]      [32, 832, 2, 7, 7]        --                        (recursive)               --
+│    │    │    │    │    │    └─Module: 7-172                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Module: 7-173                                         --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─AvgPool3d: 6-60                                            [32, 1024, 2, 7, 7]       [32, 1024, 1, 1, 1]       --                        (recursive)               --
+│    │    │    └─ModuleList: 4-23                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─MLP: 5-28                                                       [1, 32, 1024]             [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─Sequential: 6-61                                           [1, 32, 1024]             [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Linear: 7-174                                         [1, 32, 1024]             [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Dropout: 7-175                                        [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-176                                           [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-177                                         [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    └─ModuleList: 4-22                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─GraphModule: 5-29                                               [416, 3, 224, 224]        [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    └─VisionTransformer: 6-62                                    [416, 3, 224, 224]        [416, 768]                (recursive)               (recursive)               False
+│    │    │    │    │    │    └─VisionEmbeddings: 7-178                               [416, 3, 224, 224]        [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    │    └─LayerNorm: 7-179                                      [416, 197, 768]           [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Encoder: 7-180                                        --                        [416, 197, 768]           (recursive)               (recursive)               False
+│    │    │    │    │    │    └─LayerNorm: 7-181                                      [416, 768]                [416, 768]                (recursive)               (recursive)               False
+│    │    │    └─ModuleList: 4-23                                                     --                        --                        (recursive)               (recursive)               False
+│    │    │    │    └─MLP: 5-30                                                       [1, 32, 768]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─Sequential: 6-63                                           [1, 32, 768]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Linear: 7-182                                         [1, 32, 768]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Dropout: 7-183                                        [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-184                                           [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-185                                         [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    └─TemporalAggregation: 4-24                                            [3, 1, 32, 512]           [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    └─ModuleList: 5-33                                                --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-64                                                  [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-65                                                  [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    └─RelativePE: 5-32                                                --                        [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-66                                                  [1, 50, 512]              [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    └─ModuleList: 5-33                                                --                        --                        (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-67                                                  [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    └─RelativePE: 5-34                                                --                        [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-68                                                  [1, 50, 512]              [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    └─RelativePE: 5-35                                                --                        [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    └─QKV: 6-69                                                  [1, 50, 512]              [1, 50, 512]              (recursive)               (recursive)               False
+│    │    │    └─SimpleClassifier: 4-25                                               [1, 32, 512]              [1, 32]                   (recursive)               (recursive)               False
+│    │    │    │    └─MLP: 5-36                                                       [1, 32, 512]              [1, 32, 1]                (recursive)               (recursive)               False
+│    │    │    │    │    └─Sequential: 6-70                                           [1, 32, 512]              [1, 32, 1]                (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Linear: 7-186                                         [1, 32, 512]              [1, 32, 512]              (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Dropout: 7-187                                        [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-188                                           [1, 32, 512]              [1, 32, 512]              --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-189                                         [1, 32, 512]              [1, 32, 32]               (recursive)               (recursive)               False
+│    │    │    │    │    │    └─Dropout: 7-190                                        [1, 32, 32]               [1, 32, 32]               --                        (recursive)               --
+│    │    │    │    │    │    └─ReLU: 7-191                                           [1, 32, 32]               [1, 32, 32]               --                        (recursive)               --
+│    │    │    │    │    │    └─Linear: 7-192                                         [1, 32, 32]               [1, 32, 1]                (recursive)               (recursive)               False
+│    │    │    │    └─Sigmoid: 5-37                                                   [1, 32]                   [1, 32]                   --                        (recursive)               --
+│    │    │    └─PseudoLabelRefiner: 4-26                                             [1, 32]                   [1, 32]                   --                        (recursive)               --
+│    │    │    │    └─AvgPool1d: 5-38                                                 [1, 36]                   [1, 32]                   --                        (recursive)               --
+├─MLP: 1-4                                                                            [1, 64, 512]              [1, 64, 512]              (recursive)               (recursive)               True
+│    └─Sequential: 2-4                                                                [1, 64, 512]              [1, 64, 512]              (recursive)               (recursive)               True
+│    │    └─Linear: 3-8                                                               [1, 64, 512]              [1, 64, 512]              (recursive)               (recursive)               True
+│    │    └─ReLU: 3-9                                                                 [1, 64, 512]              [1, 64, 512]              --                        (recursive)               --
+│    │    └─Linear: 3-10                                                              [1, 64, 512]              [1, 64, 512]              (recursive)               (recursive)               True
+==================================================================================================================================================================================================================
+Total params: 200,531,010
+Trainable params: 3,046,977
+Non-trainable params: 197,484,033
+Total mult-adds (Units.TERABYTES): 2.96
+==================================================================================================================================================================================================================
+Input size (MB): 500.96
+Forward/backward pass size (MB): 329536.81
+Params size (MB): 801.97
+Estimated Total Size (MB): 330839.74
+==================================================================================================================================================================================================================

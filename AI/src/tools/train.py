@@ -9,6 +9,8 @@ from typing import Dict
 sys.path.append(os.path.join(os.path.dirname(os.getcwd()), "../../"))
 
 import torch
+from torch.nn import Module
+from torch.utils.data import DataLoader
 
 from AI.src.modeling import build_model
 from AI.src.data import build_dataloader
@@ -35,10 +37,10 @@ DEFAULT_CONFIG_PATH: Dict[str, pathlib.Path] = {
 def main(args: argparse.Namespace) -> None:
     config: DotDict = ConfigReader(args.config).config
 
-    train_dataloader = build_dataloader(copy.deepcopy(config), "train")
-    val_dataloader = build_dataloader(copy.deepcopy(config), "val")
+    train_dataloader: DataLoader = build_dataloader(copy.deepcopy(config), "train")
+    val_dataloader: DataLoader = build_dataloader(copy.deepcopy(config), "val")
 
-    model: torch.nn.Module = build_model(copy.deepcopy(config))
+    model: Module = build_model(copy.deepcopy(config))
     optim, scheduler = build_optimizer(copy.deepcopy(config), model)
 
     loss: LossWrapper = LossWrapper(copy.deepcopy(config))

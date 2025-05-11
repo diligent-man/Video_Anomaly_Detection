@@ -137,7 +137,7 @@ async def upload_video(file: UploadFile = File(...)):
 async def get_video(video_name: str):
     """ Lấy video theo tên """
     decoded_filename = unquote(video_name)
-    file_path = VIDEO_DIR / decoded_filename
+    file_path = Path(f"{VIDEO_DIR}{os.sep}{decoded_filename}")
 
     if not file_path.exists():
         return JSONResponse(status_code=404, content={"message": "File not found"})
@@ -153,7 +153,7 @@ async def list_videos():
     """ Liệt kê danh sách video """
     try:
         videos = []
-        for file in VIDEO_DIR.glob("*"):
+        for file in Path(VIDEO_DIR).glob("*"):
             if file.suffix.lower() in ['.mp4', '.avi', '.mov', '.mkv']:
                 # Use file creation time as upload date
                 upload_date = datetime.fromtimestamp(file.stat().st_ctime).isoformat()

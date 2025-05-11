@@ -5,7 +5,7 @@ from typing import Dict, Any, List, Tuple, Callable
 
 import torch
 from torch import Tensor
-from torch.nn import Module
+from torch.nn import Module, ModuleList, ModuleDict
 
 from ..nn import MLP
 from ...utils import DotDict, freeze_layer
@@ -31,7 +31,7 @@ class VADDistillModel(Module):
         self.__soft_label_threshold = self.__config.pop("soft_label_threshold", 0.5)
 
         self.feat_preprocessing: None | Module = self._build_feat_preprocessing()
-        self.models: Dict[str, List[Module]] = self._build_student_teacher()
+        self.models: Module = self._build_student_teacher()
 
     def __repr__(self) -> str:
         prompt = (f"{self.__class__.__name__} includes {self.models['teacher'].__len__()} teacher(s) "
@@ -50,7 +50,7 @@ class VADDistillModel(Module):
             feat_preprocessing: Module = self.__FEAT_PREPROCESSING[name](**feat_preprocessing.get_dict())
         return feat_preprocessing
 
-    def _build_student_teacher(self) -> Dict[str, List[Module]]:
+    def _build_student_teacher(self) -> ModuleDict:
         """
         :return: Build student and teacher with specified config in respective manner
         """
@@ -69,6 +69,7 @@ class VADDistillModel(Module):
                 models["student"].append(model)
             else:
                 model: Module = BaseModel(self.__config.models[model_type])
+
                 trainable_layers: True = self.__config.models[model_type].get("trainable_layers", 0)
                 assert trainable_layers == 0, ValueError("All layers must be non-trainable in offline distillation training")
 
@@ -81,7 +82,11 @@ class VADDistillModel(Module):
                 model.load_state_dict(ckpt["model"] if isinstance(ckpt["model"], dict) else ckpt["model"].state_dict())
                 model, _, _ = freeze_layer(model, trainable_layers)
                 models["teacher"].append(model)
-        return models
+
+        models: Dict[str, ModuleList[Module]]
+        models["student"] = ModuleList(models["student"])
+        models["teacher"] = ModuleList(models["teacher"])
+        return ModuleDict(models)
 
     def _forward_student(self, anomaly: Tensor, normal: Tensor, model: Module) -> VADDistillModelOutput:
         # Outs includes: logits & feats
@@ -108,12 +113,10 @@ class VADDistillModel(Module):
         soft_preds: Tensor = torch.cat((anomaly_outs.logits, normal_outs.logits), dim=1)  # (B,2*S)
         return VADDistillModelOutput(soft_preds=soft_preds, hard_preds=hard_preds, feats=feats)
 
-    def forward(self, anomaly: Tensor, normal: Tensor, device: str)\
-            -> Tuple[List[VADDistillModelOutput], List[VADDistillModelOutput]]:
+    def forward(self, anomaly: Tensor, normal: Tensor) -> Tuple[List[VADDistillModelOutput], List[VADDistillModelOutput]]:
         """
         :param anomaly: list of input tensors in the format of Shape (S,C,T,H,W) or (B,S,C,T,H,W)
         :param normal:                                  //
-        :param device: computing device
         :return: BaseModelOutput obj
 
         Student's out:
@@ -125,10 +128,11 @@ class VADDistillModel(Module):
             logits (soft labels): shape (B,S)
             prob (hard labels): shape (B,S)
         """
+        # print(anomaly.shape, normal.shape, device)
         outs: Dict[str, List[VADDistillModelOutput]] = defaultdict(list)
 
         for model_type in ["student", "teacher"]:
             for model in self.models[model_type]:
                 fn: Callable = getattr(self, f"_forward_{model_type}")
-                outs[model_type].append(fn(anomaly.to(device), normal.to(device), model))
+                outs[model_type].append(fn(anomaly, normal, model))
         return outs["student"], outs["teacher"]

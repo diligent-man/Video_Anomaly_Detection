@@ -13,16 +13,16 @@ from transformers.modeling_outputs import BaseModelOutputWithPooling
 from .constant import NET_2D, NET_3D
 
 
-__all__ = ["ModelForwarder"]
+__all__ = ["MultiBackboneForwarder"]
 
 
-class ModelForwarder(object):
+class MultiBackboneForwarder(object):
     _model: Module
     _name: str
     _reduce: partial
 
     def __init__(self, model: Module, name: str, reduce: partial) -> None:
-        super(ModelForwarder, self).__init__()
+        super(MultiBackboneForwarder, self).__init__()
         self._model = model
         self._name = name
         self._reduce = reduce

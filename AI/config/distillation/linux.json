@@ -16,16 +16,16 @@
 
         // Resume training
         "resume": false,
-        "resume_ckpt": "",
+        "resume_ckpt": null,
 
         // GradScaled is automatically init when use_amp=True
         "use_amp": true,
         "seed": 12345,
         "device": "cuda",
 
-        "inspect_model_arch": false,
+        "inspect_model_arch": true,
         "inspect_depth": 7,
-        "dummy_input_shape": [1, 32, 3, 13, 224, 224]
+        "dummy_input_shape": [[1, 32, 3, 13, 224, 224], [1, 32, 3, 13, 224, 224]]
     },
 
     "data":
@@ -53,7 +53,7 @@
             "dataloader":
             {
                 "name": "VADVideoLevelDataLoader",
-                "batch_size": 4,
+                "batch_size": 3,
                 "shuffle": true,
                 "method": 1,  // sampled by min datasource
                 "num_workers": 4,
@@ -162,12 +162,17 @@
             },
             "teacher":
             {
-                "pretrained": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/AIP391/single/train/input_2d/ckpt/best_epoch9_step2033.pt",
+                "pretrained": "/home/trong/Downloads/Local/Source/Python/semester_9/AIP391/Video_anomaly_detection/AI/results/final_train_result/teacher/input_mixed/v1/ckpt/best_epoch13_step2937.pt",
                 "backbone":
                 {
-                    "name": ["clip_vit/b16"],
+                    "name": ["rgb_i3d", "s3d", "clip_vit/b16"],
+
                     "clip_vit/b16_reduce": {"name":  "max_l2"},
-                    "compile": true,
+                    "rgb_i3d_reduce": {"name":  "max_l2"},
+                    "s3d_reduce": {"name":  "max_l2"},
+
+                    "compile": false,
+
                     "out_proj":
                     {
                         "hid_dim": [512],
@@ -185,9 +190,9 @@
                 "neck":
                 {
                     "name":"TAN",
-                    "num_backbones": 1,
+                    "num_backbones": 3,
                     "num_heads": 8,
-                    "max_relative_position": 10,
+                    "max_relative_position": 25,
                     "relative_attention": true,
                     "return_neck_out": true
                 },
@@ -282,7 +287,7 @@
 
         {
             "name": "Mlflow",
-            "apply": true,
+            "apply": false,
             "push_to_remote": false,
             "prev_run_id": null,
             "init_server_on_run": false,

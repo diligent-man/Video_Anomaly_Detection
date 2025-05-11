@@ -14,7 +14,7 @@ from transformers.modeling_outputs import BaseModelOutputWithPooling
 
 
 from ..nn import MLP
-from .ModelForwarder import ModelForwarder
+from .MultiBackboneForwarder import MultiBackboneForwarder
 from .constant import (
     NET_DEFAULT_CONFIG,
     NET_2D, NET_3D,
@@ -31,7 +31,7 @@ from ...utils import (
 
 __all__ = [
     "build_backbone",
-    "ModelForwarder",
+    "MultiBackboneForwarder",
     "NET_DEFAULT_CONFIG",
     "NET_2D", "NET_3D",
     "NET_2D_REDUCE", "NET_3D_REDUCE",

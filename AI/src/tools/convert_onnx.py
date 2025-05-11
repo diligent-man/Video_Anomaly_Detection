@@ -18,9 +18,9 @@ def main() -> None:
     }
 
     SAVE_PATH = {
-        "rgb_i3d": r"C:\Users\NDT\Downloads\rgb_i3d.pt",
-        "s3d": r"C:\Users\NDT\Downloads\s3d.pt",
-        "clip_vit/b16": r"C:\Users\NDT\Downloads\clip_vit_b16.pt",
+        "rgb_i3d": r"~\Downloads\rgb_i3d.pt",
+        "s3d": r"~\Downloads\s3d.pt",
+        "clip_vit/b16": r"~\Downloads\clip_vit_b16.pt",
     }
 
     for (model_name, trace_arg), return_node, save_path in zip(TRACER_ARGS.items(),

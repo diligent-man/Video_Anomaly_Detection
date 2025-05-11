@@ -130,7 +130,7 @@ def v2(instance: Trainer,
         instance.callback("on_step_begin")
         with grad_ctx, torch.amp.autocast(**amp_cfg):
             anomaly, normal = torch.chunk(inps, 2, 1)
-            student_outs, teacher_outs = instance.model(anomaly, normal, device)
+            student_outs, teacher_outs = instance.model(anomaly.to(device), normal.to(device))
 
             if loss is not None:
                 batch_loss: Tensor = loss.compute_batch_loss(student_outs, teacher_outs)
