@@ -79,4 +79,4 @@ Collected YouTube videos are categorized into specific action-based folders such
 Each playlist contains surveillance or incident footage matching the category. This helps structure the dataset for action recognition or anomaly detection.
 
 Categorized YouTube playlists by action
-
+![image alt](https://github.com/diligent-man/Video_Anomaly_Detection/blob/90e31539a09febf904ac2c6050d6b5269f6c47e4/data_youtube.png)
