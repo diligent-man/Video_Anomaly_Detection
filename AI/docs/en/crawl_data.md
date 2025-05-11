@@ -1,16 +1,16 @@
-# YouTube Video Downloader theo Chủ Đề
+# YouTube Video Downloader by Topic
 
-Script dùng `yt_dlp` để tải video từ các playlist YouTube và phân loại vào thư mục theo từng hành động như `abuse`, `arrest`, `robbery`, v.v.
+The script uses `yt_dlp` to download videos from YouTube playlists and categorize them into folders according to actions like `abuse`, `arrest`, `robbery`, etc.
 
-## Yêu cầu
+## Requirements
 
-* Python 3.10 trở lên
-* Thư viện `yt_dlp`
-* File cookies từ trình duyệt để truy cập các video có giới hạn (nếu cần)
+* Python 3.10 or later
+* `yt_dlp` library
+* Cookies from browser to access restricted videos (if needed)
 
-## Khuyến nghị
+## Recommendations
 
-* Nên dùng Conda để tạo môi trường ảo:
+* Conda is recommended for creating virtual environments:
 
 ```bash
 conda create -n yt_downloader python=3.10
@@ -18,35 +18,35 @@ conda activate yt_downloader
 pip install yt-dlp
 ```
 
-* Để tải được video bị giới hạn hoặc cần đăng nhập, cần dùng extension để lấy cookies từ trình duyệt:
+* To download restricted videos or videos that require login, you need to use an extension to get cookies from your browser:
 
-  * Extension: [Get cookies.txt](https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc)
-  * Sau khi cài, vào YouTube, đăng nhập bằng tài khoản của bạn, nhấn vào extension để tải file cookies.
-  * Lưu file lại (tên gì cũng được, ví dụ `cookies.txt`).
+* Extension: [Get cookies.txt](https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc)
+* After installing, go to YouTube, log in with your account, click on the extension to download the cookies file.
+* Save the file (any name is fine, for example `cookies.txt`).
 
-## Chạy script
+## Run the script
 
-1. Đặt file cookies trong cùng thư mục với script, và cập nhật dòng sau trong mã Python nếu tên file khác:
+1. Place the cookies file in the same directory as the script, and update the following line in the Python code if the file name is different:
 
 ```python
-"cookiefile": "tên_file_cookies_của_bạn.txt"
+"cookiefile": "your_cookies_filename.txt"
 ```
 
-2. Sau đó chạy:
+2. Then run:
 
 ```bash
 python crawl_data.py
 ```
 
-## Kết quả
+## Result
 
-Video sẽ được tải vào thư mục `crawled data`, mỗi chủ đề là một thư mục con. Video được đặt tên theo định dạng:
+The video will be uploaded to the `crawled data` folder, each topic is a subfolder. The video is named in the format:
 
 ```
-crawled_{ten_chu_de}_{000001}.mp4
+crawled_{topic_name}_{000001}.mp4
 ```
 
-Ví dụ:
+For example:
 
 ```
 crawled data/
@@ -56,10 +56,11 @@ crawled data/
 │   └— crawled_robbery_000001.mp4
 ...
 
-## Ghi chú
+## Note
 
-* File cookies là **tùy theo máy**, nên mỗi người cần tự tạo bằng trình duyệt của mình.
-* Nếu gặp lỗi, hãy kiểm tra lại URL playlist hoặc cập nhật `yt_dlp` bằng lệnh:
+* Cookies are **machine specific**, so each person needs to create their own using their browser.
+
+* If you encounter any errors, please check your playlist URL or update `yt_dlp` with the command:
 
 ```bash
 pip install -U yt-dlp
