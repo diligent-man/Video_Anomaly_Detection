@@ -42,12 +42,12 @@ For the ease of source code management, this repo encompasses all implemented co
 
 ## 🚩 Project Expected Output
 ### Normal case
-<video height="360" controls autoplay>
-  <source src="./AI/misc/demo_output/normal_case.mp4" type="video">
+<video height="360" width="720" controls autoplay muted>
+  <source src="./AI/misc/demo_output/normal_case.mp4" type="video/mp4">
 </video>
 
 ### Anomalous case
-<video height="360" controls autoplay>
+<video height="360" width="720" controls autoplay muted>
   <source src="./AI/misc/demo_output/anomalous_case.mp4" type="video/mp4">
 </video>
 
