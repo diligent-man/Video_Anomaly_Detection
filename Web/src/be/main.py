@@ -3,7 +3,6 @@ import os
 
 
 def main() -> None:
-    # Tăng timeout và worker để xử lý file lớn
     uvicorn.run(
         "src.app:app",
         host="0.0.0.0",
