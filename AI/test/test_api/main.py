@@ -8,7 +8,7 @@ def main() -> None:
         "file": open("./crawled_assault_000002.mp4", "rb")
     }
 
-    response = rq.post(url="http://0.0.0.0:6968/infer", files=files)
+    response = rq.post(url="http://0.0.0.0:6973/infer", files=files)
     print(response.json())
     print(type(response.json()["fps"]))
     return None

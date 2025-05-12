@@ -78,7 +78,7 @@ class VideoPreprocessor(object):
         Stage one includes:
             a/ Resampling video with specified fps
             b/ Rescale frame
-            c/ Central crop frame (temporarily disabled)
+            c/ Central crop frame
             d/ Save video stream as output
         """
         if not os.path.exists(self.__spath):

@@ -211,7 +211,7 @@ if __name__ == "__main__":
                                  )
 
     argument_parser.add_argument("--processes",
-                                 default=os.cpu_count(),
+                                 default=os.cpu_count() // 2,
                                  type=int,
                                  help="Num processes for multiprocessing")
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     argument_parser.add_argument("--wait_time",
                                  default=20,
                                  type=int,
-                                 help="Waiting time when running async manner")
+                                 help="Waiting time when running in an async manner")
 
     # Take effect from stage 2
     argument_parser.add_argument("--del_prev_result",
@@ -239,12 +239,12 @@ if __name__ == "__main__":
     argument_parser.add_argument("--include_labeled",
                                  default=False,
                                  type=lambda x: (str(x).lower() == "true"),
-                                 help="Delete previous stage result")
+                                 help="Also split labeled video into segements that will be used for train/ val later on.")
 
     # Take effect from stage 3
     argument_parser.add_argument("--vid_ext",
                                  type=_video_ext,
-                                 help="Video extension")
+                                 help="List of video extension string for being ignored when moving remaining files.")
 
     parsed_args = argument_parser.parse_args()
     main(parsed_args)
