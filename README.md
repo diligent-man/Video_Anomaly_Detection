@@ -42,10 +42,10 @@ For the ease of source code management, this repo encompasses all implemented co
 
 ## 🚩 Project Expected Output
 ### Normal case
-https://github.com/user-attachments/assets/3ef104ea-0f68-4a22-9ea0-c5494726fc2e  
+https://github.com/user-attachments/assets/5685ccc3-cb3a-4a23-87cf-acc0dccc29bb
 
 ### Anomalous case
-https://github.com/user-attachments/assets/5685ccc3-cb3a-4a23-87cf-acc0dccc29bb
+https://github.com/user-attachments/assets/3ef104ea-0f68-4a22-9ea0-c5494726fc2e  
 
 ## ✨ Key Features That Might Render You Enthralling Or Not:
 * ⚡ **Easy-to-configure model [Trainer](./AI/src/runner/Trainer.py) and [Tester](AI/src/runner/Tester.py)**: Quickly training and testing DL-based VAD model with json and yaml-supported configuration.  
