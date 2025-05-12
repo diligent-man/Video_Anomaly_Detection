@@ -50,7 +50,7 @@ class smooth_signal:
         window_length, polyorder = cls.validate_params(len(signal))
 
         """Apply Savitzky-Golay filter to signal"""
-        signal = np.array(signal)
+        signal: np.ndarray = np.array(signal)
 
         # Handle very short signals
         if len(signal) <= polyorder + 2:
