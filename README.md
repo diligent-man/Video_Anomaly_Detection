@@ -48,7 +48,7 @@ For the ease of source code management, this repo encompasses all implemented co
 
 ### Anomalous case
 <video height="360" width="720" controls autoplay muted>
-  <source src="https://github.com/diligent-man/Video_Anomaly_Detection/blob/main/AI/misc/demo_output/anomalous_case.mp4" type="video/mp4">
+  <source src="AI/misc/demo_output/anomalous_case.mp4" type="video/mp4">
 </video>
 
 ## ✨ Key Features That Might Render You Enthralling Or Not:
