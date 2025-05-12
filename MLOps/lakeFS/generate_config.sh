@@ -37,7 +37,6 @@ blockstore:
 
         # endpoint is specified in docker compose instead in this
 
-
 auth:
     login_duration: "24h"
     login_max_duration: "24h"

@@ -3,7 +3,7 @@ In our project, we make such an assumption that both AI and Web services will be
 
 ## AI service
 #### 1/ Prepare model
-If model is from remote mlflow tracking server, please use [mlflow_export_import](../../script/linux/mlflow_export_import.sh) script to download appropriate experiment at first. You, then, modify appropriate path(s) for backbone's weight in downloaded configuration file.
+If model is from remote mlflow tracking server, please use [mlflow_export_import](../../script/linux/mlflow_export_import.sh) script to download appropriate experiment at first. You, then, modify appropriate path(s) for backbone's weight in downloaded configuration file. Check [this](./weight_info.md) for backbones' weight and our pretrained models.
 
 #### 2/ Environment variable in Docker
 There are four environment variables, be it `DEVICE`, `WEIGHT_PATH`, `PORT` and `CONFIG_PATH`, you should pay your attention to. `WEIGHT_PATH` is path to deployed model's weight with root from /weight. `CONFIG_PATH` is path to deployed model's configuration json file with root from /weight. `PORT` is used in case of port conflict circumstance.

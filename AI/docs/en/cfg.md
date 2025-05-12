@@ -2,7 +2,7 @@
 Our configuration file is responsible for managing 7 important fields, namely global, data, architecture, etc., and these settings can substantially affect the model's behavior at various stages, including training and testing.
 
 # Global
-| Argument             | Default                                     | Description                                                                                                                                          |
+| Parameter            | Default                                     | Description                                                                                                                                          |
 |----------------------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `save_dir`           | <p align=center> `"results"`                | Final save dir is joined from <save_dir>, <project_name>, <experiment_name>, <technique>, <mode> and <experiment_name>.                              |
 | `project_name`       | <p align=center> `"nameless_project"`       | <p align=center> See save_dir arg.                                                                                                                   |
@@ -17,7 +17,7 @@ Our configuration file is responsible for managing 7 important fields, namely gl
 | `resume`             | <p align=center> `False`                    | Continue to train old model or not.                                                                                                                  |
 | `resume_ckpt`        | <p align=center> `""`                       | Path to checkpoint for resuming.                                                                                                                     |
 | `use_amp`            | <p align=center> `False`                    | Apply mixed precision training or not. More details at [this](https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html). |
-| `seed`               | <p align=center> `n/a`                      | Currently, we did not implement for the use of this argument.                                                                                        |
+| `seed`               | <p align=center> `n/a`                      | Currently, we did not implement for the use of this Parameter.                                                                                        |
 | `device`             | <p align=center> `"cpu"`                    | Device to run model on. We just fully experimented with "cpu" and "cuda".                                                                            |
 | `inspect_model_arch` | <p align=center> `False`                    | Retrieve model architecture by torchinfo or not. Retrieved info is automatically logged out in conjunction with mlflow service.                      |
 | `inspect_depth`      | <p align=center> `3`                        | Depth of nested layers to display (e.g. Sequentials). Nested layers below this depth will not be displayed in the summary.                           |
@@ -26,40 +26,40 @@ Our configuration file is responsible for managing 7 important fields, namely gl
 # Data
 Currently, dataset building process only accept "train" | "val" | "test" mode. Each process requires config for dataset, dataloader, and forward_strategy.
 ### dataset 
-| Argument           | Default               | Description                                                                                                                                                                                                          |
-|--------------------|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `name`             | <p align=center> --   | Name of dataset. Each dataset is inherited from torch.utils.data.Dataset [source](https://github.com/pytorch/pytorch/blob/v2.7.0/torch/utils/data/dataset.py#L39). See at [this](../../src/data/dataset/__init__.py) |
-| `transform`        | <p align=center> None | Required field for each dataset implementation. Transform is applied on read input data. More details at [this](../../src/data/transform/__init__.py)                                                                |
-| `target_transform` | <p align=center> None | Required field for each dataset implementation. Target transform is applied on read label data. More details at [this](../../src/data/transform/__init__.py)                                                         |
-| `kwarg`            | <p align=center> ---  | Other arguments required for building dataset. Detailed information is at each dataset.                                                                                                                              |
+| Parameter           |  Default              | Description                                                                                                                                                                                                          |
+|---------------------|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`              | <p align=center> --   | Name of dataset. Each dataset is inherited from torch.utils.data.Dataset [source](https://github.com/pytorch/pytorch/blob/v2.7.0/torch/utils/data/dataset.py#L39). See at [this](../../src/data/dataset/__init__.py) |
+| `transform`         | <p align=center> None | Required field for each dataset implementation. Transform is applied on read input data. More details at [this](../../src/data/transform/__init__.py)                                                                |
+| `target_transform`  | <p align=center> None | Required field for each dataset implementation. Target transform is applied on read label data. More details at [this](../../src/data/transform/__init__.py)                                                         |
+| `kwarg`             | <p align=center> ---  | Other arguments required for building dataset. Detailed information is at each dataset.                                                                                                                              |
 
 ### dataloader
-| Argument  | Default              | Description                                                                                                                                                                 |
-|-----------|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `name`    | <p align=center> --  | Name of dataloader. Each dataloader is inherited from torch.utils.data.Dataset [source](https://github.com/pytorch/pytorch/blob/v2.7.0/torch/utils/data/dataloader.py#L131) |
-| `kwarg`   | <p align=center> --  | Other arguments required for building dataloader. Details at [this](../../src/data/dataloader/__init__.py)                                                                  |
+| Parameter   | Default              | Description                                                                                                                                                                 |
+|-------------|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`      | <p align=center> --  | Name of dataloader. Each dataloader is inherited from torch.utils.data.Dataset [source](https://github.com/pytorch/pytorch/blob/v2.7.0/torch/utils/data/dataloader.py#L131) |
+| `kwarg`     | <p align=center> --  | Other arguments required for building dataloader. Details at [this](../../src/data/dataloader/__init__.py)                                                                  |
 
 ### forward_strategy 
-| Argument                  | Default                        | Description                                                        |
-|---------------------------|--------------------------------|--------------------------------------------------------------------|
-| `forward_strategy`        | <p align=center> `--`          | Name of loop that would be used in training or testing phase.      |
-| `overridden_args`         | <p align=center> `DotDict({})` | Arguments to be overriden in specified forward_strategy function.  |
+| Parameter          | Default                        | Description                                                        |
+|--------------------|--------------------------------|--------------------------------------------------------------------|
+| `forward_strategy` | <p align=center> `--`          | Name of loop that would be used in training or testing phase.      |
+| `overridden_args`  | <p align=center> `DotDict({})` | Arguments to be overriden in specified forward_strategy function.  |
 
 # Architecture
 Our implementations consist of two different types of model architecture: single model architecture (called one-stage training) and distilled model architecture (called two-stage training). The base class for build model is [BaseModel](../../src/modeling/architectures/BaseModel.py) which splits building process into four stages: build_backbone, build_neck, build_head and build_postprocessing. Each stage can be left blank if necessary.  
 ### One-stage training (a.k.a Teacher model)
-| Argument    | Default                     | Description                                                                                                      |
-|-------------|-----------------------------|------------------------------------------------------------------------------------------------------------------|
-| `algorithm` | <p align=center> `"single"` | Name of loop that would be used in training or testing phase. Currently, we support "single" and "distillation". |
-| `backbone`  | <p align=center> `--`       | Corresponding kwarg for building backbone. More details at [this](../../src/modeling/backbones/__init__.py).     |
-| `neck`      | <p align=center> `--`       | Corresponding kwarg for building backbone. More details at [this](../../src/modeling/necks/__init__.py).         |
-| `head`      | <p align=center> `--`       | Corresponding kwarg for building backbone. More details at [this](../../src/modeling/heads/__init__.py).         |
+| Parameter    | Default                     | Description                                                                                                      |
+|--------------|-----------------------------|------------------------------------------------------------------------------------------------------------------|
+| `algorithm`  | <p align=center> `"single"` | Name of loop that would be used in training or testing phase. Currently, we support "single" and "distillation". |
+| `backbone`   | <p align=center> `--`       | Corresponding kwarg for building backbone. More details at [this](../../src/modeling/backbones/__init__.py).     |
+| `neck`       | <p align=center> `--`       | Corresponding kwarg for building backbone. More details at [this](../../src/modeling/necks/__init__.py).         |
+| `head`       | <p align=center> `--`       | Corresponding kwarg for building backbone. More details at [this](../../src/modeling/heads/__init__.py).         |
 
 
 ### Two-stage training (a.k.a Student model)
 In this two-stage training, we support feature-based distillation algorithm at the moment.
 
-| Argument               | Default                     | Description                                                                                                                                                                                                                                                                                                                 |
+| Parameter              | Default                     | Description                                                                                                                                                                                                                                                                                                                 |
 |------------------------|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `algorithm`            | <p align=center> `"single"` | <p align=center> See one-stage training.                                                                                                                                                                                                                                                                                    |
 | `soft_label_threshold` | <p align=center> `0.5`      | Threshold for converting teacher model's prediction into pseud-labels that are used in calculating distillation loss later on.                                                                                                                                                                                              |
@@ -69,28 +69,28 @@ In this two-stage training, we support feature-based distillation algorithm at t
 
 # Optimizer
 
-| Argument          | Default                        | Description                                                                                                    |
+| Parameter         | Default                        | Description                                                                                                    |
 |-------------------|--------------------------------|----------------------------------------------------------------------------------------------------------------|
 | `lr.name`         | <p align=center> `None`        | Name of optimizer used for training. Currently, we support all optimizers from PyTorch.                        |
-| `lr.kwarg`        | <p align=center> `DotDict({})` | Corresponding argument to selected optimizer. See more at [here](../../src/optimizer/optimizer/__init__.py)    |
+| `lr.kwarg`        | <p align=center> `DotDict({})` | Corresponding Parameter to selected optimizer. See more at [here](../../src/optimizer/optimizer/__init__.py)    |
 | `scheduler.name`  | <p align=center> `None`        | Name of learning scheduler for training. See more at [this](../../src/optimizer/lr_scheduler/__init__.py)      |
-| `scheduler.kwarg` | <p align=center> `DotDict({})` | Corresponding argument to selected optimizer. See more at [here](../../src/optimizer/lr_scheduler/__init__.py) |                                                                                                                                                                                                                                                                                                                            |
+| `scheduler.kwarg` | <p align=center> `DotDict({})` | Corresponding Parameter to selected optimizer. See more at [here](../../src/optimizer/lr_scheduler/__init__.py) |                                                                                                                                                                                                                                                                                                                            |
 | `regularizer`     | <p align=center> `--`          | Not developed !                                                                                                |
 
 
 # Metric
-| Argument   | Default                  | Description                                                                                                                                                 |
-|------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `in_train` | <p align=center> `False` | Calculate metrics during train or not.                                                                                                                      |
-| `in_val`   | <p align=center> `False` | Calculate metrics during val or not.                                                                                                                        |
-| `in_test`  | <p align=center> `False` | Calculate metrics during test or not.                                                                                                                       |
-| `metrics`  | <p align=center> `[]`    | "name" and other corresponding kwarg for selected metric. Required to specify at least 1 metric regardless of value of `in_train` or `in_val` or `in_test`. |
+| Parameter    | Default                  | Description                                                                                                                                                 |
+|--------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `in_train`   | <p align=center> `False` | Calculate metrics during train or not.                                                                                                                      |
+| `in_val`     | <p align=center> `False` | Calculate metrics during val or not.                                                                                                                        |
+| `in_test`    | <p align=center> `False` | Calculate metrics during test or not.                                                                                                                       |
+| `metrics`    | <p align=center> `[]`    | "name" and other corresponding kwarg for selected metric. Required to specify at least 1 metric regardless of value of `in_train` or `in_val` or `in_test`. |
 
 # Loss
-| Argument | Default                 | Description                                                                                                                                                  |
-|----------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `name`   | <p align=center> `None` | Name of loss used during training                                                                                                                            |
-| `kwarg`  | <p align=center> `{}`   | Corresponding kwargs for selected loss. More details at [__LOSSES](../../src/losses/LossWrapper.py) field of [LossWrapper](../../src/losses/LossWrapper.py)  |
+| Parameter  | Default                 | Description                                                                                                                                                  |
+|------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `name`     | <p align=center> `None` | Name of loss used during training                                                                                                                            |
+| `kwarg`    | <p align=center> `{}`   | Corresponding kwargs for selected loss. More details at [__LOSSES](../../src/losses/LossWrapper.py) field of [LossWrapper](../../src/losses/LossWrapper.py)  |
 
 
 # Services
@@ -100,7 +100,7 @@ At the moment, we offer services (also called callbacks) as below:
 * Integrated service: Mlflow (configurable, only Trainer).
 
 ### Checkpointer
-| Argument                  | Default                       | Description                                                                                                       |
+| Parameter                 | Default                       | Description                                                                                                       |
 |---------------------------|-------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | `save_dir`                | <p align=center> `--`         | Directory for saving satisfied checkpoints during training.                                                       |
 | `mode`                    | <p align=center> `"min"`      | How best value is updated. Currently, we offer `"min"`.                                                           |
@@ -114,7 +114,7 @@ At the moment, we offer services (also called callbacks) as below:
 | `verbose`                 | <p align=center> `True`       | Prompt monitored quantity wordily.                                                                                |
 
 ### Earlystopper
-| Argument           | Default                       | Description                                                                |
+| Parameter          | Default                       | Description                                                                |
 |--------------------|-------------------------------|----------------------------------------------------------------------------|
 | `mode`             | <p align=center> `"min"`      | How best value is evaluated to early stop. Currently, we offer `"min"`.    |
 | `monitor`          | <p align=center> `"val_loss"` | Monitored quantity for evaluating early stop condition.                    |
@@ -124,7 +124,7 @@ At the moment, we offer services (also called callbacks) as below:
 | `verbose`          | <p align=center> `True`       | Prompt result wordily.                                                     |
 
 ### Mlflow
-| Argument              | Default                  | Description                                                                                                |
+| Parameter             | Default                  | Description                                                                                                |
 |-----------------------|--------------------------|------------------------------------------------------------------------------------------------------------|
 | `save_dir`            | <p align=center> `--`    | Directory for saving mlflow experiment.                                                                    |
 | `prev_run_id`         | <p align=center> `None`  | Continue to use previous experiment, especially useful for resuming training.                              |

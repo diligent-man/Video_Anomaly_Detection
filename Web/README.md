@@ -1,4 +1,4 @@
-# 🛠️ Project Setup Guide
+# 🛠️ Web Setup Guide
 
 ## 📦 Backend (BE)
 

@@ -144,8 +144,8 @@ services:
 
         volumes:
             - ~/MLOps_data/minio/shard1:/shard1
-#            - /mnt/MINIO1/shard2:/shard2
-#            - /mnt/MINIO2/shard3:/shard3
+            - /mnt/MINIO1/shard2:/shard2
+            - /mnt/MINIO2/shard3:/shard3
 
         restart: on-failure
 

@@ -40,8 +40,16 @@ For the ease of source code management, this repo encompasses all implemented co
 ## 🔎 Panoptic view of system
 <img src="./AI/misc/fig/sys_des.jpg" alt=""/>
 
-[//]: # (## 🚩 Project Output)
-[//]: # (Writer later)
+## 🚩 Project Expected Output
+### Normal case
+<video height="360" controls>
+  <source src="./AI/misc/demo_output/normal_case.mkv" type="video/mp4">
+</video>
+
+### Anomalous case
+<video height="360" controls>
+  <source src="./AI/misc/demo_output/anomalous_case.mkv" type="video/mp4">
+</video>
 
 ## ✨ Key Features That Might Render You Enthralling Or Not:
 * ⚡ **Easy-to-configure model [Trainer](./AI/src/runner/Trainer.py) and [Tester](AI/src/runner/Tester.py)**: Quickly training and testing DL-based VAD model with json and yaml-supported configuration.  
@@ -70,5 +78,8 @@ We want to send our gratitude to following repos due to their inspiration for ou
 * [Ultralytics](https://github.com/ultralytics/ultralytics) (a.k.a YOLO)
 * [Torchvision](https://github.com/pytorch/vision) (part of PyTorch project)
 
-## License:
+## 📃 License:
 This project is released under [MIT license](./LICENSE) <img src="./AI/misc/fig/MIT_license.png" alt="" width="15"/> .
+
+## ⚠️ Disclaimer:
+Our implemented code was not fully tested owing to the time and resource limitations, thus it should be used with your own risk !!!

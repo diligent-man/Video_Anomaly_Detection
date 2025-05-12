@@ -69,13 +69,13 @@ In order to evade dependencies conflict with other environment, we highly recomm
 pip install -r requirement.txt
 ```
 # Usage
-### For crawling data from YouTube
-Please read at [here](./docs/en/crawl_data.md)
-### For data preprocessing
-Please read at [here](./docs/en/data_preprocessing.md)
-### For training model
+### 1/ For crawling data from YouTube
+Please read [this](./docs/en/crawl_data.md).
+### 2/ For data preprocessing
+Please read [this](./docs/en/data_preprocessing.md).
+### 3/ For training model
+Please read [this](./docs/en/cfg.md).
+### 3/ For testing model
 Please read at [here](./docs/en/cfg.md)
-### For testing model
-Please read at [here](./docs/en/cfg.md)
-### For deploying model
-Please read at [here](./docs/en/deploy_model.md)
+### 4/ For deploying model
+Please read [this](./docs/en/deploy_model.md).
